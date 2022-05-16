@@ -1,0 +1,145 @@
+@white: #fff;
+@form-bg: #f8f7f6;
+@form-card-title: #bd1738;
+@form-card-bg: #ece9e7;
+@card-border-radius: 10px;
+@card-title-underline-border:4px solid #bcb2aa;
+@form-label-color: #68655c;
+@form-card-sec-title-bg: #f6ecd2;
+@form-card-sec-title-color: #231f20;
+@border-color: #bcb2aa;
+@primary-color: #bd1738;
+@import '~antd/dist/antd.less';
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+img {
+  padding: 0;
+  margin: 0;
+}
+
+.form_header {
+  height: 185px;
+  position: relative;
+  background: url(~@/assets/banner.png);
+  text-align: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  .form_title {
+    font-size: 24px;
+    color: @white;
+    line-height: 185px;
+
+    font-weight: bold;
+  }
+
+  .form_logo {
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    background-color: @white;
+    img {
+      vertical-align: middle;
+    }
+  }
+}
+.form_content {
+  .ant-input[disabled] {
+    background-color: @form-card-bg;
+  }
+  margin: 10px;
+  .ant-card {
+    margin-top: 20px;
+    border-radius: @card-border-radius;
+    background-color: @form-bg;
+    .ant-card-head {
+      color: @form-card-title;
+      background-color: @form-card-bg;
+      border-radius: @card-border-radius @card-border-radius 0 0;
+      border-bottom: @card-title-underline-border;
+      height: 50px;
+      line-height: 50px;
+    }
+    .ant-card-head-title {
+      font-weight: bold;
+      font-size: 20px;
+      padding: 0;
+    }
+    .fileWrapper {
+      .ant-form-item-control-input-content {
+        background-color: @white;
+        padding: 20px;
+        border: solid 1px #ebe8e5;
+        border-radius: 5px;
+      }
+      .file_upload {
+        width: 200px;
+        height: 92px;
+        text-align: center;
+        // line-height:92px;
+        background-color: #f1f1f1;
+        border-radius: 10px;
+        border: dashed 1px @border-color;
+        color: #6d6c5c;
+        .anticon {
+          font-size: 26px;
+          margin-top: 20px;
+        }
+      }
+    }
+
+    .sec-container {
+      border: 1px solid @border-color;
+      border-radius: @card-border-radius;
+      overflow: hidden;
+      .sec-title {
+        color: @form-card-sec-title-color;
+        background-color: @form-card-sec-title-bg;
+        height: 40px;
+        line-height: 40px;
+        font-weight: bold;
+        text-indent: 20px;
+      }
+      .sec-content {
+        padding: 20px;
+      }
+
+      .ant-tabs {
+        .ant-tabs-ink-bar {
+          background-color: transparent;
+        }
+        .ant-tabs-nav-list {
+          padding: 0 20px;
+        }
+        .ant-tabs-nav {
+          background-color: @form-card-sec-title-bg;
+        }
+        .ant-tabs-tab {
+          padding: 0;
+          height: 40px;
+          line-height: 40px;
+        }
+        .ant-tabs-top > .ant-tabs-nav::before,
+        .ant-tabs-bottom > .ant-tabs-nav::before,
+        .ant-tabs-top > div > .ant-tabs-nav::before,
+        .ant-tabs-bottom > div > .ant-tabs-nav::before {
+          border-bottom: none;
+        }
+        .ant-tabs-tabpane {
+          padding: 0 20px 20px;
+        }
+      }
+      .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+        color: @form-card-title;
+      }
+    }
+  }
+  .actionWrapper {
+    margin: 30px auto;
+    text-align: center;
+  }
+}
