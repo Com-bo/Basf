@@ -1083,7 +1083,8 @@ export default class SharepointService {
         item.ID = res.ID;
         this.submitTaskForm(item, link, isSubmit).then((res) => {});
       });
-    } catch {
+    } catch (e) {
+      console.log(e);
       window.parent.postMessage(
         {
           action: 'loading',
