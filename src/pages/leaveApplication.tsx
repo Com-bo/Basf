@@ -10,6 +10,7 @@ import DispForm from '@/components/LeaveForm/dispForm';
 const index = (props: any) => {
   const getContent = () => {
     console.log(props);
+    debugger;
     switch (props?.location?.query?.Action) {
       case 'New':
         return <NewForm />;
