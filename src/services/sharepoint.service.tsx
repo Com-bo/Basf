@@ -674,6 +674,7 @@ export default class SharepointService {
     fileName: string,
     libraryName: string,
     fileObject: any,
+    id: string,
     // id: string,
     token: any,
   ) {
@@ -1078,22 +1079,60 @@ export default class SharepointService {
 
   //提交表单
   submitBizForm(listName: string, item: any, link: string, isSubmit: Boolean) {
-    // try {
-    // window.parent.postMessage(
-    //   {
-    //     action: 'loading',
-    //     params: true,
-    //   },
-    //   '*',
-    // );
-    var token = this.getToken();
-    var spPageContext = this.getSpPageContextInfo();
-    item.WFApplicant = spPageContext.userId;
-    item.WFApplicantTime = new Date();
-    item.WFStatus = 'Starting';
-    item.WFStep = 0;
-    item.WFFormStatus = 'Submitted';
+    try {
+      window.parent.postMessage(
+        {
+          action: 'loading',
+          params: true,
+        },
+        '*',
+      );
+      var token = this.getToken();
+      var spPageContext = this.getSpPageContextInfo();
+      item.WFApplicant = spPageContext.userId;
+      item.WFApplicantTime = new Date();
+      item.WFStatus = 'Starting';
+      item.WFStep = 0;
+      item.WFFormStatus = 'Submitted';
+      // try {
+      // window.parent.postMessage(
+      //   {
+      //     action: 'loading',
+      //     params: true,
+      //   },
+      //   '*',
+      // );
+      var token = this.getToken();
+      var spPageContext = this.getSpPageContextInfo();
+      item.WFApplicant = spPageContext.userId;
+      item.WFApplicantTime = new Date();
+      item.WFStatus = 'Starting';
+      item.WFStep = 0;
+      item.WFFormStatus = 'Submitted';
 
+      this.addItem(listName, item, token).then((res) => {
+        item.ID = res.ID;
+        this.submitTaskForm(item, link, isSubmit).then((res) => {});
+      });
+    } catch {
+      window.parent.postMessage(
+        {
+          action: 'loading',
+          params: false,
+        },
+        '*',
+      );
+      window.parent.postMessage(
+        {
+          action: 'message',
+          params: {
+            type: 'error',
+            message: '表单提交失败！',
+          },
+        },
+        '*',
+      );
+    }
     return this.addItem(listName, item, token).then((res) => {
       item.ID = res.ID;
       return this.submitTaskForm(item, link, isSubmit);
@@ -1134,6 +1173,29 @@ export default class SharepointService {
         data: taskData,
       })
       .then((response: any) => {
+        window.parent.postMessage(
+          {
+            action: 'loading',
+            params: false,
+          },
+          '*',
+        );
+        window.parent.postMessage(
+          {
+            action: 'message',
+            params: {
+              type: 'success',
+              message: '表单提交成功！',
+            },
+          },
+          '*',
+        );
+        window.parent.postMessage(
+          {
+            action: 'closeDraw',
+          },
+          '*',
+        );
         // window.parent.postMessage(
         //   {
         //     action: 'loading',

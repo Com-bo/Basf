@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import styles from './index.less';
+import { Form, Input, Button } from 'antd';
+import SpService from '@/services/sharepoint.service';
 import './index.less';
 import {
   Form,
@@ -20,26 +23,33 @@ import moment from 'moment';
 import { CloudUploadOutlined } from '@ant-design/icons';
 const index = () => {
   //#region   固定模板
+  const formLink = 'https://www.baidu.com?ID=';
+  const wfFlowName = '06e42010-b8e3-4261-9e10-623ac10f3bf8';
+  const listName = 'LRMainItems';
   const formLink = 'http://localhost:8001/generalPurchaseForm?ID=';
   const wfFlowName = '4c8d42ce-89f7-4f0a-b8a5-962c08e510c9';
   const listName = 'GeneralPurchase';
 
   const [form] = Form.useForm();
+  const spService = new SpService();
   const formService = new FormService();
 
   //提交表单数据
   const submitForm = (formData: any, isSubmit: boolean) => {
     formData.Title = getSerialNum();
     formData.WFFlowName = wfFlowName;
+    spService.submitBizForm(listName, formData, formLink, isSubmit);
     formService.submitBizForm(listName, formData, formLink, isSubmit);
   };
 
   //获取流水号
   const getSerialNum = () => {
+    return 'SN' + moment(new Date(), 'YYYYMMDDHHmmss');
     return 'GP' + moment(new Date(), 'YYYYMMDDHHmmss');
   };
 
   //#endregion
+
   const { Option } = Select;
   const onSubmit = () => {
     submitForm(form.getFieldsValue(), true);
@@ -500,6 +510,8 @@ const index = () => {
           </Space>
         </div>
       </Form>
+      <Button onClick={onSubmit}>提交</Button>
+      <Button onClick={onSave}>保存</Button>
     </>
   );
 };
