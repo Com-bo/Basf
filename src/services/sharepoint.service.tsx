@@ -565,7 +565,7 @@ export default class SharepointService {
       });
   }
 
-  removeItem(listName: string, id: number, token: any) {
+  removeItem(listName: string, id: string, token: any) {
     let url = `${process.env.host}${
       process.env.relativePath
     }/_api/web/lists/getbytitle('${
@@ -674,7 +674,7 @@ export default class SharepointService {
     fileName: string,
     libraryName: string,
     fileObject: any,
-    id: string,
+    // id: string,
     token: any,
   ) {
     let reader = new FileReader();
@@ -690,11 +690,7 @@ export default class SharepointService {
         reader.readAsArrayBuffer(fileObject);
       },
     );
-    let url = `${process.env.host}${
-      process.env.relativePath
-    }/_api/web/getfolderbyserverrelativeurl('${
-      process.env.relativePath
-    }/${libraryName}/')/files/add(overwrite=true,url='${fileName + '.jpeg'}')`;
+    let url = `${process.env.host}${process.env.relativePath}/_api/web/getfolderbyserverrelativeurl('${process.env.relativePath}/${libraryName}/')/files/add(overwrite=true,url='${fileName}')`;
     return this._http
       .post(url, {
         headers: {
@@ -712,6 +708,25 @@ export default class SharepointService {
         } else {
           return value.d.ServerRelativeUrl;
         }
+      });
+  }
+  async deleteFileItem(listName: string, fileName: string, token: string) {
+    let url = `${process.env.host}${
+      process.env.relativePath
+    }/_api/web/GetFileByServerRelativeUrl('${
+      this.formatTable(listName).name
+    }/${fileName}')`;
+    return this._http
+      .post(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-RequestDigest': '{form_digest_value}',
+          'IF-MATCH': '{etag or *}',
+          'X-HTTP-Method': 'DELETE',
+        },
+      })
+      .then((response: any) => {
+        return response.data;
       });
   }
 
@@ -1063,45 +1078,45 @@ export default class SharepointService {
 
   //提交表单
   submitBizForm(listName: string, item: any, link: string, isSubmit: Boolean) {
-    try {
-      window.parent.postMessage(
-        {
-          action: 'loading',
-          params: true,
-        },
-        '*',
-      );
-      var token = this.getToken();
-      var spPageContext = this.getSpPageContextInfo();
-      item.WFApplicant = spPageContext.userId;
-      item.WFApplicantTime = new Date();
-      item.WFStatus = 'Starting';
-      item.WFStep = 0;
-      item.WFFormStatus = 'Submitted';
+    // try {
+    // window.parent.postMessage(
+    //   {
+    //     action: 'loading',
+    //     params: true,
+    //   },
+    //   '*',
+    // );
+    var token = this.getToken();
+    var spPageContext = this.getSpPageContextInfo();
+    item.WFApplicant = spPageContext.userId;
+    item.WFApplicantTime = new Date();
+    item.WFStatus = 'Starting';
+    item.WFStep = 0;
+    item.WFFormStatus = 'Submitted';
 
-      this.addItem(listName, item, token).then((res) => {
-        item.ID = res.ID;
-        this.submitTaskForm(item, link, isSubmit).then((res) => {});
-      });
-    } catch {
-      window.parent.postMessage(
-        {
-          action: 'loading',
-          params: false,
-        },
-        '*',
-      );
-      window.parent.postMessage(
-        {
-          action: 'message',
-          params: {
-            type: 'error',
-            message: '表单提交失败！',
-          },
-        },
-        '*',
-      );
-    }
+    return this.addItem(listName, item, token).then((res) => {
+      item.ID = res.ID;
+      return this.submitTaskForm(item, link, isSubmit);
+    });
+    // } catch {
+    // window.parent.postMessage(
+    //   {
+    //     action: 'loading',
+    //     params: false,
+    //   },
+    //   '*',
+    // );
+    // window.parent.postMessage(
+    //   {
+    //     action: 'message',
+    //     params: {
+    //       type: 'error',
+    //       message: '表单提交失败！',
+    //     },
+    //   },
+    //   '*',
+    // );
+    // }
   }
 
   submitTaskForm(item: any, link: string, isSubmit: Boolean) {
@@ -1119,29 +1134,29 @@ export default class SharepointService {
         data: taskData,
       })
       .then((response: any) => {
-        window.parent.postMessage(
-          {
-            action: 'loading',
-            params: false,
-          },
-          '*',
-        );
-        window.parent.postMessage(
-          {
-            action: 'message',
-            params: {
-              type: 'success',
-              message: '表单提交成功！',
-            },
-          },
-          '*',
-        );
-        window.parent.postMessage(
-          {
-            action: 'closeDraw',
-          },
-          '*',
-        );
+        // window.parent.postMessage(
+        //   {
+        //     action: 'loading',
+        //     params: false,
+        //   },
+        //   '*',
+        // );
+        // window.parent.postMessage(
+        //   {
+        //     action: 'message',
+        //     params: {
+        //       type: 'success',
+        //       message: '表单提交成功！',
+        //     },
+        //   },
+        //   '*',
+        // );
+        // window.parent.postMessage(
+        //   {
+        //     action: 'closeDraw',
+        //   },
+        //   '*',
+        // );
       });
   }
 

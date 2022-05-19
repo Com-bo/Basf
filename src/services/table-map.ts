@@ -1,6 +1,14 @@
 import Util from '@/common/util';
 
 export const TableTypeMap: any = {
+  ProcAttachList: {
+    SPList: 'ProcAttachList',
+    CDSTable: 'ProcAttachList',
+    Fields: [
+      { Key: 'Id', SPList: 'id', CDSTable: 'id', Type: 'Int' },
+      // { Key: 'Title', SPList: 'Title', CDSTable: 'title', Type: 'Text' },
+    ],
+  },
   GlobalDelegate: {
     SPList: 'GlobalDelegate',
     CDSTable: 'globaldelegates',
