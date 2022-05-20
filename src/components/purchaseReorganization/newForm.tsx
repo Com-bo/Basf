@@ -20,8 +20,8 @@ import moment from 'moment';
 import { CloudUploadOutlined } from '@ant-design/icons';
 const index = () => {
   //#region   固定模板
-  const formLink = 'http://localhost:8001/purchaseReorganization?ID=';
-  const wfFlowName = '4c8d42ce-89f7-4f0a-b8a5-962c08e510c9';
+  const formLink = 'http://bv_dpa.com:8001/purchaseReorganization?ID=';
+  const wfFlowName = '89AA3E63-E484-32E9-FE89-682CC6A2F4DD';
   const listName = 'PurchaseReorganization';
 
   const [form] = Form.useForm();
