@@ -3,10 +3,9 @@ import styles from './index.less';
 import { Form, Input, Button } from 'antd';
 import SpService from '@/services/sharepoint.service';
 import moment from 'moment';
-import NewForm from '@/components/generalPurchaseForm/newForm';
-import EditForm from '@/components/generalPurchaseForm/editForm';
-import DispForm from '@/components/generalPurchaseForm/dispForm';
-
+import NewForm from '@/components/leasedEquipmentForm/newForm';
+import EditForm from '@/components/leasedEquipmentForm/editForm';
+import DispForm from '@/components/leasedEquipmentForm/dispForm';
 const index = (props: any) => {
   const getContent = () => {
     console.log(props);

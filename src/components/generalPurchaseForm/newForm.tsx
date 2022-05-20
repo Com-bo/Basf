@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styles from './index.less';
-import { Form, Input, Button } from 'antd';
 import SpService from '@/services/sharepoint.service';
 import './index.less';
 import {
@@ -16,6 +15,7 @@ import {
   Tabs,
   Upload,
   Space,
+  message,
 } from 'antd';
 import FormService from '@/services/form.service';
 import moment from 'moment';
@@ -23,10 +23,7 @@ import moment from 'moment';
 import { CloudUploadOutlined } from '@ant-design/icons';
 const index = () => {
   //#region   固定模板
-  const formLink = 'https://www.baidu.com?ID=';
-  const wfFlowName = '06e42010-b8e3-4261-9e10-623ac10f3bf8';
-  const listName = 'LRMainItems';
-  const formLink = 'http://localhost:8001/generalPurchaseForm?ID=';
+  const formLink = 'http://bv_dpa.com:8001/generalPurchaseForm';
   const wfFlowName = '4c8d42ce-89f7-4f0a-b8a5-962c08e510c9';
   const listName = 'GeneralPurchase';
 
@@ -38,7 +35,7 @@ const index = () => {
   const submitForm = (formData: any, isSubmit: boolean) => {
     formData.Title = getSerialNum();
     formData.WFFlowName = wfFlowName;
-    spService.submitBizForm(listName, formData, formLink, isSubmit);
+    // spService.submitBizForm(listName, formData, formLink, isSubmit);
     formService.submitBizForm(listName, formData, formLink, isSubmit);
   };
 
@@ -51,6 +48,7 @@ const index = () => {
   //#endregion
 
   const { Option } = Select;
+  const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
     submitForm(form.getFieldsValue(), true);
   };
@@ -59,24 +57,28 @@ const index = () => {
     submitForm(form.getFieldsValue(), false);
   };
   useEffect(() => {
-    // formService.deleteFileItem( "清关导入模板.xlsx").then(res=>{
-    //   // 存储文件
-    //   alert("删除成功")
-    // })
-    formService.getTableDataAll('ProcAttachList').then((res) => {
-      debugger;
+    // 附件之初始化
+    formService.getFileItems().then((res) => {
+      if (res && res.length) {
+        form.setFieldsValue({
+          file: res,
+        });
+      }
     });
   }, []);
 
   const uploadProps = {
-    onRemove: (file) => {
-      // debugger
+    onRemove: (file, fileList) => {
+      if (file.id) {
+        return formService.deleteFileItem(file.name);
+      }
     },
     beforeUpload: (file, fileList) => {
-      if (file.lastModified) {
-        // 此处上传文件
-        formService.uploadFile(file.name, file).then((res) => {
+      if (!file.id) {
+        return formService.uploadFile(file.name, file).then((res) => {
           // 存储文件
+          file.id = res;
+          return res;
         });
       }
       return false;
@@ -440,6 +442,14 @@ const index = () => {
           <div className="fileWrapper">
             <Form.Item
               name="file"
+              valuePropName="fileList"
+              getValueFromEvent={(e: any) => {
+                console.log('Upload event:', e);
+                if (Array.isArray(e)) {
+                  return e;
+                }
+                return e && e.fileList;
+              }}
               label="Upload Contract Attachment"
               rules={[{ required: true }]}
             >

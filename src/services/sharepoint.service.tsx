@@ -674,7 +674,6 @@ export default class SharepointService {
     fileName: string,
     libraryName: string,
     fileObject: any,
-    id: string,
     // id: string,
     token: any,
   ) {
@@ -703,7 +702,9 @@ export default class SharepointService {
       })
       .then((response: any) => {
         let value = response.data;
-        let urls = value.d.ServerRelativeUrl.split(process.env.relativePath);
+        let urls = value.d.ServerRelativeUrl.split(
+          process.env.relativePath + '/' + libraryName + '/',
+        );
         if (urls[1]) {
           return urls[1];
         } else {
@@ -712,28 +713,40 @@ export default class SharepointService {
       });
   }
   async deleteFileItem(listName: string, fileName: string, token: string) {
-    let url = `${process.env.host}${
-      process.env.relativePath
-    }/_api/web/GetFileByServerRelativeUrl('${
-      this.formatTable(listName).name
-    }/${fileName}')`;
+    let url = `${process.env.host}${process.env.relativePath}/_api/web/GetFileByServerRelativeUrl('${process.env.relativePath}/${listName}/${fileName}')`;
     return this._http
       .post(url, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'X-RequestDigest': '{form_digest_value}',
-          'IF-MATCH': '{etag or *}',
+          'X-RequestDigest': this.formDigestValue,
+          'IF-MATCH': '*',
           'X-HTTP-Method': 'DELETE',
         },
       })
       .then((response: any) => {
+        return true;
+      });
+  }
+  // 获取文件
+  async getFileItems(listName: string, token: string) {
+    let url = `${process.env.host}${process.env.relativePath}/_api/web/GetFolderByServerRelativeUrl('${process.env.relativePath}/${listName}/')/Files`;
+    return this._http
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json;odata=verbose',
+        },
+      })
+      .then((response: any) => {
+        if (response.data.d) {
+          return response.data.d;
+        }
         return response.data;
       });
   }
 
   async updateIcon(file: any, name: string, users: string | any[], token: any) {
-    console.log(name);
-    let imageUrl = await this.uploadFile(name, 'UserAvatars', file, '', token);
+    let imageUrl = await this.uploadFile(name, 'UserAvatars', file, token);
     console.log(imageUrl);
     if (imageUrl) {
       let p = [];
