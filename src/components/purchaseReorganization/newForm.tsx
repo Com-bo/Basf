@@ -20,9 +20,9 @@ import moment from 'moment';
 import { CloudUploadOutlined } from '@ant-design/icons';
 const index = () => {
   //#region   固定模板
-  const formLink = 'http://localhost:8001/generalPurchaseForm?ID=';
+  const formLink = 'http://localhost:8001/purchaseReorganization?ID=';
   const wfFlowName = '4c8d42ce-89f7-4f0a-b8a5-962c08e510c9';
-  const listName = 'GeneralPurchase';
+  const listName = 'PurchaseReorganization';
 
   const [form] = Form.useForm();
   const formService = new FormService();
@@ -145,166 +145,106 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-        <Card title="B. Subject Matter To Be Procured" bordered={false}>
+        <Card
+          title="B. Subject Matter To Be Procured"
+          bordered={false}
+          style={{ backgroundColor: 'yellow' }}
+        >
           <Row gutter={20}>
             <Col span={24}>
-              <Form.Item
-                name="GeneralGoodsorService"
-                label="General Goods or Service"
-              >
-                <Select placeholder="-----select--------">
-                  {/* <Option></Option> */}
-                </Select>
-              </Form.Item>
+              <div className="sujectmatter">
+                <Form.Item
+                  name="GeneralGoodsorService"
+                  label="Special Equipment "
+                  rules={[{ required: true }]}
+                >
+                  <Select>
+                    {/* <Option children={undefined}></Option> */}
+                  </Select>
+                </Form.Item>
+
+                <div className="fileWrapper">
+                  <Form.Item
+                    name="file"
+                    label=" Please Provide The Qualification Documents of The Applicant's Site For Using Such Special Equipment (Upload Port)"
+                    rules={[{ required: true }]}
+                  >
+                    <Upload {...uploadProps}>
+                      <div className="file_upload">
+                        <CloudUploadOutlined />
+                        <br />
+                        <span>Upload</span>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+                  <Form.Item
+                    name="GeneralGoodsorService"
+                    label="Is The Supplier Manufacturer or Agen "
+                    rules={[{ required: true }]}
+                  >
+                    <Select>
+                      {/* <Option children={undefined}></Option> */}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    name="GeneralGoodsorService"
+                    label="   Levels of The Agent   
+                (Low/Medium/High)       "
+                    rules={[{ required: true }]}
+                  >
+                    <Select>
+                      {/* <Option children={undefined}></Option> */}
+                    </Select>
+                  </Form.Item>
+                </div>
+                <Form.Item
+                  name="GeneralGoodsorService"
+                  label=" Whether The Equipment Is An Existing Equipment 
+                (Low/Medium/High) "
+                  rules={[{ required: true }]}
+                >
+                  <Radio.Group>
+                    <Radio value={1}>Yes</Radio>
+                    <Radio value={2}>No</Radio>
+                    <Radio value={2}>No Sure</Radio>
+                  </Radio.Group>
+                </Form.Item>
+
+                <Form.Item
+                  name="GeneralGoodsorService"
+                  label="   Is There Any Right Encumbrance Such As Mortgage, Seizure And Sealing Up On The Equipment  
+                (Low/Medium/High)"
+                  rules={[{ required: true }]}
+                >
+                  <Radio.Group>
+                    <Radio value={1}>Yes</Radio>
+                    <Radio value={2}>No</Radio>
+                  </Radio.Group>
+                </Form.Item>
+                <Form.Item
+                  name="GeneralGoodsorService"
+                  label=" Does The Supplier Promise Not To Infringe The Intellectual Property Rights of Third Parties  
+                (Low/Medium/High)  "
+                  rules={[{ required: true }]}
+                >
+                  <Radio.Group>
+                    <Radio value={1}>Yes</Radio>
+                    <Radio value={2}>No</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </div>
             </Col>
           </Row>
-          <div className="sec-container">
-            <div className="sec-title">General Goods</div>
-            <div className="sec-content">
-              <Row gutter={20}>
-                <Col span={24}>
-                  <Form.Item
-                    name="GeneralGoodsorService"
-                    label="Whether it is hazardous chemicals (including chemicals that are easy to produce drugs and explosive)"
-                    rules={[{ required: true }]}
-                  >
-                    <Radio.Group>
-                      <Radio value={1}>Yes</Radio>
-                      <Radio value={2}>No</Radio>
-                      <Radio value={3}>No Sure</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item
-                    name="Environmental"
-                    label="Environmental protection (such as sewage discharge), fire fighting and occupational safety articles (A. personal protective equipment; 
-   B. fire fighting equipment; C. mandatory inspection equipment; D. others (please fill in the name))"
-                  >
-                    <Radio.Group>
-                      <Radio value={1}>Yes</Radio>
-                      <Radio value={2}>No</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item
-                    name="test"
-                    label="Other Good of Environmental Protection"
-                    rules={[{ required: true }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item
-                    name="test"
-                    label="It Equipment (A. Computer And Accessories; B. Printing Equipment; C. Telephone And Fax; D. Server; e. Others)"
-                    rules={[{ required: true }]}
-                  >
-                    <Radio.Group>
-                      <Radio value={1}>Yes</Radio>
-                      <Radio value={2}>No</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item
-                    name="test"
-                    label="Other Equipment"
-                    rules={[{ required: true }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item
-                    name="test"
-                    label="Software or Other Goods That Can Access To BV's Electronic Files or Data"
-                    rules={[{ required: true }]}
-                  >
-                    <Radio.Group>
-                      <Radio value={1}>Yes</Radio>
-                      <Radio value={2}>No</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-            <div className="sec-title">
-              General services (except HR, Consulting, Subcontracting,
-              Sales-related, Government-Related)
-            </div>
-            <div className="sec-content">
-              <Row gutter={20}>
-                <Col span={24}>
-                  <Form.Item
-                    name="GeneralGoodsorService"
-                    label="Environmental Protection (e.g. Sewage Discharge), Fire Fighting And Occupational Safety Services"
-                  >
-                    <Select placeholder="-----select--------">
-                      {/* <Option></Option> */}
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="ITservices"
-                    label="IT services"
-                    rules={[{ required: true }]}
-                  >
-                    <Select placeholder="-----select--------">
-                      {/* <Option></Option> */}
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="OtherServise"
-                    label="Other Servise"
-                    rules={[{ required: true }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item
-                    name="test"
-                    label="Whether access to required electronic files or data is involved"
-                    rules={[{ required: true }]}
-                  >
-                    <Radio.Group>
-                      <Radio value={1}>Yes</Radio>
-                      <Radio value={2}>No</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-            <div className="sec-title">HSE Engineering Contract</div>
-            <div className="sec-content">
-              <Row gutter={20}>
-                <Col span={12}>
-                  <Form.Item
-                    name="HSEEngineeringContract"
-                    label="HSE Engineering Contract"
-                    rules={[{ required: true }]}
-                  >
-                    <Select placeholder="-----select--------">
-                      {/* <Option></Option> */}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-          </div>
         </Card>
+
         <Card title="C. Payment" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
               <Form.Item
                 name="Payment1"
-                label="Contract Amount"
+                label="Contract Amount 
+                (Low/Medium/High)"
+                style={{ backgroundColor: 'yellow' }}
                 rules={[{ required: true }]}
               >
                 <Select placeholder="-----select--------">
@@ -324,10 +264,11 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 name="Payment3"
-                label="If it is a framework contract, please estimate the amount of cooperation for one year."
+                label="  If it is A Framework Contract, Please Estimate The Amount of Cooperation For One Year. If it is Not A Framework Contract, Please Fill in 
+                The Contract Amount "
                 rules={[{ required: true }]}
               >
                 <Input />
@@ -336,7 +277,8 @@ const index = () => {
             <Col span={12}>
               <Form.Item
                 name="Payment4"
-                label="If the budget has been approved"
+                label="If the budget has been approved 
+                (Low/Medium/High)"
                 rules={[{ required: true }]}
               >
                 <Radio.Group>
@@ -348,7 +290,8 @@ const index = () => {
             <Col span={12}>
               <Form.Item
                 name="Payment5"
-                label="Is it within the approved budget"
+                label="Is it within the approved budget
+                (Low/Medium/High)"
                 rules={[{ required: true }]}
               >
                 <Radio.Group>
@@ -379,10 +322,11 @@ const index = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 name="Payment8"
-                label="Instalment Arrangement"
+                label="Instalment Arrangement 
+                (Low/Medium/High)"
                 rules={[{ required: true }]}
               >
                 <Select placeholder="-----select--------">
@@ -390,10 +334,11 @@ const index = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 name="Payment9"
-                label="Payment Cycle"
+                label="Payment Cycle 
+                (Low/Medium/High)"
                 rules={[{ required: true }]}
               >
                 <Select placeholder="-----select--------">
@@ -479,7 +424,6 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-
         <Card title="F. BV's liabilities" bordered={false}>
           <Form.Item
             name="liabilities"
