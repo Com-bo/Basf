@@ -19,6 +19,7 @@ import {
   DatePicker,
 } from 'antd';
 import FormService from '@/services/form.service';
+import ApprovalActions from '@/components/procOptions/procOptions';
 import moment from 'moment';
 import { CloudUploadOutlined } from '@ant-design/icons';
 const index = () => {
@@ -29,14 +30,6 @@ const index = () => {
 
   const [form] = Form.useForm();
   const formService = new FormService();
-
-  //提交表单数据
-  const submitForm = (formData: any, isSubmit: boolean) => {
-    formData.Title = getSerialNum();
-    formData.WFFlowName = wfFlowName;
-    // spService.submitBizForm(listName, formData, formLink, isSubmit);
-    formService.submitBizForm(listName, formData, formLink, isSubmit);
-  };
 
   //获取流水号
   const getSerialNum = () => {
@@ -49,12 +42,17 @@ const index = () => {
   const { Option } = Select;
   const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
-    submitForm(form.getFieldsValue(), true);
+    return form.validateFields().then((res) => {
+      return {
+        isOk: true,
+        formData: form.getFieldsValue(),
+        formLink,
+        wfFlowName,
+        listName,
+      };
+    });
   };
 
-  const onSave = () => {
-    submitForm(form.getFieldsValue(), false);
-  };
   useEffect(() => {
     // 附件之初始化
     formService.getFileItems().then((res) => {
@@ -472,16 +470,7 @@ const index = () => {
             <Input.TextArea />
           </Form.Item>
         </Card>
-        <div className="actionWrapper">
-          <Space size={20}>
-            <Button onClick={onSave} type="default">
-              Save
-            </Button>
-            <Button onClick={onSubmit} type="primary">
-              Submit
-            </Button>
-          </Space>
-        </div>
+        <ApprovalActions formValidataion={onSubmit}></ApprovalActions>
       </Form>
     </>
   );

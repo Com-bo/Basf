@@ -16,7 +16,7 @@ import {
 import SpService from '@/services/sharepoint.service';
 import moment from 'moment';
 const { Option } = Select;
-
+import ApprovalActions from '@/components/procOptions/procOptions';
 const index = (props: any) => {
   //#region   固定模板
   const formLink = 'http://bv_dpa.com:8001/leasedEquipmentForm';
@@ -29,39 +29,48 @@ const index = (props: any) => {
 
   const SPService = new SpService();
 
-  useEffect(() => {
-    SPService.getTableData(
+  // useEffect(() => {
+  //   SPService.getTableData(
+  //     listName,
+  //     [
+  //       {
+  //         type: 'filter eq',
+  //         value: props?.location?.query?.ID,
+  //         properties: ['Id'],
+  //       },
+  //     ],
+  //     [],
+  //   ).then((res) => {
+  //     setBizInfo(res[0]);
+  //     form.setFieldsValue(res[0]);
+  //     getButtons(res[0].Title);
+  //   });
+  // }, [props]);
+
+  // const getButtons = (title: string) => {
+  //   if (!props?.location?.query?.Btn) {
+  //     return '';
+  //   }
+  //   SPService.getWorkflowTaskInfo(title).then((res) => {
+  //     setTaskInfo(res[0]);
+  //     console.log(res[0]);
+  //     setButtons(JSON.parse(res[0].ResponseOptions));
+  //   });
+  // };
+
+  // const onFlowApprove = (action: string) => {
+  //   SPService.submitFlowForm(taskInfo?.key, action).then((res) => {});
+  // };
+
+  const onSubmit = () => {
+    return Promise.resolve({
+      isOk: true,
+      formData: form.getFieldsValue(),
+      formLink,
+      wfFlowName,
       listName,
-      [
-        {
-          type: 'filter eq',
-          value: props?.location?.query?.ID,
-          properties: ['Id'],
-        },
-      ],
-      [],
-    ).then((res) => {
-      setBizInfo(res[0]);
-      form.setFieldsValue(res[0]);
-      getButtons(res[0].Title);
-    });
-  }, [props]);
-
-  const getButtons = (title: string) => {
-    if (!props?.location?.query?.Btn) {
-      return '';
-    }
-    SPService.getWorkflowTaskInfo(title).then((res) => {
-      setTaskInfo(res[0]);
-      console.log(res[0]);
-      setButtons(JSON.parse(res[0].ResponseOptions));
     });
   };
-
-  const onFlowApprove = (action: string) => {
-    SPService.submitFlowForm(taskInfo?.key, action).then((res) => {});
-  };
-
   //#endregion
 
   return (
@@ -434,14 +443,15 @@ const index = (props: any) => {
             <Input.TextArea disabled />
           </Form.Item>
         </Card>
+        <ApprovalActions formValidataion={onSubmit}></ApprovalActions>
       </Form>
-      {buttons.map((x, index) => {
+      {/* {buttons.map((x, index) => {
         return (
           <Button onClick={() => onFlowApprove(x)} key={index}>
             {x}
           </Button>
         );
-      })}
+      })} */}
     </>
   );
 };
