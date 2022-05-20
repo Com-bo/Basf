@@ -1,6 +1,8 @@
 import SpService from '@/services/sharepoint.service';
 export default class FormService {
   private _spService: SpService;
+  private _fileListName = 'ProcAttachList';
+  private _folderName = '/sites/DPA_DEV_Community/LevelRequest/ProcAttachList';
   // private _logService;
   // private authService: AuthService;
 
@@ -13,8 +15,13 @@ export default class FormService {
   // 上传文件接口
   async uploadFile(fileName: string, fileObject: any, id?: string) {
     let token = this._getToken();
+    let index = fileName.lastIndexOf('.');
+    let newFileName =
+      fileName.substring(0, index) +
+      new Date().getTime() +
+      fileName.substring(index);
     return this._spService
-      .uploadFile(fileName, 'ProcAttachList', fileObject, token)
+      .uploadFile(newFileName, this._fileListName, fileObject, token)
       .catch((error: any) => {
         // this._logService.logError(error)
         console.error(error);
@@ -54,7 +61,31 @@ export default class FormService {
   deleteFileItem(fileName: string) {
     let token: string = this._getToken();
     return this._spService
-      .deleteFileItem('ProcAttachList', fileName, token)
+      .deleteFileItem(this._fileListName, fileName, token)
+      .catch((error: any) => {
+        // this._logService.logError(error)
+        console.error(error);
+        return Promise.reject(error);
+      });
+  }
+  getFileItems() {
+    let token: string = this._getToken();
+    return this._spService
+      .getFileItems(this._fileListName, token)
+      .then((res) => {
+        let results = res.results;
+        // 处理文件
+        let files: any = [];
+        results.forEach((element: any) => {
+          files.push({
+            id: element.ServerRelativeUrl,
+            name: element.Name,
+            status: 'done',
+            url: process.env.host + element.ServerRelativeUrl,
+          });
+        });
+        return files;
+      })
       .catch((error: any) => {
         // this._logService.logError(error)
         console.error(error);

@@ -174,7 +174,29 @@ const index = () => {
             <div className="sec-title">General Goods</div>
             <div className="sec-content">
               <Row gutter={20}>
-                <Col span={24}>
+                <Col span={12}>
+                  <Form.Item
+                    name="BVSigningEntity"
+                    label="BV Signing Entity"
+                    rules={[{ required: true }]}
+                  >
+                    <Select placeholder="-----select--------">
+                      {/* <Option></Option> */}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="SBU"
+                    label="SBU"
+                    rules={[{ required: true }]}
+                  >
+                    <Select placeholder="-----select--------">
+                      {/* <Option></Option> */}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item
                     name="GeneralGoodsorService"
                     label="Whether it is hazardous chemicals (including chemicals that are easy to produce drugs and explosive)"
@@ -183,9 +205,122 @@ const index = () => {
                     <Radio.Group>
                       <Radio value={1}>Yes</Radio>
                       <Radio value={2}>No</Radio>
-                      <Radio value={3}>No Sure</Radio>
                     </Radio.Group>
                   </Form.Item>
+                </Col>
+                <div className="fileWrapper">
+                  <Form.Item
+                    name="file"
+                    valuePropName="fileList"
+                    getValueFromEvent={(e: any) => {
+                      if (Array.isArray(e)) {
+                        return e;
+                      }
+                      return e && e.fileList;
+                    }}
+                    label="Upload Contract Attachment"
+                    rules={[{ required: true }]}
+                  >
+                    <Upload {...uploadProps}>
+                      <div className="file_upload">
+                        <CloudUploadOutlined />
+                        <br />
+                        <span>Upload</span>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+                </div>
+                <Col span={12}>
+                  <Form.Item
+                    name="GeneralGoodsorService"
+                    label="Whether it is hazardous chemicals (including chemicals that are easy to produce drugs and explosive)"
+                    rules={[{ required: true }]}
+                  >
+                    <Radio.Group>
+                      <Radio value={1}>Yes</Radio>
+                      <Radio value={2}>No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+                <div className="fileWrapper">
+                  <Form.Item
+                    name="file"
+                    valuePropName="fileList"
+                    getValueFromEvent={(e: any) => {
+                      if (Array.isArray(e)) {
+                        return e;
+                      }
+                      return e && e.fileList;
+                    }}
+                    label="Upload Contract Attachment"
+                    rules={[{ required: true }]}
+                  >
+                    <Upload {...uploadProps}>
+                      <div className="file_upload">
+                        <CloudUploadOutlined />
+                        <br />
+                        <span>Upload</span>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+                </div>
+                <Col span={12}>
+                  <Form.Item
+                    name="GeneralGoodsorService"
+                    label="Whether it is hazardous chemicals (including chemicals that are easy to produce drugs and explosive)"
+                    rules={[{ required: true }]}
+                  >
+                    <Radio.Group>
+                      <Radio value={1}>Yes</Radio>
+                      <Radio value={2}>No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+                <div className="fileWrapper">
+                  <Form.Item
+                    name="file"
+                    valuePropName="fileList"
+                    getValueFromEvent={(e: any) => {
+                      if (Array.isArray(e)) {
+                        return e;
+                      }
+                      return e && e.fileList;
+                    }}
+                    label="Upload Contract Attachment"
+                    rules={[{ required: true }]}
+                  >
+                    <Upload {...uploadProps}>
+                      <div className="file_upload">
+                        <CloudUploadOutlined />
+                        <br />
+                        <span>Upload</span>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+                </div>
+                <Col span={24}>
+                  <div className="fileWrapper">
+                    <Form.Item
+                      name="file"
+                      valuePropName="fileList"
+                      getValueFromEvent={(e: any) => {
+                        if (Array.isArray(e)) {
+                          return e;
+                        }
+                        return e && e.fileList;
+                      }}
+                      label="Upload Contract Attachment"
+                      rules={[{ required: true }]}
+                    >
+                      <Upload {...uploadProps}>
+                        <div className="file_upload">
+                          <CloudUploadOutlined />
+                          <br />
+                          <span>Upload</span>
+                        </div>
+                      </Upload>
+                    </Form.Item>
+                  </div>
                 </Col>
                 <Col span={24}>
                   <Form.Item
@@ -199,7 +334,7 @@ const index = () => {
                     </Radio.Group>
                   </Form.Item>
                 </Col>
-                <Col span={24}>
+                <Col span={12}>
                   <Form.Item
                     name="test"
                     label="Other Good of Environmental Protection"
@@ -208,12 +343,30 @@ const index = () => {
                     <Input />
                   </Form.Item>
                 </Col>
-                <Col span={24}>
+                <Col span={12}>
                   <Form.Item
                     name="test"
-                    label="It Equipment (A. Computer And Accessories; B. Printing Equipment; C. Telephone And Fax; D. Server; e. Others)"
+                    label="Other Good of Environmental Protection"
                     rules={[{ required: true }]}
                   >
+                    <Select></Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
+            <div className="sec-title">Non-Capex Equipment</div>
+            <div className="sec-content">
+              <Row gutter={20}>
+                <Col span={12}>
+                  <Form.Item name="Environmental" label="1111">
+                    <Radio.Group>
+                      <Radio value={1}>Yes</Radio>
+                      <Radio value={2}>No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item name="Environmental" label="1111">
                     <Radio.Group>
                       <Radio value={1}>Yes</Radio>
                       <Radio value={2}>No</Radio>
@@ -221,81 +374,110 @@ const index = () => {
                   </Form.Item>
                 </Col>
                 <Col span={24}>
+                  <Form.Item name="Environmental" label="1111">
+                    <Radio.Group>
+                      <Radio value={1}>Yes</Radio>
+                      <Radio value={2}>No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+                <Col span={24}>
+                  <div className="fileWrapper">
+                    <Form.Item
+                      name="file"
+                      valuePropName="fileList"
+                      getValueFromEvent={(e: any) => {
+                        if (Array.isArray(e)) {
+                          return e;
+                        }
+                        return e && e.fileList;
+                      }}
+                      label="Upload Contract Attachment"
+                      rules={[{ required: true }]}
+                    >
+                      <Upload {...uploadProps}>
+                        <div className="file_upload">
+                          <CloudUploadOutlined />
+                          <br />
+                          <span>Upload</span>
+                        </div>
+                      </Upload>
+                    </Form.Item>
+                  </div>
+                  <Col span={24}>
+                    <Form.Item name="Environmental" label="1111">
+                      <Radio.Group>
+                        <Radio value={1}>Yes</Radio>
+                        <Radio value={2}>No</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </Col>
+                </Col>
+                <Col span={24}>
+                  <Form.Item name="Environmental" label="1111">
+                    <Radio.Group>
+                      <Radio value={1}>Yes</Radio>
+                      <Radio value={2}>No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item
                     name="test"
-                    label="Other Equipment"
+                    label="Other Good of Environmental Protection"
                     rules={[{ required: true }]}
                   >
                     <Input />
                   </Form.Item>
                 </Col>
-                <Col span={24}>
+                <Col span={12}>
                   <Form.Item
                     name="test"
-                    label="Software or Other Goods That Can Access To BV's Electronic Files or Data"
+                    label="Other Good of Environmental Protection"
                     rules={[{ required: true }]}
                   >
-                    <Radio.Group>
-                      <Radio value={1}>Yes</Radio>
-                      <Radio value={2}>No</Radio>
-                    </Radio.Group>
+                    <Select></Select>
                   </Form.Item>
                 </Col>
               </Row>
             </div>
-            <div className="sec-title">
-              General services (except HR, Consulting, Subcontracting,
-              Sales-related, Government-Related)
-            </div>
+            <div className="sec-title"> Others</div>
             <div className="sec-content">
               <Row gutter={20}>
-                <Col span={24}>
-                  <Form.Item
-                    name="GeneralGoodsorService"
-                    label="Environmental Protection (e.g. Sewage Discharge), Fire Fighting And Occupational Safety Services"
-                  >
-                    <Select placeholder="-----select--------">
-                      {/* <Option></Option> */}
-                    </Select>
-                  </Form.Item>
-                </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="ITservices"
-                    label="IT services"
-                    rules={[{ required: true }]}
-                  >
-                    <Select placeholder="-----select--------">
-                      {/* <Option></Option> */}
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="OtherServise"
-                    label="Other Servise"
+                    name="test"
+                    label="Other Good of Environmental Protection"
                     rules={[{ required: true }]}
                   >
                     <Input />
                   </Form.Item>
                 </Col>
-                <Col span={24}>
+                <Col span={12}>
                   <Form.Item
                     name="test"
-                    label="Whether access to required electronic files or data is involved"
+                    label="Other Good of Environmental Protection"
                     rules={[{ required: true }]}
                   >
+                    <Select></Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item name="Environmental" label="1111">
                     <Radio.Group>
                       <Radio value={1}>Yes</Radio>
                       <Radio value={2}>No</Radio>
                     </Radio.Group>
                   </Form.Item>
                 </Col>
-              </Row>
-            </div>
-            <div className="sec-title">HSE Engineering Contract</div>
-            <div className="sec-content">
-              <Row gutter={20}>
+                <Col span={12}>
+                  <Form.Item name="Environmental" label="1111">
+                    <Radio.Group>
+                      <Radio value={1}>Yes</Radio>
+                      <Radio value={2}>No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
                 <Col span={12}>
                   <Form.Item
                     name="HSEEngineeringContract"
@@ -503,6 +685,15 @@ const index = () => {
           <Form.Item
             name="liabilities"
             label="BV's liabilities"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+        </Card>
+        <Card title="G.Process Info" bordered={false}>
+          <Form.Item
+            name="Comments"
+            label="Comments"
             rules={[{ required: true }]}
           >
             <Input.TextArea />

@@ -702,7 +702,9 @@ export default class SharepointService {
       })
       .then((response: any) => {
         let value = response.data;
-        let urls = value.d.ServerRelativeUrl.split(process.env.relativePath);
+        let urls = value.d.ServerRelativeUrl.split(
+          process.env.relativePath + '/' + libraryName + '/',
+        );
         if (urls[1]) {
           return urls[1];
         } else {
@@ -711,28 +713,40 @@ export default class SharepointService {
       });
   }
   async deleteFileItem(listName: string, fileName: string, token: string) {
-    let url = `${process.env.host}${
-      process.env.relativePath
-    }/_api/web/GetFileByServerRelativeUrl('${
-      this.formatTable(listName).name
-    }/${fileName}')`;
+    let url = `${process.env.host}${process.env.relativePath}/_api/web/GetFileByServerRelativeUrl('${process.env.relativePath}/${listName}/${fileName}')`;
     return this._http
       .post(url, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'X-RequestDigest': '{form_digest_value}',
-          'IF-MATCH': '{etag or *}',
+          'X-RequestDigest': this.formDigestValue,
+          'IF-MATCH': '*',
           'X-HTTP-Method': 'DELETE',
         },
       })
       .then((response: any) => {
+        return true;
+      });
+  }
+  // 获取文件
+  async getFileItems(listName: string, token: string) {
+    let url = `${process.env.host}${process.env.relativePath}/_api/web/GetFolderByServerRelativeUrl('${process.env.relativePath}/${listName}/')/Files`;
+    return this._http
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json;odata=verbose',
+        },
+      })
+      .then((response: any) => {
+        if (response.data.d) {
+          return response.data.d;
+        }
         return response.data;
       });
   }
 
   async updateIcon(file: any, name: string, users: string | any[], token: any) {
-    console.log(name);
-    let imageUrl = await this.uploadFile(name, 'UserAvatars', file, '', token);
+    let imageUrl = await this.uploadFile(name, 'UserAvatars', file, token);
     console.log(imageUrl);
     if (imageUrl) {
       let p = [];
@@ -1078,22 +1092,60 @@ export default class SharepointService {
 
   //提交表单
   submitBizForm(listName: string, item: any, link: string, isSubmit: Boolean) {
-    // try {
-    // window.parent.postMessage(
-    //   {
-    //     action: 'loading',
-    //     params: true,
-    //   },
-    //   '*',
-    // );
-    var token = this.getToken();
-    var spPageContext = this.getSpPageContextInfo();
-    item.WFApplicant = spPageContext.userId;
-    item.WFApplicantTime = new Date();
-    item.WFStatus = 'Starting';
-    item.WFStep = 0;
-    item.WFFormStatus = 'Submitted';
+    try {
+      window.parent.postMessage(
+        {
+          action: 'loading',
+          params: true,
+        },
+        '*',
+      );
+      var token = this.getToken();
+      var spPageContext = this.getSpPageContextInfo();
+      item.WFApplicant = spPageContext.userId;
+      item.WFApplicantTime = new Date();
+      item.WFStatus = 'Starting';
+      item.WFStep = 0;
+      item.WFFormStatus = 'Submitted';
+      // try {
+      // window.parent.postMessage(
+      //   {
+      //     action: 'loading',
+      //     params: true,
+      //   },
+      //   '*',
+      // );
+      var token = this.getToken();
+      var spPageContext = this.getSpPageContextInfo();
+      item.WFApplicant = spPageContext.userId;
+      item.WFApplicantTime = new Date();
+      item.WFStatus = 'Starting';
+      item.WFStep = 0;
+      item.WFFormStatus = 'Submitted';
 
+      this.addItem(listName, item, token).then((res) => {
+        item.ID = res.ID;
+        this.submitTaskForm(item, link, isSubmit).then((res) => {});
+      });
+    } catch {
+      window.parent.postMessage(
+        {
+          action: 'loading',
+          params: false,
+        },
+        '*',
+      );
+      window.parent.postMessage(
+        {
+          action: 'message',
+          params: {
+            type: 'error',
+            message: '表单提交失败！',
+          },
+        },
+        '*',
+      );
+    }
     return this.addItem(listName, item, token).then((res) => {
       item.ID = res.ID;
       return this.submitTaskForm(item, link, isSubmit);
@@ -1134,6 +1186,29 @@ export default class SharepointService {
         data: taskData,
       })
       .then((response: any) => {
+        window.parent.postMessage(
+          {
+            action: 'loading',
+            params: false,
+          },
+          '*',
+        );
+        window.parent.postMessage(
+          {
+            action: 'message',
+            params: {
+              type: 'success',
+              message: '表单提交成功！',
+            },
+          },
+          '*',
+        );
+        window.parent.postMessage(
+          {
+            action: 'closeDraw',
+          },
+          '*',
+        );
         // window.parent.postMessage(
         //   {
         //     action: 'loading',

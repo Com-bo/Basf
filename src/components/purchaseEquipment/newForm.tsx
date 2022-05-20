@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import styles from './index.less';
+import SpService from '@/services/sharepoint.service';
 import './index.less';
 import {
   Form,
@@ -13,6 +15,7 @@ import {
   Tabs,
   Upload,
   Space,
+  message,
 } from 'antd';
 import FormService from '@/services/form.service';
 import moment from 'moment';
@@ -25,22 +28,27 @@ const index = () => {
   const listName = 'purchaseEquipment';
 
   const [form] = Form.useForm();
+  const spService = new SpService();
   const formService = new FormService();
 
   //提交表单数据
   const submitForm = (formData: any, isSubmit: boolean) => {
     formData.Title = getSerialNum();
     formData.WFFlowName = wfFlowName;
+    spService.submitBizForm(listName, formData, formLink, isSubmit);
     formService.submitBizForm(listName, formData, formLink, isSubmit);
   };
 
   //获取流水号
   const getSerialNum = () => {
+    return 'SN' + moment(new Date(), 'YYYYMMDDHHmmss');
     return 'GP' + moment(new Date(), 'YYYYMMDDHHmmss');
   };
 
   //#endregion
+
   const { Option } = Select;
+  const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
     submitForm(form.getFieldsValue(), true);
   };
@@ -49,24 +57,28 @@ const index = () => {
     submitForm(form.getFieldsValue(), false);
   };
   useEffect(() => {
-    // formService.deleteFileItem( "清关导入模板.xlsx").then(res=>{
-    //   // 存储文件
-    //   alert("删除成功")
-    // })
-    // formService.getTableDataAll('ProcAttachList').then((res) => {
-    //   debugger;
-    // });
+    // 附件之初始化
+    formService.getFileItems().then((res) => {
+      if (res && res.length) {
+        form.setFieldsValue({
+          file: res,
+        });
+      }
+    });
   }, []);
 
   const uploadProps = {
-    onRemove: (file) => {
-      // debugger
+    onRemove: (file, fileList) => {
+      if (file.id) {
+        return formService.deleteFileItem(file.name);
+      }
     },
     beforeUpload: (file, fileList) => {
-      if (file.lastModified) {
-        // 此处上传文件
-        formService.uploadFile(file.name, file).then((res) => {
+      if (!file.id) {
+        return formService.uploadFile(file.name, file).then((res) => {
           // 存储文件
+          file.id = res;
+          return res;
         });
       }
       return false;
@@ -79,12 +91,12 @@ const index = () => {
         <Card title="A. General Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="Requester" label="Requester">
+              <Form.Item name="requester" label="Requester">
                 <Input disabled />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="RequestDate" label="Request Date">
+              <Form.Item name="requestDate" label="Request Date">
                 <Input disabled />
               </Form.Item>
             </Col>
@@ -152,7 +164,7 @@ const index = () => {
         >
           <Row gutter={20}>
             <Col span={24}>
-              <Form.Item name="pecialequipment" label="Special Equipment">
+              <Form.Item name="specialequipment" label="Special Equipment">
                 <Select placeholder="-----select--------">
                   {/* <Option></Option> */}
                 </Select>
@@ -160,7 +172,14 @@ const index = () => {
               <div className="fileWrapper">
                 <Form.Item
                   name="file"
-                  label="  Please Provide The Qualification Documents Of The Applicant's Site For  Using Such Special Equipment (Upload Port)  "
+                  valuePropName="fileList"
+                  getValueFromEvent={(e: any) => {
+                    if (Array.isArray(e)) {
+                      return e;
+                    }
+                    return e && e.fileList;
+                  }}
+                  label="Please Provide The Qualification Documents Of The Applicant's Site For  Using Such Special Equipment (Upload Port)"
                   rules={[{ required: true }]}
                 >
                   <Upload {...uploadProps}>
@@ -172,15 +191,16 @@ const index = () => {
                   </Upload>
                 </Form.Item>
               </div>
+
               <Form.Item
-                name="IsTheSupplier"
+                name="manufacturerOrAgent"
                 label="Is The Supplier Manufacturer Or Agent"
               >
                 <Select placeholder="-----select--------">
                   {/* <Option></Option> */}
                 </Select>
               </Form.Item>
-              <Form.Item name="LevelsOfTheAgent" label="Levels Of The Agent">
+              <Form.Item name="levelsOfTheAgent" label="Levels Of The Agent">
                 <Select placeholder="-----select--------">
                   {/* <Option></Option> */}
                 </Select>
@@ -188,7 +208,14 @@ const index = () => {
               <div className="fileWrapper">
                 <Form.Item
                   name="file"
-                  label="     Please Upload The Supplier's Proof As The Agent   (upload port)  "
+                  valuePropName="fileList"
+                  getValueFromEvent={(e: any) => {
+                    if (Array.isArray(e)) {
+                      return e;
+                    }
+                    return e && e.fileList;
+                  }}
+                  label=" Please Upload The Supplier's Proof As The Agent   (upload port)"
                   rules={[{ required: true }]}
                 >
                   <Upload {...uploadProps}>
@@ -200,27 +227,26 @@ const index = () => {
                   </Upload>
                 </Form.Item>
               </div>
+
               <Form.Item
-                name="GeneralGoodsorService"
-                label="   Does The Supplier Promise Not To Infringe The Intellectual Property Rights of Third Parties
-                    (Low/Medium/High) "
-                rules={[{ required: true }]}
+                name="radio"
+                label="Whether The Equipment Is An Existing Equipment
+                (Low/Medium/High) "
               >
                 <Radio.Group>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={2}>No</Radio>
-                  <Radio value={3}>No Sure</Radio>
+                  <Radio value={0}>Yes</Radio>
+                  <Radio value={1}>No</Radio>
+                  <Radio value={2}>No Sure</Radio>
                 </Radio.Group>
               </Form.Item>
               <Form.Item
-                name="GeneralGoodsorService"
-                label="   Does The Supplier Promise Not To Infringe The Intellectual Property Rights of Third Parties
+                name="radio2"
+                label="Does The Supplier Promise Not To Infringe The Intellectual Property Rights of Third Parties
                     (Low/Medium/High) "
-                rules={[{ required: true }]}
               >
                 <Radio.Group>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={2}>No</Radio>
+                  <Radio value={0}>Yes</Radio>
+                  <Radio value={1}>No</Radio>
                 </Radio.Group>
               </Form.Item>
             </Col>
@@ -230,7 +256,7 @@ const index = () => {
           <Row gutter={20}>
             <Col span={12}>
               <Form.Item
-                name="Payment1"
+                name="ContractAmount"
                 label="Contract Amount"
                 rules={[{ required: true }]}
                 style={{ backgroundColor: 'yellow' }}
@@ -242,7 +268,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Payment2"
+                name="frameworkcontract"
                 label="Whether the contract is a framework contract"
                 rules={[{ required: true }]}
               >
@@ -254,7 +280,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Payment3"
+                name="estimateofcooperation"
                 label="If it is a framework contract, please estimate the amount of cooperation for one year."
                 rules={[{ required: true }]}
               >
@@ -263,7 +289,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Payment4"
+                name="approved"
                 label="If the budget has been approved"
                 rules={[{ required: true }]}
               >
@@ -275,7 +301,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Payment5"
+                name="approvedbudget"
                 label="Is it within the approved budget"
                 rules={[{ required: true }]}
               >
@@ -287,7 +313,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Payment6"
+                name="PaymentMethod"
                 label="Payment Method"
                 rules={[{ required: true }]}
               >
@@ -298,7 +324,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Payment7"
+                name="PaymentMethod1"
                 label="Payment Method"
                 rules={[{ required: true }]}
               >
@@ -309,7 +335,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Payment8"
+                name="InstalmentArrangement"
                 label="Instalment Arrangement"
                 rules={[{ required: true }]}
               >
@@ -320,7 +346,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Payment9"
+                name="PaymentCycle"
                 label="Payment Cycle"
                 rules={[{ required: true }]}
               >
@@ -333,7 +359,7 @@ const index = () => {
         </Card>
         <Card title="D. Contract Template" bordered={false}>
           <Form.Item
-            name="Contract1"
+            name="Template"
             label="Whether To Use A Mandatory Template"
             rules={[{ required: true }]}
           >
@@ -375,7 +401,7 @@ const index = () => {
           <Row>
             <Col span={12}>
               <Form.Item
-                name="Arrangement1"
+                name="awarrantyperiod"
                 label="Is there a warranty period"
                 rules={[{ required: true }]}
               >
@@ -387,7 +413,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Arrangement2"
+                name="WarrantyPeriod"
                 label="Warranty Period"
                 rules={[{ required: true }]}
               >
@@ -398,7 +424,7 @@ const index = () => {
             </Col>
             <Col span={24}>
               <Form.Item
-                name="Arrangement3"
+                name="inpnowarrantyperiodut2"
                 label="Why there is no warranty period"
                 rules={[{ required: true }]}
               >
@@ -412,6 +438,15 @@ const index = () => {
           <Form.Item
             name="liabilities"
             label="BV's liabilities"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea />
+          </Form.Item>
+        </Card>
+        <Card title="G.Process Info" bordered={false}>
+          <Form.Item
+            name="Comments"
+            label="Comments"
             rules={[{ required: true }]}
           >
             <Input.TextArea />
