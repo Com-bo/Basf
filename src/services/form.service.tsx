@@ -1,4 +1,5 @@
 import SpService from '@/services/sharepoint.service';
+import { IFilter } from '@/models/type';
 export default class FormService {
   private _spService: SpService;
   private _fileListName = 'ProcAttachList';
@@ -86,6 +87,15 @@ export default class FormService {
         });
         return files;
       })
+      .catch((error: any) => {
+        // this._logService.logError(error)
+        console.error(error);
+        return Promise.reject(error);
+      });
+  }
+  getTableData(listName: string, filter: IFilter[], expand: any[]) {
+    return this._spService
+      .getTableData(listName, filter, expand)
       .catch((error: any) => {
         // this._logService.logError(error)
         console.error(error);

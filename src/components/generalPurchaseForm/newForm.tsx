@@ -35,7 +35,7 @@ const index = () => {
   const submitForm = (formData: any, isSubmit: boolean) => {
     formData.Title = getSerialNum();
     formData.WFFlowName = wfFlowName;
-    spService.submitBizForm(listName, formData, formLink, isSubmit);
+    // spService.submitBizForm(listName, formData, formLink, isSubmit);
     formService.submitBizForm(listName, formData, formLink, isSubmit);
   };
 
@@ -444,6 +444,7 @@ const index = () => {
               name="file"
               valuePropName="fileList"
               getValueFromEvent={(e: any) => {
+                console.log('Upload event:', e);
                 if (Array.isArray(e)) {
                   return e;
                 }
