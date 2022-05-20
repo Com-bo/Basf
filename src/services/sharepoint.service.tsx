@@ -1315,5 +1315,75 @@ export default class SharepointService {
       });
   }
 
+  getLastTaskInfo(filter: IFilter[], expand: any[]) {
+    filter.push({
+      type: 'orderby desc',
+      properties: ['ID'],
+    });
+    let table = this.formatTable('WorkflowTasks');
+    if (table.expand) {
+      expand = expand.concat(table.expand).reduce((p: string[], c: string) => {
+        if (p.findIndex((e) => e === c) < 0) {
+          p.push(c);
+        }
+        return p;
+      }, []);
+    }
+
+    if (filter[0] && !filter[0].format) {
+      var queryPayload = {
+        query: {
+          // '__metadata': { 'type': 'SP.CamlQuery' },
+          ViewXml:
+            `<View>` +
+            // + `<RowLimit>500@</RowLimit>`
+            `${filter ? this.formatFilterNew(filter, 'WorkflowTasks') : ''}` +
+            `</View>`,
+          // "ListItemCollectionPosition": {
+          //     "PagingInfo": "Paged=TRUE&p_ID=" + 1
+          // }
+        },
+      };
+      let url = `${process.env.host}${process.env.taskRelativePath}/_api/web/lists/getbytitle('${table.name}')/getitems`;
+
+      return this._http
+        .post(url, {
+          headers: {
+            Accept: 'application/json;odata=verbose',
+            Authorization: `Bearer ${this.getToken()}`,
+            'X-RequestDigest': this.formDigestValue,
+          },
+          data: queryPayload,
+        })
+        .then((response: any) => {
+          let res = response.data;
+          return res.d.results.map((e: any) =>
+            this.formatValue(e, 'WorkflowTasks'),
+          )[0];
+        });
+    } else {
+      let url =
+        `${process.env.host}${process.env.relativePath}/_api/web/lists/getbytitle('${table.name}')/items?` +
+        `$skiptoken=Paged=TRUE&p_ID=1&$top=${this.pageSize}` +
+        `&$select=*` +
+        `${expand ? this.formatExpand(expand, 'WorkflowTasks') : ''}` +
+        `${filter ? this.formatFilter(filter, 'WorkflowTasks') : ''}`;
+
+      return this._http
+        .get(url, {
+          headers: {
+            Accept: 'application/json;odata=verbose',
+            Authorization: `Bearer ${this.getToken()}`,
+          },
+        })
+        .then((response: any) => {
+          let res = response.data;
+          return res.d.results.map((e: any) =>
+            this.formatValue(e, 'WorkflowTasks'),
+          )[0];
+        });
+    }
+  }
+
   //#endregion
 }
