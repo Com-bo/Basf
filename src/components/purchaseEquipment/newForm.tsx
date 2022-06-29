@@ -157,11 +157,7 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-        <Card
-          title="B. Subject Matter To Be Procured"
-          bordered={false}
-          style={{ backgroundColor: 'yellow' }}
-        >
+        <Card title="B. Subject Matter To Be Procured" bordered={false}>
           <Row gutter={20}>
             <Col span={24}>
               <Form.Item name="specialequipment" label="Special Equipment">
@@ -259,7 +255,6 @@ const index = () => {
                 name="ContractAmount"
                 label="Contract Amount"
                 rules={[{ required: true }]}
-                style={{ backgroundColor: 'yellow' }}
               >
                 <Select placeholder="-----select--------">
                   {/* <Option></Option> */}

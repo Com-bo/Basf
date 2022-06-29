@@ -55,13 +55,16 @@ const index = () => {
 
   useEffect(() => {
     // 附件之初始化
-    formService.getFileItems().then((res) => {
-      if (res && res.length) {
-        form.setFieldsValue({
-          file: res,
-        });
-      }
-    });
+    // formService.getTableDataAll("LeasedEquipment").then(res=>{
+    //   res=[{},{}]
+    // })
+    // formService.getFileItems().then((res) => {
+    //   if (res && res.length) {
+    //     form.setFieldsValue({
+    //       file: res,
+    //     });
+    //   }
+    // });
   }, []);
 
   const uploadProps = {

@@ -68,12 +68,12 @@ const index = () => {
   }, []);
 
   const uploadProps = {
-    onRemove: (file, fileList) => {
+    onRemove: (file: any, fileList: any) => {
       if (file.id) {
         return formService.deleteFileItem(file.name);
       }
     },
-    beforeUpload: (file, fileList) => {
+    beforeUpload: (file: any, fileList: any) => {
       if (!file.id) {
         return formService.uploadFile(file.name, file).then((res) => {
           // 存储文件
@@ -157,11 +157,7 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-        <Card
-          title="B. Subject Matter To Be Procured"
-          bordered={false}
-          style={{ backgroundColor: 'yellow' }}
-        >
+        <Card title="B. Subject Matter To Be Procured" bordered={false}>
           <Row gutter={20}>
             <Col span={24}>
               <div className="sujectmatter">
@@ -285,7 +281,6 @@ const index = () => {
                 name="ContractAmount "
                 label="Contract Amount 
                 (Low/Medium/High)"
-                style={{ backgroundColor: 'yellow' }}
                 rules={[{ required: true }]}
               >
                 <Select placeholder="-----select--------">

@@ -13,7 +13,7 @@ export default class FormService {
   constructor() {
     this._spService = new SpService();
   }
-  // 上传文件接口
+  // 上传单个文件接口
   async uploadFile(fileName: string, fileObject: any, id?: string) {
     let token = this._getToken();
     let index = fileName.lastIndexOf('.');

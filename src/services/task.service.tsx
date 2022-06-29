@@ -9,7 +9,7 @@ import {
   getImageColumn,
 } from './table-map';
 
-export default class SharepointService {
+export default class TaskService {
   private _http: HttpService;
   private formDigestValue: string;
   private pageSize = 500;

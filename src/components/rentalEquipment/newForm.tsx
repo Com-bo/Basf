@@ -157,11 +157,7 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-        <Card
-          title="B. Subject Matter To Be Procured"
-          bordered={false}
-          style={{ backgroundColor: 'yellow' }}
-        >
+        <Card title="B. Subject Matter To Be Procured" bordered={false}>
           <Row gutter={20}>
             <Col span={24}>
               <div className="fileWrapper">
@@ -282,18 +278,13 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-        <Card
-          title="C. Lease Term"
-          bordered={false}
-          style={{ backgroundColor: 'yellow' }}
-        >
+        <Card title="C. Lease Term" bordered={false}>
           <Row gutter={20}>
             <Col span={24}>
               <Form.Item
                 name="LeaseTerm"
                 label="Lease Term 
                 (Low/Medium/High)"
-                style={{ backgroundColor: 'yellow' }}
                 rules={[{ required: true }]}
               >
                 <Select placeholder="-----select--------">
@@ -321,7 +312,6 @@ const index = () => {
                 label="Contract Amount 
                 (Low/Medium/High)"
                 rules={[{ required: true }]}
-                style={{ backgroundColor: 'yellow' }}
               >
                 <Select placeholder="-----select--------">
                   {/* <Option></Option> */}
@@ -376,7 +366,7 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={24} style={{ backgroundColor: 'yellow' }}>
+            <Col span={24}>
               <Form.Item
                 name="aDeposit"
                 label="Whether There Is A Deposit
@@ -395,7 +385,6 @@ const index = () => {
                 label="Proportion Of Deposit In Annual Rent   
                   (Low/Medium/High)"
                 rules={[{ required: true }]}
-                style={{ backgroundColor: 'yellow' }}
               >
                 <Select placeholder="-----select--------">
                   {/* <Option></Option> */}
@@ -408,7 +397,6 @@ const index = () => {
                 label="Payment Cycle 
                 (Low/Medium/High)"
                 rules={[{ required: true }]}
-                style={{ backgroundColor: 'yellow' }}
               >
                 <Select placeholder="-----select--------">
                   {/* <Option></Option> */}

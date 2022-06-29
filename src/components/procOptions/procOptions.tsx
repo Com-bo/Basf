@@ -1,7 +1,7 @@
 import TextArea from 'antd/lib/input/TextArea';
 import React, { useState, useEffect } from 'react';
 import SpService from '@/services/sharepoint.service';
-import { Button, Card, Form, Input, Modal, Space } from 'antd';
+import { Button, Card, Col, Form, Input, Modal, Row, Space } from 'antd';
 
 interface IProps {
   wfFlowName?: string;
@@ -18,6 +18,7 @@ interface IBForm {
 
 const index = (props: IProps) => {
   const spService = new SpService();
+  const [form] = Form.useForm();
   const [comments, setComments] = useState('');
   const [buttons, setButtons] = useState(Array<string>());
 
@@ -46,9 +47,15 @@ const index = (props: IProps) => {
   //#region   按钮事件
 
   //表单提交
-  const onSubmit = () => {
-    props.formValidataion().then((res: IBForm) => {
-      if (res.isOK) {
+  const onSubmit = async () => {
+    let res: IBForm = await props.formValidataion().catch((e: any) => {
+      console.error(e);
+    });
+    if (res.isOK) {
+      const valid = await form.validateFields().catch((e: any) => {
+        console.error(e);
+      });
+      if (valid) {
         Modal.confirm({
           title: 'Tips',
           content: '是否确认发起流程？',
@@ -64,7 +71,7 @@ const index = (props: IProps) => {
           },
         });
       }
-    });
+    }
   };
 
   const onSave = () => {
@@ -102,18 +109,18 @@ const index = (props: IProps) => {
         <div className="actionWrapper">
           <Space size={20}>
             <Button
-              onClick={onSubmit}
-              hidden={buttons.indexOf('Submit') < 0}
-              danger
-            >
-              提交
-            </Button>
-            <Button
               onClick={onSave}
               hidden={buttons.indexOf('Save') < 0}
               type="default"
             >
-              保存
+              Save
+            </Button>
+            <Button
+              onClick={onSubmit}
+              hidden={buttons.indexOf('Submit') < 0}
+              danger
+            >
+              Submit
             </Button>
             <Button hidden={buttons.indexOf('Approve') < 0}>同意</Button>
             <Button hidden={buttons.indexOf('Reject') < 0}>拒绝</Button>
