@@ -1093,13 +1093,13 @@ export default class SharepointService {
   //提交表单
   submitBizForm(listName: string, item: any, link: string, isSubmit: Boolean) {
     try {
-      window.parent.postMessage(
-        {
-          action: 'loading',
-          params: true,
-        },
-        '*',
-      );
+      // window.parent.postMessage(
+      //   {
+      //     action: 'loading',
+      //     params: true,
+      //   },
+      //   '*',
+      // );
       var token = this.getToken();
       var spPageContext = this.getSpPageContextInfo();
       item.WFApplicant = spPageContext.userId;
@@ -1122,7 +1122,6 @@ export default class SharepointService {
       item.WFStatus = 'Starting';
       item.WFStep = 0;
       item.WFFormStatus = 'Submitted';
-
       this.addItem(listName, item, token).then((res) => {
         item.ID = res.ID;
         this.submitTaskForm(item, link, isSubmit).then((res) => {});
@@ -1146,6 +1145,7 @@ export default class SharepointService {
         '*',
       );
     }
+
     return this.addItem(listName, item, token).then((res) => {
       item.ID = res.ID;
       return this.submitTaskForm(item, link, isSubmit);

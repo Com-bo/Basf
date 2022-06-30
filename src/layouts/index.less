@@ -12,7 +12,7 @@
 @import '~antd/dist/antd.less';
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arail;
 }
 
 img {
@@ -29,9 +29,9 @@ img {
   > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::after {
   display: inline-block;
   margin-right: 4px;
-  color: #ff4d4f;
+  color: @primary-color;
   font-size: 14px;
-  font-family: SimSun, sans-serif;
+  font-family: Arail;
   line-height: 1;
   content: '*';
 }
@@ -48,7 +48,7 @@ img {
     font-size: 30px;
     color: @white;
     line-height: 185px;
-
+    font-family: Arail;
     font-weight: bold;
   }
 
@@ -71,6 +71,7 @@ img {
   .ant-input[disabled] {
     background-color: @form-card-bg;
   }
+
   .ant-form-item {
     margin-bottom: 20px;
   }
@@ -177,6 +178,11 @@ img {
       .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
         color: @form-card-title;
       }
+    }
+
+    .dot_required {
+      color: @primary-color;
+      margin: 0 5px;
     }
   }
 

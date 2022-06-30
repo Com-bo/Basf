@@ -257,7 +257,7 @@ export const TableTypeMap: any = {
         Key: 'NeededReasonExplain',
         SPList: 'NeededReasonExplain',
         CDSTable: 'NeededReasonExplain',
-        Type: 'Text',
+        Type: 'Multiline Text',
       },
       {
         Key: 'RequestService',
@@ -269,7 +269,7 @@ export const TableTypeMap: any = {
         Key: 'Background',
         SPList: 'Background',
         CDSTable: 'Background',
-        Type: 'Text',
+        Type: 'Multiline Text',
       },
       {
         Key: 'HasLicense',
@@ -287,7 +287,7 @@ export const TableTypeMap: any = {
         Key: 'NoLicenseReason',
         SPList: 'NoLicenseReason',
         CDSTable: 'NoLicenseReason',
-        Type: 'Text',
+        Type: 'Multiline Text',
       },
       {
         Key: 'UnethicalBehaviorRequired',
@@ -329,13 +329,13 @@ export const TableTypeMap: any = {
         Key: 'RiskAndmMeasures',
         SPList: 'RiskAndmMeasures',
         CDSTable: 'RiskAndmMeasures',
-        Type: 'Text',
+        Type: 'Multiline Text',
       },
       {
         Key: 'Comments',
         SPList: 'Comments',
         CDSTable: 'Comments',
-        Type: 'Text',
+        Type: 'Multiline Text',
       },
     ],
   },

@@ -24,6 +24,7 @@ import moment from 'moment';
 import ApprovalActions from '@/components/procOptions/procOptions';
 import { CloudUploadOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { formatStrategyValues } from 'rc-tree-select/lib/utils/strategyUtil';
+import { getapplicationNo } from '@/tools/utils';
 interface OptionItem {
   key: number;
   Title: string;
@@ -32,7 +33,7 @@ const index = () => {
   //#region   固定模板
   const formLink = 'http://bv_dpa.com:8001/subcontractContract?ID=';
   const wfFlowName = '6C941EF0-0464-088B-E2EF-7022F59C1CA5';
-  const listName = 'GeneralPurchase';
+  const listName = 'SubContractContract';
 
   const [form] = Form.useForm();
   // const spService = new SpService();
@@ -40,8 +41,11 @@ const index = () => {
 
   //获取流水号
   const getSerialNum = () => {
-    return 'SN' + moment(new Date(), 'YYYYMMDDHHmmss');
-    return 'GP' + moment(new Date(), 'YYYYMMDDHHmmss');
+    getapplicationNo(listName, formService).then((res) => {
+      form.setFieldsValue({
+        ApplicationNo: res,
+      });
+    });
   };
 
   //#endregion
@@ -50,9 +54,13 @@ const index = () => {
   const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
     return form.validateFields().then((res) => {
+      const params = {
+        ...form.getFieldsValue(),
+      };
+      delete params.file;
       return {
-        isOk: true,
-        formData: form.getFieldsValue(),
+        isOK: true,
+        formData: params,
         formLink,
         wfFlowName,
         listName,
@@ -74,6 +82,7 @@ const index = () => {
   const [contractTermsOptions, setContractTerms] = useState([]);
   const [hideTermExplainReason, setHideTermExplainReason] = useState(true);
   const [hideBackground, setHideBackground] = useState(true);
+  const [hasLicense, setHasLicense] = useState(null);
   useEffect(() => {
     // 附件之初始化
     // formService.getFileItems().then((res) => {
@@ -85,9 +94,9 @@ const index = () => {
     // });
     // 获取下拉options
     _getOps();
+    getSerialNum();
     form.setFieldsValue({
-      ApplicationNo: getSerialNum(),
-      RequestDate: moment().format('YYYY/MM/DD'),
+      RequestDate: moment(),
     });
   }, []);
   const getCountry = (_region: string) => {
@@ -135,16 +144,82 @@ const index = () => {
     //     return formService.deleteFileItem(file.name);
     //   }
     // },
-    // beforeUpload: (file, fileList) => {
-    //   if (!file.id) {
-    //     return formService.uploadFile(file.name, file).then((res) => {
-    //       // 存储文件
-    //       file.id = res;
-    //       return res;
-    //     });
-    //   }
-    //   return false;
-    // },
+    beforeUpload: (file, fileList) => {
+      // if (!file.id) {
+      //   return formService.uploadFile(file.name, file).then((res) => {
+      //     // 存储文件
+      //     file.id = res;
+      //     return res;
+      //   });
+      // }
+      return false;
+    },
+  };
+  const getLevel = (type: string) => {
+    switch (type) {
+      case 'Low':
+        return (
+          <span
+            style={{
+              display: 'inline-block',
+              fontSize: '14px',
+              marginLeft: '10px',
+              verticalAlign: 'middle',
+              color: '#2588c9',
+              backgroundColor: '#e9f3f3',
+              height: '18px',
+              padding: '0 5px',
+              borderRadius: '9px',
+              lineHeight: '18px',
+              textAlign: 'center',
+            }}
+          >
+            {type}
+          </span>
+        );
+      case 'High':
+        return (
+          <span
+            style={{
+              display: 'inline-block',
+              fontSize: '14px',
+              marginLeft: '10px',
+              verticalAlign: 'middle',
+              color: '#bd1738',
+              backgroundColor: '#f8e7eb',
+              height: '18px',
+              padding: '0 5px',
+              borderRadius: '9px',
+              lineHeight: '18px',
+              textAlign: 'center',
+            }}
+          >
+            {type}
+          </span>
+        );
+      case 'Medium':
+        return (
+          <span
+            style={{
+              display: 'inline-block',
+              fontSize: '14px',
+              marginLeft: '10px',
+              verticalAlign: 'middle',
+              color: '#d0a11d',
+              backgroundColor: '#faf5e8',
+              height: '18px',
+              padding: '0 5px',
+              borderRadius: '9px',
+              lineHeight: '18px',
+              textAlign: 'center',
+            }}
+          >
+            {type}
+          </span>
+        );
+      default:
+        return '';
+    }
   };
   const onValuesChange = ({
     EntityOfBVCPS,
@@ -199,7 +274,7 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item name="RequestDate" label="Request Date">
-                <Input disabled />
+                <DatePicker format="YYYY/MM/DD" disabled />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -335,12 +410,21 @@ const index = () => {
                 <Col span={12}>
                   <Form.Item
                     name="EntityOfBVCPS"
+                    required={false}
                     label={
                       <>
                         Whether the subcontractor is an entity of BVCPS
-                        <Tooltip title="Note, the CoE/BPCC declaration must be signed before or together with the contract.">
+                        <span className="dot_required">*</span>
+                        <Tooltip
+                          trigger="click"
+                          title="Note, the CoE/BPCC declaration must be signed before or together with the contract."
+                        >
                           <InfoCircleOutlined
-                            style={{ margin: '0 5px', color: 'orange' }}
+                            style={{
+                              margin: '0 5px',
+                              color: 'orange',
+                              cursor: 'pointer',
+                            }}
                           />
                         </Tooltip>
                       </>
@@ -380,9 +464,16 @@ const index = () => {
                           Whether the proposed services provided by the
                           subcontractor will have any connection to any country
                           listed under BV Sanctions policy
-                          <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / ">
+                          <Tooltip
+                            trigger="click"
+                            title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / "
+                          >
                             <InfoCircleOutlined
-                              style={{ margin: '0 5px', color: 'orange' }}
+                              style={{
+                                margin: '0 5px',
+                                color: 'orange',
+                                cursor: 'pointer',
+                              }}
                             />
                           </Tooltip>
                         </>
@@ -420,13 +511,22 @@ const index = () => {
             <Col span={24}>
               <Form.Item
                 name="AnnualContractSum"
+                required={false}
                 label={
                   <>
                     Please state the annual contract sum (if known) or provide
                     an estimate annual contract sum
-                    <Tooltip title="The applicant can fill in either the local currency or USD">
+                    <span className="dot_required">*</span>
+                    <Tooltip
+                      trigger="click"
+                      title="The applicant can fill in either the local currency or USD"
+                    >
                       <InfoCircleOutlined
-                        style={{ margin: '0 5px', color: 'orange' }}
+                        style={{
+                          margin: '0 5px',
+                          color: 'orange',
+                          cursor: 'pointer',
+                        }}
                       />
                     </Tooltip>
                   </>
@@ -493,8 +593,19 @@ const index = () => {
           <Row gutter={20}>
             <Col span={12}>
               <Form.Item
+                required={false}
                 name="NeededReason"
-                label="Please describe why the subcontractor is needed"
+                label={
+                  <>
+                    Please describe why the subcontractor is needed{' '}
+                    <span className="dot_required">*</span>{' '}
+                    {getLevel(
+                      form.getFieldValue('NeededReason') !== 'Others'
+                        ? 'Low'
+                        : '',
+                    )}{' '}
+                  </>
+                }
                 rules={[{ required: true }]}
               >
                 <Select
@@ -530,8 +641,19 @@ const index = () => {
             )}
             <Col span={12}>
               <Form.Item
+                required={false}
                 name="RequestService"
-                label="Did a BV customer or government official request the service?"
+                label={
+                  <>
+                    Did a BV customer or government official request the
+                    service?<span className="dot_required">*</span>
+                    {getLevel(
+                      form.getFieldValue('RequestService') == 1
+                        ? 'High'
+                        : 'Low',
+                    )}
+                  </>
+                }
                 rules={[{ required: true }]}
               >
                 <Radio.Group
@@ -555,6 +677,7 @@ const index = () => {
                 <Form.Item
                   name="Background"
                   label="Please provide the background"
+                  rules={[{ required: true }]}
                 >
                   <Input.TextArea placeholder="Please input" />
                 </Form.Item>
@@ -563,34 +686,67 @@ const index = () => {
             <Col span={24}>
               <Form.Item
                 name="HasLicense"
-                label='Whether the subcontractor has license to operate ("LTO")  required by the project?'
+                required={false}
+                label={
+                  <>
+                    Whether the subcontractor has license to operate ("LTO")
+                    required by the project?
+                    <span className="dot_required">*</span>
+                    {getLevel(
+                      form.getFieldValue('HasLicense') == 1 ? 'High' : 'Low',
+                    )}
+                  </>
+                }
               >
-                <Radio.Group>
+                <Radio.Group
+                  onChange={(e) => {
+                    setHasLicense(e.target.value);
+                  }}
+                >
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
               </Form.Item>
             </Col>
+            {hasLicense == 1 ? (
+              <Col span={12}>
+                <Form.Item
+                  name="InsertLTO"
+                  label="Please insert the LTO of the subcontractor"
+                  rules={[{ required: true }]}
+                >
+                  <Input placeholder="Please input" />
+                </Form.Item>
+              </Col>
+            ) : hasLicense === 0 ? (
+              <Col span={24}>
+                <Form.Item
+                  name="NoLicenseReason"
+                  label="Please explain the reason"
+                  rules={[{ required: true }]}
+                >
+                  <Input.TextArea placeholder="Please input" />
+                </Form.Item>
+              </Col>
+            ) : (
+              ''
+            )}
+
             <Col span={12}>
               <Form.Item
-                name="InsertLTO"
-                label="Please insert the LTO of the subcontractor"
-              >
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={24}>
-              <Form.Item
-                name="NoLicenseReason"
-                label="Please explain the reason"
-              >
-                <Input.TextArea placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
+                required={false}
                 name="UnethicalBehaviorRequired"
-                label="Does the contracting process require unethical behavior?"
+                label={
+                  <>
+                    Does the contracting process require unethical behavior?
+                    <span className="dot_required">*</span>
+                    {getLevel(
+                      form.getFieldValue('UnethicalBehaviorRequired') === 1
+                        ? 'High'
+                        : 'Low',
+                    )}
+                  </>
+                }
                 rules={[{ required: true }]}
               >
                 <Radio.Group>
@@ -601,8 +757,22 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
+                required={false}
                 name="FamilyMemberHere"
-                label="Do you or your family member have any interest in the subcontractor or does your family member work for or in the subcontractor?"
+                label={
+                  <>
+                    <span>
+                      Do you or your family member have any interest in the
+                      subcontractor or does your family member work for or in
+                      the subcontractor?<span className="dot_required">*</span>
+                      {getLevel(
+                        form.getFieldValue('FamilyMemberHere') == 1
+                          ? 'High'
+                          : 'Low',
+                      )}
+                    </span>
+                  </>
+                }
                 rules={[{ required: true }]}
               >
                 <Radio.Group>
@@ -613,8 +783,17 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
+                required={false}
                 name="ProcessInfo"
-                label="Will the subcontractor be processing personal data on behalf of BV or accessing any of BV’s Information System?"
+                label={
+                  <>
+                    <span>
+                      Will the subcontractor be processing personal data on
+                      behalf of BV or accessing any of BV’s Information System?
+                      <span className="dot_required">*</span>
+                    </span>
+                  </>
+                }
                 rules={[{ required: true }]}
               >
                 <Radio.Group>
@@ -638,14 +817,28 @@ const index = () => {
             <Col span={12}>
               <Form.Item
                 name="UseMandatoryTemplate"
+                required={false}
                 label={
                   <>
                     Whether to use a BV Mandatory template
-                    <Tooltip title="In principle, BV entities shall use our standard template for subcontractor agreements.">
+                    <span className="dot_required">*</span>
+                    <Tooltip
+                      trigger="click"
+                      title="In principle, BV entities shall use our standard template for subcontractor agreements."
+                    >
                       <InfoCircleOutlined
-                        style={{ margin: '0 5px', color: 'orange' }}
+                        style={{
+                          margin: '0 5px',
+                          color: 'orange',
+                          cursor: 'pointer',
+                        }}
                       />
                     </Tooltip>
+                    {getLevel(
+                      form.getFieldValue('UseMandatoryTemplate') == 0
+                        ? 'High'
+                        : 'Low',
+                    )}
                   </>
                 }
                 rules={[{ required: true }]}
@@ -707,90 +900,112 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-        <Card title="F. Approver Information" bordered={false}>
-          <Row gutter={20}>
-            <Col span={12}>
-              <Form.Item
-                name="procurement"
-                label="Procurement"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="financeController"
-                label="Finance Controller"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="dataSecurity"
-                label="Data Security"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="legal"
-                label="Legal"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="siteGM"
-                label="Site GM"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="countryManagerGM"
-                label="Country Manager/GM"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="regionalVP"
-                label="Regional VP"
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="cfo" label="CFO" rules={[{ required: true }]}>
-                <Input placeholder="Please input" />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
-      </Form>
-      <div style={{ margin: '20px auto', textAlign: 'center' }}>
+
+        {/* <div style={{ margin: '20px auto', textAlign: 'center' }}>
         <Space size={50}>
-          <Button type="primary" onClick={() => {}}>
+          <Button type="primary" onClick={() => {
+            form.validateFields().then(res => {
+              formService.submitBizForm(
+               listName,
+                res.formData,
+                res.formLink,
+                true,
+              );
+           
+            })
+          }}>
             Save
           </Button>
-          <Button type="primary" onClick={() => {}}>
+          <Button type="primary" onClick={() => { }}>
             Submit
           </Button>
         </Space>
-      </div>
-      {/* <ApprovalActions formValidataion={onSubmit}></ApprovalActions> */}
+      </div> */}
+        <ApprovalActions
+          formValidataion={onSubmit}
+          callBack={(result: any) => {
+            console.log('提交');
+          }}
+          approvalRender={
+            <Card title="F. Approver Information" bordered={false}>
+              <Row gutter={20}>
+                <Col span={12}>
+                  <Form.Item
+                    name="procurement"
+                    label="Procurement"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="financeController"
+                    label="Finance Controller"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="dataSecurity"
+                    label="Data Security"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="legal"
+                    label="Legal"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="siteGM"
+                    label="Site GM"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="countryManagerGM"
+                    label="Country Manager/GM"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="regionalVP"
+                    label="Regional VP"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="cfo"
+                    label="CFO"
+                    rules={[{ required: true }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+          }
+        ></ApprovalActions>
+      </Form>
     </>
   );
 };

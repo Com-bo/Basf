@@ -1,11 +1,23 @@
 import TextArea from 'antd/lib/input/TextArea';
 import React, { useState, useEffect } from 'react';
 import SpService from '@/services/sharepoint.service';
-import { Button, Card, Col, Form, Input, Modal, Row, Space } from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Row,
+  Space,
+} from 'antd';
 
 interface IProps {
   wfFlowName?: string;
   formValidataion: Function;
+  approvalRender: React.ReactNode;
+  callBack?: Function;
 }
 
 interface IBForm {
@@ -62,12 +74,13 @@ const index = (props: IProps) => {
           okText: '确认发起',
           cancelText: '取消',
           onOk: () => {
-            spService.submitBizForm(
-              res.listName,
-              res.formData,
-              res.formLink,
-              true,
-            );
+            spService
+              .submitBizForm(res.listName, res.formData, res.formLink, true)
+              .then((res) => {
+                console.log(res);
+                props.callBack && props.callBack(res);
+              })
+              .catch((e) => message.error(e));
           },
         });
       }
@@ -83,12 +96,13 @@ const index = (props: IProps) => {
           okText: '确认保存',
           cancelText: '取消',
           onOk: () => {
-            spService.submitBizForm(
-              res.listName,
-              res.formData,
-              res.formLink,
-              true,
-            );
+            spService
+              .submitBizForm(res.listName, res.formData, res.formLink, true)
+              .then((res) => {
+                console.log(res);
+                props.callBack && props.callBack(res);
+              })
+              .catch((e) => message.error(e));
           },
         });
       }
@@ -99,39 +113,42 @@ const index = (props: IProps) => {
 
   return (
     <>
-      <Card title="Process Info" bordered={false}>
+      {/* <Card title="Process Info" bordered={false}>
         <Form.Item label="Comments">
           <TextArea
             onChange={(e) => setComments(e.target.value)}
             value={comments}
           ></TextArea>
         </Form.Item>
-        <div className="actionWrapper">
-          <Space size={20}>
-            <Button
-              onClick={onSave}
-              hidden={buttons.indexOf('Save') < 0}
-              type="default"
-            >
-              Save
-            </Button>
-            <Button
-              onClick={onSubmit}
-              hidden={buttons.indexOf('Submit') < 0}
-              danger
-            >
-              Submit
-            </Button>
-            <Button hidden={buttons.indexOf('Approve') < 0}>同意</Button>
-            <Button hidden={buttons.indexOf('Reject') < 0}>拒绝</Button>
-            <Button hidden={buttons.indexOf('Trans') < 0}>转移任务</Button>
-            <Button hidden={buttons.indexOf('Add') < 0}>加签</Button>
-            <Button hidden={buttons.indexOf('Post') < 0}>提交</Button>
-            <Button hidden={buttons.indexOf('Return') < 0}>退回</Button>
-            <Button hidden={buttons.indexOf('NotAllow') < 0}>不同意</Button>
-          </Space>
-        </div>
-      </Card>
+      
+      </Card> */}
+
+      {props.approvalRender}
+      <div className="actionWrapper">
+        <Space size={20}>
+          <Button
+            onClick={onSave}
+            hidden={buttons.indexOf('Save') < 0}
+            type="default"
+          >
+            Save
+          </Button>
+          <Button
+            onClick={onSubmit}
+            hidden={buttons.indexOf('Submit') < 0}
+            danger
+          >
+            Submit
+          </Button>
+          <Button hidden={buttons.indexOf('Approve') < 0}>同意</Button>
+          <Button hidden={buttons.indexOf('Reject') < 0}>拒绝</Button>
+          <Button hidden={buttons.indexOf('Trans') < 0}>转移任务</Button>
+          <Button hidden={buttons.indexOf('Add') < 0}>加签</Button>
+          <Button hidden={buttons.indexOf('Post') < 0}>提交</Button>
+          <Button hidden={buttons.indexOf('Return') < 0}>退回</Button>
+          <Button hidden={buttons.indexOf('NotAllow') < 0}>不同意</Button>
+        </Space>
+      </div>
     </>
   );
 };
