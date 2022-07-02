@@ -28,40 +28,9 @@ const index = (props: any) => {
 
   const spService = new SpService();
 
-  // useEffect(() => {
-  //   spService
-  //     .getTableData(
-  //       listName,
-  //       [
-  //         {
-  //           type: 'filter eq',
-  //           value: props?.location?.query?.ID,
-  //           properties: ['Id'],
-  //         },
-  //       ],
-  //       [],
-  //     )
-  //     .then((res) => {
-  //       setBizInfo(res[0]);
-  //       form.setFieldsValue(res[0]);
-  //       getButtons(res[0].Title);
-  //     });
-  // }, [props]);
-
-  // const getButtons = (title: string) => {
-  //   if (!props?.location?.query?.Btn) {
-  //     return '';
-  //   }
-  //   spService.getWorkflowTaskInfo(title).then((res) => {
-  //     setTaskInfo(res[0]);
-  //     console.log(res[0]);
-  //     setButtons(JSON.parse(res[0].ResponseOptions));
-  //   });
-  // };
-
   const onSubmit = () => {
     return Promise.resolve({
-      isOk: true,
+      isOK: true,
       formData: form.getFieldsValue(),
       formLink,
       wfFlowName,
@@ -176,7 +145,7 @@ const index = (props: any) => {
                 <Col span={24}>
                   <Form.Item
                     name="Environmental"
-                    label="Environmental protection (such as sewage discharge), fire fighting and occupational safety articles (A. personal protective equipment; 
+                    label="Environmental protection (such as sewage discharge), fire fighting and occupational safety articles (A. personal protective equipment;
    B. fire fighting equipment; C. mandatory inspection equipment; D. others (please fill in the name))"
                   >
                     <Radio.Group disabled>

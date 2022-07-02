@@ -44,7 +44,7 @@ const index = () => {
   const onSubmit = () => {
     return form.validateFields().then((res) => {
       return {
-        isOk: true,
+        isOK: true,
         formData: form.getFieldsValue(),
         formLink,
         wfFlowName,

@@ -63,7 +63,7 @@ const index = (props: IProps) => {
     let res: IBForm = await props.formValidataion().catch((e: any) => {
       console.error(e);
     });
-    if (res.isOK) {
+    if (res?.isOK) {
       const valid = await form.validateFields().catch((e: any) => {
         console.error(e);
       });
@@ -84,6 +84,8 @@ const index = (props: IProps) => {
           },
         });
       }
+    } else {
+      message.error('表单验证失败！');
     }
   };
 
@@ -120,7 +122,7 @@ const index = (props: IProps) => {
             value={comments}
           ></TextArea>
         </Form.Item>
-      
+
       </Card> */}
 
       {props.approvalRender}

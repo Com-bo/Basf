@@ -900,27 +900,6 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-
-        {/* <div style={{ margin: '20px auto', textAlign: 'center' }}>
-        <Space size={50}>
-          <Button type="primary" onClick={() => {
-            form.validateFields().then(res => {
-              formService.submitBizForm(
-               listName,
-                res.formData,
-                res.formLink,
-                true,
-              );
-           
-            })
-          }}>
-            Save
-          </Button>
-          <Button type="primary" onClick={() => { }}>
-            Submit
-          </Button>
-        </Space>
-      </div> */}
         <ApprovalActions
           formValidataion={onSubmit}
           callBack={(result: any) => {
@@ -931,7 +910,7 @@ const index = () => {
               <Row gutter={20}>
                 <Col span={12}>
                   <Form.Item
-                    name="procurement"
+                    name="Procurement"
                     label="Procurement"
                     rules={[{ required: true }]}
                   >
@@ -940,7 +919,7 @@ const index = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="financeController"
+                    name="FinanceController"
                     label="Finance Controller"
                     rules={[{ required: true }]}
                   >
@@ -949,7 +928,7 @@ const index = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="dataSecurity"
+                    name="DataSecurity"
                     label="Data Security"
                     rules={[{ required: true }]}
                   >
@@ -958,7 +937,7 @@ const index = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="legal"
+                    name="Legal"
                     label="Legal"
                     rules={[{ required: true }]}
                   >
@@ -967,7 +946,7 @@ const index = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="siteGM"
+                    name="SiteGM"
                     label="Site GM"
                     rules={[{ required: true }]}
                   >
@@ -976,7 +955,7 @@ const index = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="countryManagerGM"
+                    name="CountryManagerGM"
                     label="Country Manager/GM"
                     rules={[{ required: true }]}
                   >
@@ -985,7 +964,7 @@ const index = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="regionalVP"
+                    name="RegionalVP"
                     label="Regional VP"
                     rules={[{ required: true }]}
                   >
@@ -994,7 +973,7 @@ const index = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="cfo"
+                    name="CFO"
                     label="CFO"
                     rules={[{ required: true }]}
                   >

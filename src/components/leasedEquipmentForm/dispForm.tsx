@@ -64,7 +64,7 @@ const index = (props: any) => {
 
   const onSubmit = () => {
     return Promise.resolve({
-      isOk: true,
+      isOK: true,
       formData: form.getFieldsValue(),
       formLink,
       wfFlowName,

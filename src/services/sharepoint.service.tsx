@@ -1102,22 +1102,14 @@ export default class SharepointService {
       // );
       var token = this.getToken();
       var spPageContext = this.getSpPageContextInfo();
-      item.WFApplicant = spPageContext.userId;
+      item.WFApplicantId = spPageContext.userId;
       item.WFApplicantTime = new Date();
       item.WFStatus = 'Starting';
       item.WFStep = 0;
       item.WFFormStatus = 'Submitted';
-      // try {
-      // window.parent.postMessage(
-      //   {
-      //     action: 'loading',
-      //     params: true,
-      //   },
-      //   '*',
-      // );
       var token = this.getToken();
       var spPageContext = this.getSpPageContextInfo();
-      item.WFApplicant = spPageContext.userId;
+      item.WFApplicantId = spPageContext.userId;
       item.WFApplicantTime = new Date();
       item.WFStatus = 'Starting';
       item.WFStep = 0;

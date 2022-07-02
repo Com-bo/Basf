@@ -61,7 +61,7 @@ const index = (props: any) => {
 
   const onSubmit = () => {
     return Promise.resolve({
-      isOk: true,
+      isOK: true,
       formData: form.getFieldsValue(),
       formLink,
       wfFlowName,
@@ -176,7 +176,7 @@ const index = (props: any) => {
                 <Col span={24}>
                   <Form.Item
                     name="Environmental"
-                    label="Environmental protection (such as sewage discharge), fire fighting and occupational safety articles (A. personal protective equipment; 
+                    label="Environmental protection (such as sewage discharge), fire fighting and occupational safety articles (A. personal protective equipment;
    B. fire fighting equipment; C. mandatory inspection equipment; D. others (please fill in the name))"
                   >
                     <Radio.Group disabled>
