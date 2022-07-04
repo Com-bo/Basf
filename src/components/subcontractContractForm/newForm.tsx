@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './index.less';
-import SpService from '@/services/sharepoint.service';
+
 import './index.less';
 import {
   Form,
@@ -22,8 +22,11 @@ import {
 import FormService from '@/services/form.service';
 import moment from 'moment';
 import ApprovalActions from '@/components/procOptions/procOptions';
-import { CloudUploadOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { formatStrategyValues } from 'rc-tree-select/lib/utils/strategyUtil';
+import {
+  CloudUploadOutlined,
+  InfoCircleOutlined,
+  BellOutlined,
+} from '@ant-design/icons';
 import { getapplicationNo } from '@/tools/utils';
 interface OptionItem {
   key: number;
@@ -83,6 +86,10 @@ const index = () => {
   const [hideTermExplainReason, setHideTermExplainReason] = useState(true);
   const [hideBackground, setHideBackground] = useState(true);
   const [hasLicense, setHasLicense] = useState(null);
+  const [familyMemberHere, setFamilyMemberHere] = useState(null);
+  const [unethicalBehaviorRequired, setUnethicalBehaviorRequired] =
+    useState(null);
+  const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   useEffect(() => {
     // 附件之初始化
     // formService.getFileItems().then((res) => {
@@ -92,6 +99,9 @@ const index = () => {
     //     });
     //   }
     // });
+    // formService.getTableDataAll("ProcAttachList").then(res=>{
+
+    // })
     // 获取下拉options
     _getOps();
     getSerialNum();
@@ -144,7 +154,7 @@ const index = () => {
     //     return formService.deleteFileItem(file.name);
     //   }
     // },
-    beforeUpload: (file, fileList) => {
+    beforeUpload: (file: any, fileList: any) => {
       // if (!file.id) {
       //   return formService.uploadFile(file.name, file).then((res) => {
       //     // 存储文件
@@ -274,7 +284,11 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item name="RequestDate" label="Request Date">
-                <DatePicker format="YYYY/MM/DD" disabled />
+                <DatePicker
+                  format="YYYY/MM/DD"
+                  disabled
+                  style={{ width: '100%' }}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -415,17 +429,8 @@ const index = () => {
                       <>
                         Whether the subcontractor is an entity of BVCPS
                         <span className="dot_required">*</span>
-                        <Tooltip
-                          trigger="click"
-                          title="Note, the CoE/BPCC declaration must be signed before or together with the contract."
-                        >
-                          <InfoCircleOutlined
-                            style={{
-                              margin: '0 5px',
-                              color: 'orange',
-                              cursor: 'pointer',
-                            }}
-                          />
+                        <Tooltip title="Note, the CoE/BPCC declaration must be signed before or together with the contract.">
+                          <BellOutlined />
                         </Tooltip>
                       </>
                     }
@@ -464,17 +469,8 @@ const index = () => {
                           Whether the proposed services provided by the
                           subcontractor will have any connection to any country
                           listed under BV Sanctions policy
-                          <Tooltip
-                            trigger="click"
-                            title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / "
-                          >
-                            <InfoCircleOutlined
-                              style={{
-                                margin: '0 5px',
-                                color: 'orange',
-                                cursor: 'pointer',
-                              }}
-                            />
+                          <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / ">
+                            <BellOutlined />
                           </Tooltip>
                         </>
                       }
@@ -517,17 +513,8 @@ const index = () => {
                     Please state the annual contract sum (if known) or provide
                     an estimate annual contract sum
                     <span className="dot_required">*</span>
-                    <Tooltip
-                      trigger="click"
-                      title="The applicant can fill in either the local currency or USD"
-                    >
-                      <InfoCircleOutlined
-                        style={{
-                          margin: '0 5px',
-                          color: 'orange',
-                          cursor: 'pointer',
-                        }}
-                      />
+                    <Tooltip title="The applicant can fill in either the local currency or USD">
+                      <BellOutlined />
                     </Tooltip>
                   </>
                 }
@@ -600,7 +587,8 @@ const index = () => {
                     Please describe why the subcontractor is needed{' '}
                     <span className="dot_required">*</span>{' '}
                     {getLevel(
-                      form.getFieldValue('NeededReason') !== 'Others'
+                      form.getFieldValue('NeededReason') !== 'Others' &&
+                        form.getFieldValue('NeededReason')
                         ? 'Low'
                         : '',
                     )}{' '}
@@ -650,7 +638,9 @@ const index = () => {
                     {getLevel(
                       form.getFieldValue('RequestService') == 1
                         ? 'High'
-                        : 'Low',
+                        : form.getFieldValue('RequestService') === 0
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
@@ -693,7 +683,11 @@ const index = () => {
                     required by the project?
                     <span className="dot_required">*</span>
                     {getLevel(
-                      form.getFieldValue('HasLicense') == 1 ? 'High' : 'Low',
+                      form.getFieldValue('HasLicense') == 1
+                        ? 'High'
+                        : form.getFieldValue('HasLicense') === 0
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
@@ -743,13 +737,19 @@ const index = () => {
                     {getLevel(
                       form.getFieldValue('UnethicalBehaviorRequired') === 1
                         ? 'High'
-                        : 'Low',
+                        : form.getFieldValue('UnethicalBehaviorRequired') === 0
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
                 rules={[{ required: true }]}
               >
-                <Radio.Group>
+                <Radio.Group
+                  onChange={(val: any) => {
+                    setUnethicalBehaviorRequired(val);
+                  }}
+                >
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -768,14 +768,20 @@ const index = () => {
                       {getLevel(
                         form.getFieldValue('FamilyMemberHere') == 1
                           ? 'High'
-                          : 'Low',
+                          : form.getFieldValue('FamilyMemberHere') === 0
+                          ? 'Low'
+                          : '',
                       )}
                     </span>
                   </>
                 }
                 rules={[{ required: true }]}
               >
-                <Radio.Group>
+                <Radio.Group
+                  onChange={(val: any) => {
+                    setFamilyMemberHere(val);
+                  }}
+                >
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -822,28 +828,25 @@ const index = () => {
                   <>
                     Whether to use a BV Mandatory template
                     <span className="dot_required">*</span>
-                    <Tooltip
-                      trigger="click"
-                      title="In principle, BV entities shall use our standard template for subcontractor agreements."
-                    >
-                      <InfoCircleOutlined
-                        style={{
-                          margin: '0 5px',
-                          color: 'orange',
-                          cursor: 'pointer',
-                        }}
-                      />
+                    <Tooltip title="In principle, BV entities shall use our standard template for subcontractor agreements.">
+                      <BellOutlined />
                     </Tooltip>
                     {getLevel(
-                      form.getFieldValue('UseMandatoryTemplate') == 0
+                      form.getFieldValue('UseMandatoryTemplate') === 0
                         ? 'High'
-                        : 'Low',
+                        : form.getFieldValue('UseMandatoryTemplate') === 1
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
                 rules={[{ required: true }]}
               >
-                <Radio.Group>
+                <Radio.Group
+                  onChange={(val: any) => {
+                    setUseMandatoryTemplate(val);
+                  }}
+                >
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -875,7 +878,7 @@ const index = () => {
                   label="Upload Contract Attachment"
                   rules={[{ required: true }]}
                 >
-                  <Upload {...uploadProps}>
+                  <Upload {...uploadProps} listType="picture-card">
                     <div className="file_upload">
                       <CloudUploadOutlined />
                       <br />
@@ -903,7 +906,9 @@ const index = () => {
         <ApprovalActions
           formValidataion={onSubmit}
           callBack={(result: any) => {
-            console.log('提交');
+            debugger;
+            //  formService.uploadFile(form.getFieldValue("file")).
+            // formService.uploadFile()
           }}
           approvalRender={
             <Card title="F. Approver Information" bordered={false}>

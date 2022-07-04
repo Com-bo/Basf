@@ -74,6 +74,7 @@ export default class FormService {
     return this._spService
       .getFileItems(this._fileListName, token)
       .then((res) => {
+        debugger;
         let results = res.results;
         // 处理文件
         let files: any = [];

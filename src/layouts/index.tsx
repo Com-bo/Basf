@@ -5,6 +5,9 @@ const _config: any = {
   subcontractContract: {
     title: 'Subcontract  Contract Application Form',
   },
+  leasehold: {
+    title: 'Risk Assessment Questionaire for Lease of Real Estate',
+  },
 };
 export default function (props: any) {
   const [title, setTitle] = useState('Procurement  Contract Application Form');

@@ -738,6 +738,7 @@ export default class SharepointService {
         },
       })
       .then((response: any) => {
+        debugger;
         if (response.data.d) {
           return response.data.d;
         }

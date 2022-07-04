@@ -97,7 +97,7 @@ const index = () => {
     //   }
     // });
     // 获取下拉options
-    // _getOps();
+    _getOps();
     getSerialNum();
     form.setFieldsValue({
       RequestDate: moment(),

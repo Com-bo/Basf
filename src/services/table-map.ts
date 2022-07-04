@@ -5,7 +5,14 @@ export const TableTypeMap: any = {
     SPList: 'ProcAttachList',
     CDSTable: 'ProcAttachList',
     Fields: [
-      { Key: 'Id', SPList: 'id', CDSTable: 'id', Type: 'Int' },
+      { Key: 'Name', SPList: 'Name', CDSTable: 'Name', Type: 'Text' },
+      {
+        Key: 'ProcName',
+        SPList: 'ProcName',
+        CDSTable: 'ProcName',
+        Type: 'Text',
+      },
+      { Key: 'ProcId', SPList: 'ProcId', CDSTable: 'ProcId', Type: 'Text' },
       // { Key: 'Title', SPList: 'Title', CDSTable: 'title', Type: 'Text' },
     ],
   },
