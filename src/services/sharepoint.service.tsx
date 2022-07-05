@@ -95,6 +95,7 @@ export default class SharepointService {
         filters
           .map((e) => {
             let newStr = e.format;
+
             e.properties.forEach((k) => {
               let column = formatColumnByKey(listName, k);
               if (column.expandProperties) {
@@ -163,6 +164,7 @@ export default class SharepointService {
     arr: any[],
     properties: any[],
   ) {
+    debugger;
     let order = arr[1] ? arr[1] : 'asc';
     let column = formatColumnByKey(listName, properties[0]);
     if (column.expandProperties) {
@@ -732,6 +734,8 @@ export default class SharepointService {
         item.ProcName +
         "','ProcId':'" +
         item.ProcId +
+        "','Title':'" +
+        'sub' +
         "'}";
       return await this._http.post(file.uri, {
         data: body,
@@ -775,12 +779,15 @@ export default class SharepointService {
         },
       })
       .then((response: any) => {
-        debugger;
+        // this.getField(response.data.d.results[0])
         if (response.data.d) {
           return response.data.d;
         }
         return response.data;
       });
+  }
+  getField(url: string) {
+    // 通过链接获取字段
   }
 
   async updateIcon(file: any, name: string, users: string | any[], token: any) {

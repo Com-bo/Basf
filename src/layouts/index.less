@@ -73,6 +73,15 @@ img {
     background-color: @form-card-bg;
     color: @form-card-sec-title-color;
   }
+  .ant-radio-disabled .ant-radio-inner::after {
+    background-color: @primary-color;
+  }
+  .ant-radio-disabled + span {
+    color: @form-card-sec-title-color;
+  }
+  .ant-radio-checked.ant-radio-disabled .ant-radio-inner {
+    border-color: @primary-color !important;
+  }
 
   .ant-picker-input > input[disabled] {
     color: @form-card-sec-title-color;

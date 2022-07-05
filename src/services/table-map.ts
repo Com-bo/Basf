@@ -123,6 +123,12 @@ export const TableTypeMap: any = {
     CDSTable: 'SubcontractContract',
     Fields: [
       {
+        Key: 'ID',
+        SPList: 'ID',
+        CDSTable: 'ID',
+        Type: 'Number',
+      },
+      {
         Key: 'ApplicationNo',
         SPList: 'ApplicationNo',
         CDSTable: 'ApplicationNo',
@@ -343,6 +349,54 @@ export const TableTypeMap: any = {
         SPList: 'Comments',
         CDSTable: 'Comments',
         Type: 'Multiline Text',
+      },
+      {
+        Key: 'Procurement',
+        SPList: 'Procurement',
+        CDSTable: 'Procurement',
+        Type: 'Text',
+      },
+      {
+        Key: 'FinanceController',
+        SPList: 'FinanceController',
+        CDSTable: 'FinanceController',
+        Type: 'Text',
+      },
+      {
+        Key: 'DataSecurity',
+        SPList: 'DataSecurity',
+        CDSTable: 'DataSecurity',
+        Type: 'Text',
+      },
+      {
+        Key: 'Legal',
+        SPList: 'Legal',
+        CDSTable: 'Legal',
+        Type: 'Text',
+      },
+      {
+        Key: 'SiteGM',
+        SPList: 'SiteGM',
+        CDSTable: 'SiteGM',
+        Type: 'Text',
+      },
+      {
+        Key: 'CountryManagerGM',
+        SPList: 'CountryManagerGM',
+        CDSTable: 'CountryManagerGM',
+        Type: 'Text',
+      },
+      {
+        Key: 'RegionalVP',
+        SPList: 'RegionalVP',
+        CDSTable: 'RegionalVP',
+        Type: 'Text',
+      },
+      {
+        Key: 'CFO',
+        SPList: 'CFO',
+        CDSTable: 'CFO',
+        Type: 'Text',
       },
     ],
   },

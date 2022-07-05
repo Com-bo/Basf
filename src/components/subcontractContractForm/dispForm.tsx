@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './index.less';
-import SpService from '@/services/sharepoint.service';
+
 import './index.less';
 import {
   Form,
@@ -22,8 +22,11 @@ import {
 import FormService from '@/services/form.service';
 import moment from 'moment';
 import ApprovalActions from '@/components/procOptions/procOptions';
-import { CloudUploadOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { formatStrategyValues } from 'rc-tree-select/lib/utils/strategyUtil';
+import {
+  CloudUploadOutlined,
+  InfoCircleOutlined,
+  BellOutlined,
+} from '@ant-design/icons';
 import { getapplicationNo } from '@/tools/utils';
 interface OptionItem {
   key: number;
@@ -38,15 +41,6 @@ const index = () => {
   const [form] = Form.useForm();
   // const spService = new SpService();
   const formService = new FormService();
-
-  //获取流水号
-  const getSerialNum = () => {
-    getapplicationNo(listName, formService).then((res) => {
-      form.setFieldsValue({
-        ApplicationNo: res,
-      });
-    });
-  };
 
   //#endregion
 
@@ -89,59 +83,47 @@ const index = () => {
   const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   useEffect(() => {
     // 附件之初始化
-    // formService.getFileItems().then((res) => {
-    //   if (res && res.length) {
-    //     form.setFieldsValue({
-    //       file: res,
-    //     });
-    //   }
-    // });
-    // 获取下拉options
-    // _getOps();
-    getSerialNum();
-    form.setFieldsValue({
-      RequestDate: moment(),
-    });
-  }, []);
-  const getCountry = (_region: string) => {
-    return formService
+    formService
       .getTableData(
-        'Country',
+        listName,
         [
           {
             type: 'filter eq',
-            value: _region,
-            properties: ['Region'],
+            value: 26,
+            properties: ['ID'],
           },
         ],
         [],
       )
       .then((res) => {
-        setCountry(res);
+        if (res && res.length) {
+          console.log(res[0]);
+          form.setFieldsValue({
+            ...res[0],
+            RequestDate: moment(res[0].RequestDate),
+          });
+        }
+        return formService.getFileItems(listName, 26);
       })
-      .catch((e) => {});
-  };
+      .then((res) => {
+        if (res && res.length) {
+          form.setFieldsValue({
+            file: res,
+          });
+        }
+      });
+    // 获取表单
 
-  const _getOps = async () => {
-    try {
-      const drop1 = await formService.getTableDataAll('SBU');
-      setSBUOptions(drop1);
-      const drop2 = await formService.getTableDataAll('BVSigningEntity');
-      setBVEntityOptions(drop2);
-      const drop3 = await formService.getTableDataAll('Site');
-      setSiteOptions(drop3);
-      const drop4 = await formService.getTableDataAll('Region');
-      setRegion(drop4);
-      const drop5 = await formService.getTableDataAll('ContractAmountScope');
-      setContractAmount(drop5);
-      const drop6 = await formService.getTableDataAll('PaymentTerm');
-      setPaymentTerms(drop6);
-      const drop7 = await formService.getTableDataAll(
-        'SubcontractorContractTerms',
-      );
-      setContractTerms(drop7);
-    } catch (error) {}
-  };
+    // return formService.updateFileItem(file, { ProcName: 'hhh', ProcId: 299 })
+    // formService.getTableDataAll("ProcAttachList").then(res=>{
+
+    // })
+    // 获取下拉options
+    // form.setFieldsValue({
+    //   RequestDate: moment(),
+    // });
+  }, []);
+
   const uploadProps = {
     // onRemove: (file, fileList) => {
     //   if (file.id) {
@@ -149,13 +131,6 @@ const index = () => {
     //   }
     // },
     beforeUpload: (file: any, fileList: any) => {
-      // if (!file.id) {
-      //   return formService.uploadFile(file.name, file).then((res) => {
-      //     // 存储文件
-      //     file.id = res;
-      //     return res;
-      //   });
-      // }
       return false;
     },
   };
@@ -301,23 +276,7 @@ const index = () => {
                     label="Region"
                     rules={[{ required: true }]}
                   >
-                    <Select
-                      placeholder="----select------"
-                      allowClear
-                      onChange={(val) => {
-                        if (val) {
-                          getCountry(val);
-                        } else {
-                          setCountry([]);
-                        }
-                      }}
-                    >
-                      {regionOptions.map((item: OptionItem, index) => (
-                        <Select.Option value={item?.Title} key={index}>
-                          {item?.Title}
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -326,13 +285,7 @@ const index = () => {
                     label="Country"
                     rules={[{ required: true }]}
                   >
-                    <Select placeholder="----select------">
-                      {countryOptions.map((item: OptionItem, index) => (
-                        <Select.Option value={item?.Title} key={index}>
-                          {item?.Title}
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -341,13 +294,7 @@ const index = () => {
                     label="SBU"
                     rules={[{ required: true }]}
                   >
-                    <Select placeholder="-----select--------">
-                      {sBUOptions.map((item: OptionItem, index) => (
-                        <Select.Option value={item?.Title} key={index}>
-                          {item?.Title}
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -356,13 +303,7 @@ const index = () => {
                     label="BV Signing Entity"
                     rules={[{ required: true }]}
                   >
-                    <Select placeholder="-----select--------">
-                      {bvEntityOptions.map((item: OptionItem, index) => (
-                        <Select.Option value={item?.Title} key={index}>
-                          {item?.Title}
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -371,13 +312,7 @@ const index = () => {
                     label="Site"
                     rules={[{ required: true }]}
                   >
-                    <Select placeholder="-----select--------">
-                      {siteOptions.map((item: OptionItem, index) => (
-                        <Select.Option value={item?.Title} key={index}>
-                          {item?.Title}
-                        </Select.Option>
-                      ))}
-                    </Select>
+                    <Input disabled />
                   </Form.Item>
                 </Col>
               </Row>
@@ -391,7 +326,7 @@ const index = () => {
                     label="Name of Counterparty"
                     rules={[{ required: true }]}
                   >
-                    <Input placeholder="Please input" />
+                    <Input placeholder="Please input" disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -400,7 +335,7 @@ const index = () => {
                     label="Please upload the supplier code"
                     rules={[{ required: true }]}
                   >
-                    <Input placeholder="Please input" />
+                    <Input placeholder="Please input" disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -409,7 +344,7 @@ const index = () => {
                     label="CoE / BPCC declaration signed or not"
                     rules={[{ required: true }]}
                   >
-                    <Radio.Group>
+                    <Radio.Group disabled>
                       <Radio value={1}>Yes</Radio>
                       <Radio value={0}>No</Radio>
                     </Radio.Group>
@@ -424,19 +359,13 @@ const index = () => {
                         Whether the subcontractor is an entity of BVCPS
                         <span className="dot_required">*</span>
                         <Tooltip title="Note, the CoE/BPCC declaration must be signed before or together with the contract.">
-                          <InfoCircleOutlined
-                            style={{
-                              margin: '0 5px',
-                              color: 'orange',
-                              cursor: 'pointer',
-                            }}
-                          />
+                          <BellOutlined />
                         </Tooltip>
                       </>
                     }
                     rules={[{ required: true }]}
                   >
-                    <Radio.Group>
+                    <Radio.Group disabled>
                       <Radio value={1}>Yes</Radio>
                       <Radio value={0}>No</Radio>
                     </Radio.Group>
@@ -449,7 +378,7 @@ const index = () => {
                       label="Whether the subcontractor is located in a country listed under BV Sanctions policy"
                       rules={[{ required: true }]}
                     >
-                      <Radio.Group>
+                      <Radio.Group disabled>
                         <Radio value={1}>Yes</Radio>
                         <Radio value={0}>No</Radio>
                       </Radio.Group>
@@ -470,19 +399,13 @@ const index = () => {
                           subcontractor will have any connection to any country
                           listed under BV Sanctions policy
                           <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / ">
-                            <InfoCircleOutlined
-                              style={{
-                                margin: '0 5px',
-                                color: 'orange',
-                                cursor: 'pointer',
-                              }}
-                            />
+                            <BellOutlined />
                           </Tooltip>
                         </>
                       }
                       rules={[{ required: true }]}
                     >
-                      <Radio.Group>
+                      <Radio.Group disabled>
                         <Radio value={1}>Yes</Radio>
                         <Radio value={0}>No</Radio>
                       </Radio.Group>
@@ -501,13 +424,7 @@ const index = () => {
                 label="Contract Amount for one year of service"
                 rules={[{ required: true }]}
               >
-                <Select placeholder="-----select--------">
-                  {contractAmountOptions.map((item: OptionItem, index) => (
-                    <Select.Option value={item?.Title} key={index}>
-                      {item?.Title}
-                    </Select.Option>
-                  ))}
-                </Select>
+                <Input placeholder="Please input" disabled />
               </Form.Item>
             </Col>
             <Col span={24}>
@@ -520,19 +437,13 @@ const index = () => {
                     an estimate annual contract sum
                     <span className="dot_required">*</span>
                     <Tooltip title="The applicant can fill in either the local currency or USD">
-                      <InfoCircleOutlined
-                        style={{
-                          margin: '0 5px',
-                          color: 'orange',
-                          cursor: 'pointer',
-                        }}
-                      />
+                      <BellOutlined />
                     </Tooltip>
                   </>
                 }
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Input placeholder="Please input" disabled />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -541,7 +452,7 @@ const index = () => {
                 label="If the budget has been approved"
                 rules={[{ required: true }]}
               >
-                <Radio.Group>
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                   <Radio value={-1}>No approved budget is required</Radio>
@@ -554,7 +465,7 @@ const index = () => {
                 label="Is the contract sum within the approved budget"
                 rules={[{ required: true }]}
               >
-                <Radio.Group>
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -565,13 +476,7 @@ const index = () => {
                 name="PaymentTerm"
                 label="Please summarize the payment term"
               >
-                <Select placeholder="-----select--------">
-                  {paymentTermsOptions.map((item: OptionItem, index) => (
-                    <Select.Option value={item?.Title} key={index}>
-                      {item?.Title}
-                    </Select.Option>
-                  ))}
-                </Select>
+                <Input placeholder="Please input" disabled />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -580,7 +485,7 @@ const index = () => {
                 label="Please provide the others payment term"
                 rules={[{ validator: requiredOtherPaymentTerm }]}
               >
-                <Input placeholder="Please input" />
+                <Input placeholder="Please input" disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -599,7 +504,8 @@ const index = () => {
                     Please describe why the subcontractor is needed{' '}
                     <span className="dot_required">*</span>{' '}
                     {getLevel(
-                      form.getFieldValue('NeededReason') !== 'Others'
+                      form.getFieldValue('NeededReason') !== 'Others' &&
+                        form.getFieldValue('NeededReason')
                         ? 'Low'
                         : '',
                     )}{' '}
@@ -607,22 +513,7 @@ const index = () => {
                 }
                 rules={[{ required: true }]}
               >
-                <Select
-                  placeholder="-----select--------"
-                  onChange={(val) => {
-                    if (val == 'Others') {
-                      setHideTermExplainReason(false);
-                    } else {
-                      setHideTermExplainReason(true);
-                    }
-                  }}
-                >
-                  {contractTermsOptions.map((item: OptionItem, index) => (
-                    <Select.Option value={item?.Title} key={index}>
-                      {item?.Title}
-                    </Select.Option>
-                  ))}
-                </Select>
+                <Input placeholder="Please input" disabled />
               </Form.Item>
             </Col>
             {hideTermExplainReason ? (
@@ -634,7 +525,7 @@ const index = () => {
                   label="Please explain the reason"
                   rules={[{ required: true }]}
                 >
-                  <Input.TextArea placeholder="Please input" />
+                  <Input.TextArea placeholder="Please input" disabled />
                 </Form.Item>
               </Col>
             )}
@@ -649,21 +540,15 @@ const index = () => {
                     {getLevel(
                       form.getFieldValue('RequestService') == 1
                         ? 'High'
-                        : 'Low',
+                        : form.getFieldValue('RequestService') === 0
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
                 rules={[{ required: true }]}
               >
-                <Radio.Group
-                  onChange={(val) => {
-                    if (val.target.value === 1) {
-                      setHideBackground(false);
-                    } else {
-                      setHideBackground(true);
-                    }
-                  }}
-                >
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -678,7 +563,7 @@ const index = () => {
                   label="Please provide the background"
                   rules={[{ required: true }]}
                 >
-                  <Input.TextArea placeholder="Please input" />
+                  <Input.TextArea placeholder="Please input" disabled />
                 </Form.Item>
               </Col>
             )}
@@ -692,16 +577,16 @@ const index = () => {
                     required by the project?
                     <span className="dot_required">*</span>
                     {getLevel(
-                      form.getFieldValue('HasLicense') == 1 ? 'High' : 'Low',
+                      form.getFieldValue('HasLicense') == 1
+                        ? 'High'
+                        : form.getFieldValue('HasLicense') === 0
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
               >
-                <Radio.Group
-                  onChange={(e) => {
-                    setHasLicense(e.target.value);
-                  }}
-                >
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -724,7 +609,7 @@ const index = () => {
                   label="Please explain the reason"
                   rules={[{ required: true }]}
                 >
-                  <Input.TextArea placeholder="Please input" />
+                  <Input.TextArea placeholder="Please input" disabled />
                 </Form.Item>
               </Col>
             ) : (
@@ -742,17 +627,15 @@ const index = () => {
                     {getLevel(
                       form.getFieldValue('UnethicalBehaviorRequired') === 1
                         ? 'High'
-                        : 'Low',
+                        : form.getFieldValue('UnethicalBehaviorRequired') === 0
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
                 rules={[{ required: true }]}
               >
-                <Radio.Group
-                  onChange={(val: any) => {
-                    setUnethicalBehaviorRequired(val);
-                  }}
-                >
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -771,18 +654,16 @@ const index = () => {
                       {getLevel(
                         form.getFieldValue('FamilyMemberHere') == 1
                           ? 'High'
-                          : 'Low',
+                          : form.getFieldValue('FamilyMemberHere') === 0
+                          ? 'Low'
+                          : '',
                       )}
                     </span>
                   </>
                 }
                 rules={[{ required: true }]}
               >
-                <Radio.Group
-                  onChange={(val: any) => {
-                    setFamilyMemberHere(val);
-                  }}
-                >
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -803,7 +684,7 @@ const index = () => {
                 }
                 rules={[{ required: true }]}
               >
-                <Radio.Group>
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -814,7 +695,7 @@ const index = () => {
                 name="Agreement"
                 label="Please provide the term of the agreement"
               >
-                <Input placeholder="Please input" />
+                <Input placeholder="Please input" disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -830,28 +711,20 @@ const index = () => {
                     Whether to use a BV Mandatory template
                     <span className="dot_required">*</span>
                     <Tooltip title="In principle, BV entities shall use our standard template for subcontractor agreements.">
-                      <InfoCircleOutlined
-                        style={{
-                          margin: '0 5px',
-                          color: 'orange',
-                          cursor: 'pointer',
-                        }}
-                      />
+                      <BellOutlined />
                     </Tooltip>
                     {getLevel(
-                      form.getFieldValue('UseMandatoryTemplate') == 0
+                      form.getFieldValue('UseMandatoryTemplate') === 0
                         ? 'High'
-                        : 'Low',
+                        : form.getFieldValue('UseMandatoryTemplate') === 1
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
                 rules={[{ required: true }]}
               >
-                <Radio.Group
-                  onChange={(val: any) => {
-                    setUseMandatoryTemplate(val);
-                  }}
-                >
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -863,7 +736,7 @@ const index = () => {
                 label="Whether there is any material changes to any term of the agreement"
                 rules={[{ validator: validHasMaterialChanges }]}
               >
-                <Radio.Group>
+                <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -883,7 +756,7 @@ const index = () => {
                   label="Upload Contract Attachment"
                   rules={[{ required: true }]}
                 >
-                  <Upload {...uploadProps} listType="picture-card">
+                  <Upload {...uploadProps} listType="picture-card" disabled>
                     <div className="file_upload">
                       <CloudUploadOutlined />
                       <br />
@@ -898,12 +771,12 @@ const index = () => {
                 name="RiskAndmMeasures"
                 label="Any risk that you identified and if yes what is the mitigation measures?"
               >
-                <Input.TextArea placeholder="Please input" />
+                <Input.TextArea placeholder="Please input" disabled />
               </Form.Item>
             </Col>
             <Col span={24}>
               <Form.Item name="Comments" label="Other comments">
-                <Input.TextArea placeholder="Please input" />
+                <Input.TextArea placeholder="Please input" disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -911,7 +784,7 @@ const index = () => {
         <ApprovalActions
           formValidataion={onSubmit}
           callBack={(result: any) => {
-            console.log('提交文件');
+            // formService.uploadFile()
           }}
           approvalRender={
             <Card title="F. Approver Information" bordered={false}>

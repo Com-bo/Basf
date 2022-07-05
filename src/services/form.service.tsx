@@ -1,6 +1,10 @@
 import SpService from '@/services/sharepoint.service';
 import { IFilter } from '@/models/type';
 import useItems from 'antd/lib/menu/hooks/useItems';
+interface FileForm {
+  ProcName: string;
+  ProcId: number;
+}
 export default class FormService {
   private _spService: SpService;
   private _fileListName = 'ProcAttachList';
@@ -103,22 +107,31 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
-  getFileItems() {
+  getFileItems(ProcName: string, ProcId: number) {
     let token: string = this._getToken();
-    return this._spService
-      .getFileItems(this._fileListName, token)
+    let listIndex: number[] = [];
+    return this.getFilesProperty()
+      .then((filePropertys) => {
+        filePropertys.forEach((element: FileForm, index: number) => {
+          if (element.ProcId == ProcId) {
+            listIndex.push(index);
+          }
+        });
+        return this._spService.getFileItems(this._fileListName, token);
+      })
       .then((res) => {
-        debugger;
         let results = res.results;
         // 处理文件
         let files: any = [];
-        results.forEach((element: any) => {
-          files.push({
-            id: element.ServerRelativeUrl,
-            name: element.Name,
-            status: 'done',
-            url: process.env.host + element.ServerRelativeUrl,
-          });
+        results.forEach((element: any, index: number) => {
+          if (listIndex.indexOf(index) != -1) {
+            files.push({
+              id: element.ServerRelativeUrl,
+              name: element.Name,
+              status: 'done',
+              url: process.env.host + element.ServerRelativeUrl,
+            });
+          }
         });
         return files;
       })
@@ -127,6 +140,9 @@ export default class FormService {
         console.error(error);
         return Promise.reject(error);
       });
+  }
+  getFilesProperty() {
+    return this.getTableDataAll(this._fileListName);
   }
   getTableData(listName: string, filter: IFilter[], expand: any[]) {
     return this._spService

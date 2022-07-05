@@ -901,7 +901,6 @@ const index = () => {
         <ApprovalActions
           formValidataion={onSubmit}
           callBack={(result: any) => {
-            debugger;
             let _listFile = form.getFieldValue('file');
             let res: any;
             formService
@@ -916,7 +915,7 @@ const index = () => {
               })
               .then((resultMiddle) => {
                 return formService.updateFileItem(resultMiddle, {
-                  ProcName: 'subcontractContract',
+                  ProcName: listName,
                   ProcId: result.ID,
                 });
               })

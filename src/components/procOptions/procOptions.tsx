@@ -78,7 +78,8 @@ const index = (props: IProps) => {
               .submitBizForm(res.listName, res.formData, res.formLink, true)
               .then((res) => {
                 console.log(res);
-                props.callBack && props.callBack(res);
+                message.success('Submit success!');
+                // props.callBack && props.callBack(res);
               })
               .catch((e) => message.error(e));
           },
