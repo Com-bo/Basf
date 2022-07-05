@@ -1,5 +1,6 @@
 import SpService from '@/services/sharepoint.service';
 import { IFilter } from '@/models/type';
+import useItems from 'antd/lib/menu/hooks/useItems';
 export default class FormService {
   private _spService: SpService;
   private _fileListName = 'ProcAttachList';
@@ -29,6 +30,7 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
+
   // 删除一条数据
   removeItem(listName: string, id: string) {
     let token = this._getToken();
@@ -49,6 +51,25 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
+  updateItem(listName: string, id: number, item: any) {
+    let token = this._getToken();
+    return this._spService.updateItem(listName, id, item, token);
+  }
+  // 更新文件的属性
+  /**
+   *@param file 文件的信息 url，type
+   *@param item 需要更新的属性
+   **/
+  updateFileItem(file: any, item: any) {
+    let token = this._getToken();
+    return this._spService
+      .updateFileItem(file, item, token)
+      .catch((error: any) => {
+        // this._logService.logError(error)
+        console.error(error);
+        return Promise.reject(error);
+      });
+  }
   getTableDataAll(listName: string) {
     let token = this._getToken();
     return this._spService
@@ -63,6 +84,19 @@ export default class FormService {
     let token: string = this._getToken();
     return this._spService
       .deleteFileItem(this._fileListName, fileName, token)
+      .catch((error: any) => {
+        // this._logService.logError(error)
+        console.error(error);
+        return Promise.reject(error);
+      });
+  }
+  getFile(url: string) {
+    let token: string = this._getToken();
+    return this._spService
+      .getFile(url, token)
+      .then((res) => {
+        return res;
+      })
       .catch((error: any) => {
         // this._logService.logError(error)
         console.error(error);

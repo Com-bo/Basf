@@ -11,6 +11,7 @@ import {
 import TaskService from '@/services/task.service';
 import moment from 'moment';
 import { message } from 'antd';
+import Item from 'antd/lib/list/Item';
 
 export default class SharepointService {
   private _http: HttpService;
@@ -674,7 +675,6 @@ export default class SharepointService {
     fileName: string,
     libraryName: string,
     fileObject: any,
-    // id: string,
     token: any,
   ) {
     let reader = new FileReader();
@@ -702,15 +702,52 @@ export default class SharepointService {
       })
       .then((response: any) => {
         let value = response.data;
-        let urls = value.d.ServerRelativeUrl.split(
-          process.env.relativePath + '/' + libraryName + '/',
-        );
-        if (urls[1]) {
-          return urls[1];
-        } else {
-          return value.d.ServerRelativeUrl;
-        }
+        return value;
+      })
+      .catch((e) => {
+        return e;
       });
+  }
+  // 获取文件
+  async getFile(url: string, token: string) {
+    try {
+      const res: any = await this._http.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-RequestDigest': this.formDigestValue,
+          accept: 'application/json;odata=verbose',
+        },
+      });
+      return res.data.d.__metadata;
+    } catch (error) {
+      return error;
+    }
+  }
+  async updateFileItem(file: any, item: any, token: string) {
+    try {
+      let body =
+        "{'__metadata':{'type':'" +
+        file.type +
+        "'},'ProcName':'" +
+        item.ProcName +
+        "','ProcId':'" +
+        item.ProcId +
+        "'}";
+      return await this._http.post(file.uri, {
+        data: body,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-RequestDigest': this.formDigestValue,
+          // accept: 'application/json;odata=verbose',
+          'content-type': 'application/json;odata=verbose',
+          'content-length': body.length,
+          'IF-MATCH': '*',
+          'X-HTTP-Method': 'MERGE',
+        },
+      });
+    } catch (error) {
+      message.error(error as unknown as string);
+    }
   }
   async deleteFileItem(listName: string, fileName: string, token: string) {
     let url = `${process.env.host}${process.env.relativePath}/_api/web/GetFileByServerRelativeUrl('${process.env.relativePath}/${listName}/${fileName}')`;
@@ -1108,13 +1145,6 @@ export default class SharepointService {
       item.WFStatus = 'Starting';
       item.WFStep = 0;
       item.WFFormStatus = 'Submitted';
-      var token = this.getToken();
-      var spPageContext = this.getSpPageContextInfo();
-      item.WFApplicantId = spPageContext.userId;
-      item.WFApplicantTime = new Date();
-      item.WFStatus = 'Starting';
-      item.WFStep = 0;
-      item.WFFormStatus = 'Submitted';
       this.addItem(listName, item, token).then((res) => {
         item.ID = res.ID;
         this.submitTaskForm(item, link, isSubmit).then((res) => {});
@@ -1202,6 +1232,7 @@ export default class SharepointService {
           },
           '*',
         );
+        return item;
         // window.parent.postMessage(
         //   {
         //     action: 'loading',

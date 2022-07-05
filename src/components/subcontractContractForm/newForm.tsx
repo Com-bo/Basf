@@ -92,13 +92,15 @@ const index = () => {
   const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   useEffect(() => {
     // 附件之初始化
+
     // formService.getFileItems().then((res) => {
     //   if (res && res.length) {
-    //     form.setFieldsValue({
-    //       file: res,
-    //     });
+    // // form.setFieldsValue({
+    // //   file: res,
+    // // });
     //   }
     // });
+    // return formService.updateFileItem(file, { ProcName: 'hhh', ProcId: 299 })
     // formService.getTableDataAll("ProcAttachList").then(res=>{
 
     // })
@@ -155,13 +157,6 @@ const index = () => {
     //   }
     // },
     beforeUpload: (file: any, fileList: any) => {
-      // if (!file.id) {
-      //   return formService.uploadFile(file.name, file).then((res) => {
-      //     // 存储文件
-      //     file.id = res;
-      //     return res;
-      //   });
-      // }
       return false;
     },
   };
@@ -907,7 +902,30 @@ const index = () => {
           formValidataion={onSubmit}
           callBack={(result: any) => {
             debugger;
-            //  formService.uploadFile(form.getFieldValue("file")).
+            let _listFile = form.getFieldValue('file');
+            let res: any;
+            formService
+              .uploadFile(_listFile[0].name, _listFile[0].originFileObj)
+              .then((result1) => {
+                //  上传文件，并添加id
+                res = result1;
+                //   存储文件
+                return formService.getFile(
+                  res.d.ListItemAllFields.__deferred.uri,
+                );
+              })
+              .then((resultMiddle) => {
+                return formService.updateFileItem(resultMiddle, {
+                  ProcName: 'subcontractContract',
+                  ProcId: result.ID,
+                });
+              })
+              .then((result) => {
+                message.success('Operate Success!');
+              })
+              .catch((e) => {
+                message.error(e);
+              });
             // formService.uploadFile()
           }}
           approvalRender={
