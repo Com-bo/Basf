@@ -1,33 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import styles from './index.less';
+import { useState, useEffect } from 'react';
 
 import './index.less';
 import {
   Form,
   Input,
-  Button,
-  InputNumber,
   Select,
   Card,
   Row,
   Col,
   Radio,
-  Tabs,
   Upload,
-  Space,
   message,
   DatePicker,
   Tooltip,
 } from 'antd';
 import FormService from '@/services/form.service';
 import moment from 'moment';
+import spService from '@/services/sharepoint.service';
 import ApprovalActions from '@/components/procOptions/procOptions';
-import {
-  CloudUploadOutlined,
-  InfoCircleOutlined,
-  BellOutlined,
-} from '@ant-design/icons';
-import { getapplicationNo } from '@/tools/utils';
+import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
 interface OptionItem {
   key: number;
   Title: string;
@@ -39,16 +30,11 @@ const index = () => {
   const listName = 'SubContractContract';
 
   const [form] = Form.useForm();
-  // const spService = new SpService();
   const formService = new FormService();
 
   //获取流水号
   const getSerialNum = () => {
-    getapplicationNo(listName, formService).then((res) => {
-      form.setFieldsValue({
-        ApplicationNo: res,
-      });
-    });
+    return 'SN' + moment(new Date(), 'YYYYMMDDHHmmss');
   };
 
   //#endregion
@@ -60,6 +46,7 @@ const index = () => {
       const params = {
         ...form.getFieldsValue(),
       };
+      params.Title = getSerialNum();
       delete params.file;
       return {
         isOK: true,
@@ -91,24 +78,12 @@ const index = () => {
     useState(null);
   const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   useEffect(() => {
-    // 附件之初始化
-
-    // formService.getFileItems().then((res) => {
-    //   if (res && res.length) {
-    // // form.setFieldsValue({
-    // //   file: res,
-    // // });
-    //   }
-    // });
-    // return formService.updateFileItem(file, { ProcName: 'hhh', ProcId: 299 })
-    // formService.getTableDataAll("ProcAttachList").then(res=>{
-
-    // })
-    // 获取下拉options
     _getOps();
-    getSerialNum();
+
     form.setFieldsValue({
+      ApplicationNo: 'To Be Generated',
       RequestDate: moment(),
+      Requester: new spService().getSpPageContextInfo().userEmail,
     });
   }, []);
   const getCountry = (_region: string) => {

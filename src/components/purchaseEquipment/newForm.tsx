@@ -42,7 +42,6 @@ const index = () => {
   //获取流水号
   const getSerialNum = () => {
     return 'SN' + moment(new Date(), 'YYYYMMDDHHmmss');
-    return 'GP' + moment(new Date(), 'YYYYMMDDHHmmss');
   };
 
   //#endregion

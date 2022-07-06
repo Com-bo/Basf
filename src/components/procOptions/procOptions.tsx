@@ -73,15 +73,14 @@ const index = (props: IProps) => {
           content: '是否确认发起流程？',
           okText: '确认发起',
           cancelText: '取消',
-          onOk: () => {
-            spService
-              .submitBizForm(res.listName, res.formData, res.formLink, true)
-              .then((res) => {
-                console.log(res);
-                message.success('Submit success!');
-                // props.callBack && props.callBack(res);
-              })
-              .catch((e) => message.error(e));
+          onOk: async () => {
+            var spRes = await spService.submitBizForm(
+              res.listName,
+              res.formData,
+              res.formLink,
+              res.wfFlowName,
+              true,
+            );
           },
         });
       }
@@ -98,14 +97,15 @@ const index = (props: IProps) => {
           content: '是否确认保存流程？',
           okText: '确认保存',
           cancelText: '取消',
-          onOk: () => {
-            spService
-              .submitBizForm(res.listName, res.formData, res.formLink, true)
-              .then((res) => {
-                console.log(res);
-                props.callBack && props.callBack(res);
-              })
-              .catch((e) => message.error(e));
+          onOk: async () => {
+            var spRes = await spService.submitBizForm(
+              res.listName,
+              res.formData,
+              res.formLink,
+              res.wfFlowName,
+              true,
+            );
+            props.callBack && props.callBack(res);
           },
         });
       }
