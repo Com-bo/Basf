@@ -1,0 +1,27 @@
+.loading-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.14);
+  z-index: -1;
+  opacity: 0;
+
+  transition: all 0.2s;
+  &.light {
+    background: transparent;
+  }
+
+  &.show {
+    z-index: 90;
+    opacity: 1;
+  }
+
+  .loading {
+    position: relative;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+  }
+}

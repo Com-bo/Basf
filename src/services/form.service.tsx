@@ -21,13 +21,13 @@ export default class FormService {
   // 上传单个文件接口
   async uploadFile(fileName: string, fileObject: any, id?: string) {
     let token = this._getToken();
-    let index = fileName.lastIndexOf('.');
-    let newFileName =
-      fileName.substring(0, index) +
-      new Date().getTime() +
-      fileName.substring(index);
+    // let index = fileName.lastIndexOf('.');
+    // let newFileName =
+    //   fileName.substring(0, index) +
+    //   new Date().getTime() +
+    //   fileName.substring(index);
     return this._spService
-      .uploadFile(newFileName, this._fileListName, fileObject, token)
+      .uploadFile(fileName, this._fileListName, fileObject, token)
       .catch((error: any) => {
         // this._logService.logError(error)
         console.error(error);
@@ -46,9 +46,15 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
-  submitBizForm(listName: string, item: any, link: string, isSubmit: Boolean) {
+  submitBizForm(
+    listName: string,
+    item: any,
+    link: string,
+    formLink: string,
+    isSubmit: Boolean,
+  ) {
     return this._spService
-      .submitBizForm(listName, item, link, isSubmit)
+      .submitBizForm(listName, item, link, formLink, isSubmit)
       .catch((error: any) => {
         // this._logService.logError(error)
         console.error(error);

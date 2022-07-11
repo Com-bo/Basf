@@ -164,7 +164,6 @@ export default class SharepointService {
     arr: any[],
     properties: any[],
   ) {
-    debugger;
     let order = arr[1] ? arr[1] : 'asc';
     let column = formatColumnByKey(listName, properties[0]);
     if (column.expandProperties) {
@@ -1136,7 +1135,7 @@ export default class SharepointService {
   }
 
   //提交表单
-  submitBizForm(
+  async submitBizForm(
     listName: string,
     item: any,
     link: string,
@@ -1152,10 +1151,12 @@ export default class SharepointService {
       item.WFStatus = 'Starting';
       item.WFStep = 0;
       item.WFFormStatus = 'Submitted';
-      return this.addItem(listName, item, token).then((res) => {
-        item.ID = res.ID;
-        this.submitTaskForm(item, link, isSubmit).then((res) => {});
-      });
+      let res = await this.addItem(listName, item, token);
+      item.ID = res.ID;
+      await this.submitTaskForm(item, link, isSubmit);
+      return {
+        ID: res.ID,
+      };
     } catch {
       window.parent.postMessage(
         {
@@ -1239,6 +1240,46 @@ export default class SharepointService {
         //   },
         //   '*',
         // );
+      });
+  }
+  // 根据tilte获取reponseOptions
+  getTaskFlowApproveOptions(title: string) {
+    var listName = 'WorkflowTasks';
+    var token = this.getToken();
+    let table = this.formatTable(listName);
+    var filter = [
+      {
+        type: 'filter contains',
+        value: `[${title}]`,
+        properties: ['Title'],
+      },
+      {
+        type: 'orderby desc',
+        properties: ['StartDate'],
+      },
+    ];
+    var queryPayload = {
+      query: {
+        ViewXml:
+          `<View Scope='RecursiveAll'>` +
+          `${filter ? this.formatFilterNew(filter, listName) : ''}` +
+          `</View>`,
+      },
+    };
+    let url = `${process.env.host}${process.env.taskRelativePath}/_api/web/lists/getbytitle('${table.name}')/getitems`;
+
+    return this._http
+      .post(url, {
+        headers: {
+          Accept: 'application/json;odata=verbose',
+          Authorization: `Bearer ${token}`,
+          'X-RequestDigest': this.formDigestValue,
+        },
+        data: queryPayload,
+      })
+      .then((response: any) => {
+        let res = response.data;
+        return res.d.results.map((e: any) => this.formatValue(e, listName));
       });
   }
 
@@ -1338,7 +1379,7 @@ export default class SharepointService {
   getLastTaskInfo(filter: IFilter[], expand: any[]) {
     filter.push({
       type: 'orderby desc',
-      properties: ['ID'],
+      properties: ['Modified'],
     });
     let table = this.formatTable('WorkflowTasks');
     if (table.expand) {

@@ -5,8 +5,8 @@ const _config: any = {
   subcontractContract: {
     title: 'Subcontract  Contract Application Form',
   },
-  leasehold: {
-    title: 'Risk Assessment Questionaire for Lease of Real Estate',
+  leaseEstateContract: {
+    title: 'Lease of Real Estate Contract Application Form',
   },
 };
 export default function (props: any) {
@@ -27,6 +27,7 @@ export default function (props: any) {
         </div>
       </header>
       <div className="form_content">{props.children}</div>
+      <div id="loading-root"></div>
     </>
   );
 }

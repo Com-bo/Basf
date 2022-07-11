@@ -1,51 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import styles from './index.less';
-import SpService from '@/services/sharepoint.service';
+import { useState, useEffect } from 'react';
+
 import './index.less';
 import {
   Form,
   Input,
-  Button,
-  InputNumber,
   Select,
   Card,
   Row,
   Col,
   Radio,
-  Tabs,
   Upload,
-  Space,
   message,
   DatePicker,
   Tooltip,
+  InputNumber,
 } from 'antd';
 import FormService from '@/services/form.service';
 import moment from 'moment';
+import spService from '@/services/sharepoint.service';
 import ApprovalActions from '@/components/procOptions/procOptions';
-import { CloudUploadOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { formatStrategyValues } from 'rc-tree-select/lib/utils/strategyUtil';
-import { getapplicationNo } from '@/tools/utils';
+import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
 interface OptionItem {
   key: number;
   Title: string;
 }
 const index = () => {
   //#region   固定模板
-  const formLink = 'http://bv_dpa.com:8001/subcontractContract?ID=';
-  const wfFlowName = '6C941EF0-0464-088B-E2EF-7022F59C1CA5';
-  const listName = 'SubContractContract';
+  const formLink = 'http://bv_dpa.com:8001/leaseEstateContract?ID=';
+  const wfFlowName = '3FCF0B04-C380-0ECF-1509-B8CF153924B4';
+  const listName = 'LeaseEstateContract';
+  const [applicationNo, setApplicationNo] = useState('');
 
   const [form] = Form.useForm();
-  // const spService = new SpService();
   const formService = new FormService();
 
   //获取流水号
   const getSerialNum = () => {
-    getapplicationNo(listName, formService).then((res) => {
-      form.setFieldsValue({
-        ApplicationNo: res,
-      });
-    });
+    return 'SN' + moment(new Date(), 'YYYYMMDDHHmmss');
   };
 
   //#endregion
@@ -57,11 +48,13 @@ const index = () => {
       const params = {
         ...form.getFieldsValue(),
       };
+      params.Title = getSerialNum();
       delete params.file;
       return {
         isOK: true,
         formData: params,
         formLink,
+        applicationNo,
         wfFlowName,
         listName,
       };
@@ -88,19 +81,12 @@ const index = () => {
     useState(null);
   const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   useEffect(() => {
-    // 附件之初始化
-    // formService.getFileItems().then((res) => {
-    //   if (res && res.length) {
-    //     form.setFieldsValue({
-    //       file: res,
-    //     });
-    //   }
-    // });
-    // 获取下拉options
     _getOps();
-    getSerialNum();
+
     form.setFieldsValue({
+      ApplicationNo: 'To Be Generated',
       RequestDate: moment(),
+      Requester: new spService().getSpPageContextInfo().userEmail,
     });
   }, []);
   const getCountry = (_region: string) => {
@@ -149,13 +135,6 @@ const index = () => {
     //   }
     // },
     beforeUpload: (file: any, fileList: any) => {
-      // if (!file.id) {
-      //   return formService.uploadFile(file.name, file).then((res) => {
-      //     // 存储文件
-      //     file.id = res;
-      //     return res;
-      //   });
-      // }
       return false;
     },
   };
@@ -299,7 +278,7 @@ const index = () => {
                   <Form.Item
                     name="Region"
                     label="Region"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select
                       placeholder="----select------"
@@ -324,7 +303,7 @@ const index = () => {
                   <Form.Item
                     name="Country"
                     label="Country"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select placeholder="----select------">
                       {countryOptions.map((item: OptionItem, index) => (
@@ -339,7 +318,7 @@ const index = () => {
                   <Form.Item
                     name="SBU"
                     label="SBU"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select placeholder="-----select--------">
                       {sBUOptions.map((item: OptionItem, index) => (
@@ -354,7 +333,7 @@ const index = () => {
                   <Form.Item
                     name="BVSigningEntity"
                     label="BV Signing Entity"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select placeholder="-----select--------">
                       {bvEntityOptions.map((item: OptionItem, index) => (
@@ -369,7 +348,7 @@ const index = () => {
                   <Form.Item
                     name="Site"
                     label="Site"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select placeholder="-----select--------">
                       {siteOptions.map((item: OptionItem, index) => (
@@ -389,7 +368,7 @@ const index = () => {
                   <Form.Item
                     name="NameofCounterparty"
                     label="Name of Counterparty"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please input' }]}
                   >
                     <Input placeholder="Please input" />
                   </Form.Item>
@@ -398,16 +377,16 @@ const index = () => {
                   <Form.Item
                     name="SupplierCode"
                     label="Please upload the supplier code"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please input' }]}
                   >
                     <Input placeholder="Please input" />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="CoEOrBPCCSigned"
-                    label="CoE / BPCC declaration signed or not"
-                    rules={[{ required: true }]}
+                    name="BPCCSigned"
+                    label="BPCC declaration signed or not"
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Radio.Group>
                       <Radio value={1}>Yes</Radio>
@@ -417,24 +396,19 @@ const index = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="EntityOfBVCPS"
-                    required={false}
-                    label={
-                      <>
-                        Whether the subcontractor is an entity of BVCPS
-                        <span className="dot_required">*</span>
-                        <Tooltip title="Note, the CoE/BPCC declaration must be signed before or together with the contract.">
-                          <InfoCircleOutlined
-                            style={{
-                              margin: '0 5px',
-                              color: 'orange',
-                              cursor: 'pointer',
-                            }}
-                          />
-                        </Tooltip>
-                      </>
-                    }
-                    rules={[{ required: true }]}
+                    name="LeaseYear"
+                    label="Term of Lease (year)"
+                    rules={[{ required: true, message: 'Please input' }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+
+                <Col span={12}>
+                  <Form.Item
+                    name="LeaseOrRenewal"
+                    label="New lease or renewal"
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Radio.Group>
                       <Radio value={1}>Yes</Radio>
@@ -442,53 +416,53 @@ const index = () => {
                     </Radio.Group>
                   </Form.Item>
                 </Col>
-                {!hideLocatedInCountryListed ? (
-                  <Col span={24}>
+                <Col span={12}>
+                  <Form.Item
+                    name="LeaseArea"
+                    label="Lease Area"
+                    rules={[{ required: true, message: 'Please input' }]}
+                  >
+                    <Input placeholder="Please input" />
+                  </Form.Item>
+                </Col>
+                <Col span={24}>
+                  <div className="fileWrapper">
                     <Form.Item
-                      name="LocatedInCountryListed"
-                      label="Whether the subcontractor is located in a country listed under BV Sanctions policy"
-                      rules={[{ required: true }]}
+                      name="file"
+                      valuePropName="fileList"
+                      getValueFromEvent={(e: any) => {
+                        if (Array.isArray(e)) {
+                          return e;
+                        }
+                        return e && e.fileList;
+                      }}
+                      label="Please upload the last lease agreement if it is a  renewa"
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Please upload the last lease agreement',
+                        },
+                      ]}
                     >
-                      <Radio.Group>
-                        <Radio value={1}>Yes</Radio>
-                        <Radio value={0}>No</Radio>
-                      </Radio.Group>
+                      <Upload {...uploadProps} listType="picture-card">
+                        <div className="file_upload">
+                          <CloudUploadOutlined />
+                          <br />
+                          <span>Add Attachment</span>
+                        </div>
+                      </Upload>
                     </Form.Item>
-                  </Col>
-                ) : (
-                  ''
-                )}
-                {hideProposedServicesConnection ? (
-                  ''
-                ) : (
-                  <Col span={24}>
-                    <Form.Item
-                      name="ProposedServicesConnection"
-                      label={
-                        <>
-                          Whether the proposed services provided by the
-                          subcontractor will have any connection to any country
-                          listed under BV Sanctions policy
-                          <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / ">
-                            <InfoCircleOutlined
-                              style={{
-                                margin: '0 5px',
-                                color: 'orange',
-                                cursor: 'pointer',
-                              }}
-                            />
-                          </Tooltip>
-                        </>
-                      }
-                      rules={[{ required: true }]}
-                    >
-                      <Radio.Group>
-                        <Radio value={1}>Yes</Radio>
-                        <Radio value={0}>No</Radio>
-                      </Radio.Group>
-                    </Form.Item>
-                  </Col>
-                )}
+                  </div>
+                </Col>
+                <Col span={24}>
+                  <Form.Item
+                    name="LeaseType"
+                    label="Type of lease"
+                    rules={[{ required: true, message: 'Please select' }]}
+                  >
+                    <Select placeholder="Please select"></Select>
+                  </Form.Item>
+                </Col>
               </Row>
             </div>
           </div>
@@ -497,49 +471,19 @@ const index = () => {
           <Row gutter={20}>
             <Col span={24}>
               <Form.Item
-                name="ContractAmount"
-                label="Contract Amount for one year of service"
-                rules={[{ required: true }]}
-              >
-                <Select placeholder="-----select--------">
-                  {contractAmountOptions.map((item: OptionItem, index) => (
-                    <Select.Option value={item?.Title} key={index}>
-                      {item?.Title}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={24}>
-              <Form.Item
-                name="AnnualContractSum"
-                required={false}
-                label={
-                  <>
-                    Please state the annual contract sum (if known) or provide
-                    an estimate annual contract sum
-                    <span className="dot_required">*</span>
-                    <Tooltip title="The applicant can fill in either the local currency or USD">
-                      <InfoCircleOutlined
-                        style={{
-                          margin: '0 5px',
-                          color: 'orange',
-                          cursor: 'pointer',
-                        }}
-                      />
-                    </Tooltip>
-                  </>
-                }
-                rules={[{ required: true }]}
+                name="MonthLyAmount"
+                label="Monthly rental amount"
+                rules={[{ required: true, message: 'Please input' }]}
               >
                 <Input placeholder="Please input" />
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
-                name="BudgetApproved"
-                label="If the budget has been approved"
-                rules={[{ required: true }]}
+                name="PaymentTerm"
+                required={false}
+                label="Payment term"
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group>
                   <Radio value={1}>Yes</Radio>
@@ -552,7 +496,7 @@ const index = () => {
               <Form.Item
                 name="ContractSumWithinBudget"
                 label="Is the contract sum within the approved budget"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group>
                   <Radio value={1}>Yes</Radio>
@@ -562,246 +506,79 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="PaymentTerm"
-                label="Please summarize the payment term"
+                name="BudgetApproved"
+                label="Within the approved budget or not"
+                rules={[{ required: true, message: 'Please select' }]}
               >
-                <Select placeholder="-----select--------">
-                  {paymentTermsOptions.map((item: OptionItem, index) => (
-                    <Select.Option value={item?.Title} key={index}>
-                      {item?.Title}
-                    </Select.Option>
-                  ))}
-                </Select>
+                <Radio.Group>
+                  <Radio value={1}>Monthly</Radio>
+                  <Radio value={0}>Quarterly</Radio>
+                  <Radio value={-1}>6 months or others</Radio>
+                </Radio.Group>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="OthersPaymentTerm"
-                label="Please provide the others payment term"
-                rules={[{ validator: requiredOtherPaymentTerm }]}
+                name="MgmtFee"
+                label="Property management fee actual amount"
               >
                 <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="DepositAmount" label="Deposit actual amount">
+                <Select></Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="OthersDeposit" label="Others deposit amount">
+                <InputNumber
+                  placeholder="Please input"
+                  min={0}
+                  style={{ width: '100%' }}
+                />
               </Form.Item>
             </Col>
           </Row>
         </Card>
-        <Card
-          title="C. Technical Aspects of Project and Contract Terms"
-          bordered={false}
-        >
+        <Card title="C. Property Information" bordered={false}>
           <Row gutter={20}>
-            <Col span={12}>
-              <Form.Item
-                required={false}
-                name="NeededReason"
-                label={
-                  <>
-                    Please describe why the subcontractor is needed{' '}
-                    <span className="dot_required">*</span>{' '}
-                    {getLevel(
-                      form.getFieldValue('NeededReason') !== 'Others'
-                        ? 'Low'
-                        : '',
-                    )}{' '}
-                  </>
-                }
-                rules={[{ required: true }]}
-              >
-                <Select
-                  placeholder="-----select--------"
-                  onChange={(val) => {
-                    if (val == 'Others') {
-                      setHideTermExplainReason(false);
-                    } else {
-                      setHideTermExplainReason(true);
-                    }
-                  }}
-                >
-                  {contractTermsOptions.map((item: OptionItem, index) => (
-                    <Select.Option value={item?.Title} key={index}>
-                      {item?.Title}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-            {hideTermExplainReason ? (
-              ''
-            ) : (
-              <Col span={24}>
+            <Col span={24}>
+              <div className="fileWrapper">
                 <Form.Item
-                  name="NeededReasonExplain"
-                  label="Please explain the reason"
-                  rules={[{ required: true }]}
-                >
-                  <Input.TextArea placeholder="Please input" />
-                </Form.Item>
-              </Col>
-            )}
-            <Col span={12}>
-              <Form.Item
-                required={false}
-                name="RequestService"
-                label={
-                  <>
-                    Did a BV customer or government official request the
-                    service?<span className="dot_required">*</span>
-                    {getLevel(
-                      form.getFieldValue('RequestService') == 1
-                        ? 'High'
-                        : 'Low',
-                    )}
-                  </>
-                }
-                rules={[{ required: true }]}
-              >
-                <Radio.Group
-                  onChange={(val) => {
-                    if (val.target.value === 1) {
-                      setHideBackground(false);
-                    } else {
-                      setHideBackground(true);
+                  name="certificateFile"
+                  valuePropName="fileList"
+                  getValueFromEvent={(e: any) => {
+                    if (Array.isArray(e)) {
+                      return e;
                     }
+                    return e && e.fileList;
                   }}
+                  label="Please upload the certificate of property ownership"
+                  rules={[
+                    {
+                      required: true,
+                      message:
+                        'The certificate of property ownership is required',
+                    },
+                  ]}
                 >
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            {hideBackground ? (
-              ''
-            ) : (
-              <Col span={24}>
-                <Form.Item
-                  name="Background"
-                  label="Please provide the background"
-                  rules={[{ required: true }]}
-                >
-                  <Input.TextArea placeholder="Please input" />
+                  <Upload {...uploadProps} listType="picture-card">
+                    <div className="file_upload">
+                      <CloudUploadOutlined />
+                      <br />
+                      <span>Add Attachment</span>
+                    </div>
+                  </Upload>
                 </Form.Item>
-              </Col>
-            )}
+              </div>
+            </Col>
             <Col span={24}>
               <Form.Item
-                name="HasLicense"
                 required={false}
-                label={
-                  <>
-                    Whether the subcontractor has license to operate ("LTO")
-                    required by the project?
-                    <span className="dot_required">*</span>
-                    {getLevel(
-                      form.getFieldValue('HasLicense') == 1 ? 'High' : 'Low',
-                    )}
-                  </>
-                }
-              >
-                <Radio.Group
-                  onChange={(e) => {
-                    setHasLicense(e.target.value);
-                  }}
-                >
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            {hasLicense == 1 ? (
-              <Col span={12}>
-                <Form.Item
-                  name="InsertLTO"
-                  label="Please insert the LTO of the subcontractor"
-                  rules={[{ required: true }]}
-                >
-                  <Input placeholder="Please input" />
-                </Form.Item>
-              </Col>
-            ) : hasLicense === 0 ? (
-              <Col span={24}>
-                <Form.Item
-                  name="NoLicenseReason"
-                  label="Please explain the reason"
-                  rules={[{ required: true }]}
-                >
-                  <Input.TextArea placeholder="Please input" />
-                </Form.Item>
-              </Col>
-            ) : (
-              ''
-            )}
-
-            <Col span={12}>
-              <Form.Item
-                required={false}
-                name="UnethicalBehaviorRequired"
-                label={
-                  <>
-                    Does the contracting process require unethical behavior?
-                    <span className="dot_required">*</span>
-                    {getLevel(
-                      form.getFieldValue('UnethicalBehaviorRequired') === 1
-                        ? 'High'
-                        : 'Low',
-                    )}
-                  </>
-                }
-                rules={[{ required: true }]}
-              >
-                <Radio.Group
-                  onChange={(val: any) => {
-                    setUnethicalBehaviorRequired(val);
-                  }}
-                >
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                required={false}
-                name="FamilyMemberHere"
-                label={
-                  <>
-                    <span>
-                      Do you or your family member have any interest in the
-                      subcontractor or does your family member work for or in
-                      the subcontractor?<span className="dot_required">*</span>
-                      {getLevel(
-                        form.getFieldValue('FamilyMemberHere') == 1
-                          ? 'High'
-                          : 'Low',
-                      )}
-                    </span>
-                  </>
-                }
-                rules={[{ required: true }]}
-              >
-                <Radio.Group
-                  onChange={(val: any) => {
-                    setFamilyMemberHere(val);
-                  }}
-                >
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                required={false}
-                name="ProcessInfo"
-                label={
-                  <>
-                    <span>
-                      Will the subcontractor be processing personal data on
-                      behalf of BV or accessing any of BV’s Information System?
-                      <span className="dot_required">*</span>
-                    </span>
-                  </>
-                }
-                rules={[{ required: true }]}
+                name="LessorIsOwner"
+                label="Whether the lessor is the owner of the property"
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group>
                   <Radio value={1}>Yes</Radio>
@@ -809,12 +586,87 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={24}>
+              <div className="fileWrapper">
+                <Form.Item
+                  name="lessorFile"
+                  valuePropName="fileList"
+                  getValueFromEvent={(e: any) => {
+                    if (Array.isArray(e)) {
+                      return e;
+                    }
+                    return e && e.fileList;
+                  }}
+                  label="Please upload the documents to demonstrate the lessor has the right to rent, such as lease contract and power of attorney"
+                  rules={[{ required: true, message: 'file is required' }]}
+                >
+                  <Upload {...uploadProps} listType="picture-card">
+                    <div className="file_upload">
+                      <CloudUploadOutlined />
+                      <br />
+                      <span>Add Attachment</span>
+                    </div>
+                  </Upload>
+                </Form.Item>
+              </div>
+            </Col>
+            <Col span={24}>
               <Form.Item
-                name="Agreement"
-                label="Please provide the term of the agreement"
+                name="Mortgage"
+                label="Any mortgage and/or seize on the property that restricted the lessor from leasing"
+                rules={[{ required: true, message: 'Please select' }]}
+              >
+                <Radio.Group>
+                  <Radio value={1}>Yes</Radio>
+                  <Radio value={0}>No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item
+                name="UsePropertyRecord"
+                label="Use of property recorded in the certificate of property ownership"
               >
                 <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item
+                required={false}
+                name="EnvironmentalProtectMeet"
+                label="Environmental protection, fire prevention and/or any other necessary requirement of the property are met or not "
+                rules={[{ required: true, message: 'Please select' }]}
+              >
+                <Radio.Group>
+                  <Radio value={1}>Yes</Radio>
+                  <Radio value={0}>No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                name="PriorityOfRenew"
+                label="Whether BV has the priority to renew the lease"
+                rules={[{ required: true, message: 'Please select' }]}
+              >
+                <Radio.Group>
+                  <Radio value={1}>Yes</Radio>
+                  <Radio value={0}>No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                name="AdvanceNoticeClause"
+                required={false}
+                label="Whether there is any provision in the lease that allows the lessor to serve a prior notice to break/terminate the lease term (e.g due to redevelopment reason or self-use reason) and without paying any compensation"
+              >
+                <Radio.Group>
+                  <Radio value={1}>Yes</Radio>
+                  <Radio value={0}>No</Radio>
+                </Radio.Group>
               </Form.Item>
             </Col>
           </Row>
@@ -830,22 +682,18 @@ const index = () => {
                     Whether to use a BV Mandatory template
                     <span className="dot_required">*</span>
                     <Tooltip title="In principle, BV entities shall use our standard template for subcontractor agreements.">
-                      <InfoCircleOutlined
-                        style={{
-                          margin: '0 5px',
-                          color: 'orange',
-                          cursor: 'pointer',
-                        }}
-                      />
+                      <BellOutlined />
                     </Tooltip>
                     {getLevel(
-                      form.getFieldValue('UseMandatoryTemplate') == 0
+                      form.getFieldValue('UseMandatoryTemplate') === 0
                         ? 'High'
-                        : 'Low',
+                        : form.getFieldValue('UseMandatoryTemplate') === 1
+                        ? 'Low'
+                        : '',
                     )}
                   </>
                 }
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group
                   onChange={(val: any) => {
@@ -881,7 +729,12 @@ const index = () => {
                     return e && e.fileList;
                   }}
                   label="Upload Contract Attachment"
-                  rules={[{ required: true }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Contract Attachment is required',
+                    },
+                  ]}
                 >
                   <Upload {...uploadProps} listType="picture-card">
                     <div className="file_upload">
@@ -911,7 +764,31 @@ const index = () => {
         <ApprovalActions
           formValidataion={onSubmit}
           callBack={(result: any) => {
-            console.log('提交文件');
+            let _listFile = form.getFieldValue('file');
+            let res: any;
+            formService
+              .uploadFile(_listFile[0].name, _listFile[0].originFileObj)
+              .then((result1) => {
+                //  上传文件，并添加id
+                res = result1;
+                //   存储文件
+                return formService.getFile(
+                  res.d.ListItemAllFields.__deferred.uri,
+                );
+              })
+              .then((resultMiddle) => {
+                return formService.updateFileItem(resultMiddle, {
+                  ProcName: listName,
+                  ProcId: result.ID,
+                });
+              })
+              .then((result) => {
+                message.success('Operate Success!');
+              })
+              .catch((e) => {
+                message.error(e);
+              });
+            // formService.uploadFile()
           }}
           approvalRender={
             <Card title="F. Approver Information" bordered={false}>

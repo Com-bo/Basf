@@ -18,7 +18,9 @@ import FormService from '@/services/form.service';
 import moment from 'moment';
 import spService from '@/services/sharepoint.service';
 import ApprovalActions from '@/components/procOptions/procOptions';
+
 import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
+import Loading from '@/components/loading/Loading';
 interface OptionItem {
   key: number;
   Title: string;
@@ -28,13 +30,19 @@ const index = () => {
   const formLink = 'http://bv_dpa.com:8001/subcontractContract?ID=';
   const wfFlowName = '6C941EF0-0464-088B-E2EF-7022F59C1CA5';
   const listName = 'SubContractContract';
+  const [applicationNo, setApplicationNo] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [form] = Form.useForm();
   const formService = new FormService();
 
   //获取流水号
   const getSerialNum = () => {
-    return 'SN' + moment(new Date(), 'YYYYMMDDHHmmss');
+    let code = '';
+    for (var i = 0; i < 5; i++) {
+      code += parseInt(Math.random() * 10);
+    }
+    return 'SC' + moment(new Date(), 'YYYYMMDD' + code);
   };
 
   //#endregion
@@ -47,11 +55,13 @@ const index = () => {
         ...form.getFieldsValue(),
       };
       params.Title = getSerialNum();
+      params.ApplicationNo = getSerialNum();
       delete params.file;
       return {
         isOK: true,
         formData: params,
         formLink,
+        applicationNo,
         wfFlowName,
         listName,
       };
@@ -106,6 +116,7 @@ const index = () => {
   };
 
   const _getOps = async () => {
+    setLoading(true);
     try {
       const drop1 = await formService.getTableDataAll('SBU');
       setSBUOptions(drop1);
@@ -123,7 +134,10 @@ const index = () => {
         'SubcontractorContractTerms',
       );
       setContractTerms(drop7);
-    } catch (error) {}
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
   };
   const uploadProps = {
     // onRemove: (file, fileList) => {
@@ -275,7 +289,7 @@ const index = () => {
                   <Form.Item
                     name="Region"
                     label="Region"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select
                       placeholder="----select------"
@@ -300,7 +314,7 @@ const index = () => {
                   <Form.Item
                     name="Country"
                     label="Country"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select placeholder="----select------">
                       {countryOptions.map((item: OptionItem, index) => (
@@ -315,7 +329,7 @@ const index = () => {
                   <Form.Item
                     name="SBU"
                     label="SBU"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select placeholder="-----select--------">
                       {sBUOptions.map((item: OptionItem, index) => (
@@ -330,7 +344,7 @@ const index = () => {
                   <Form.Item
                     name="BVSigningEntity"
                     label="BV Signing Entity"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select placeholder="-----select--------">
                       {bvEntityOptions.map((item: OptionItem, index) => (
@@ -345,7 +359,7 @@ const index = () => {
                   <Form.Item
                     name="Site"
                     label="Site"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select placeholder="-----select--------">
                       {siteOptions.map((item: OptionItem, index) => (
@@ -365,7 +379,7 @@ const index = () => {
                   <Form.Item
                     name="NameofCounterparty"
                     label="Name of Counterparty"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please input' }]}
                   >
                     <Input placeholder="Please input" />
                   </Form.Item>
@@ -374,7 +388,7 @@ const index = () => {
                   <Form.Item
                     name="SupplierCode"
                     label="Please upload the supplier code"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please input' }]}
                   >
                     <Input placeholder="Please input" />
                   </Form.Item>
@@ -383,7 +397,7 @@ const index = () => {
                   <Form.Item
                     name="CoEOrBPCCSigned"
                     label="CoE / BPCC declaration signed or not"
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Radio.Group>
                       <Radio value={1}>Yes</Radio>
@@ -404,7 +418,7 @@ const index = () => {
                         </Tooltip>
                       </>
                     }
-                    rules={[{ required: true }]}
+                    rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Radio.Group>
                       <Radio value={1}>Yes</Radio>
@@ -417,7 +431,7 @@ const index = () => {
                     <Form.Item
                       name="LocatedInCountryListed"
                       label="Whether the subcontractor is located in a country listed under BV Sanctions policy"
-                      rules={[{ required: true }]}
+                      rules={[{ required: true, message: 'Please select' }]}
                     >
                       <Radio.Group>
                         <Radio value={1}>Yes</Radio>
@@ -444,7 +458,7 @@ const index = () => {
                           </Tooltip>
                         </>
                       }
-                      rules={[{ required: true }]}
+                      rules={[{ required: true, message: 'Please select' }]}
                     >
                       <Radio.Group>
                         <Radio value={1}>Yes</Radio>
@@ -463,7 +477,7 @@ const index = () => {
               <Form.Item
                 name="ContractAmount"
                 label="Contract Amount for one year of service"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Select placeholder="-----select--------">
                   {contractAmountOptions.map((item: OptionItem, index) => (
@@ -488,7 +502,7 @@ const index = () => {
                     </Tooltip>
                   </>
                 }
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please input' }]}
               >
                 <Input placeholder="Please input" />
               </Form.Item>
@@ -497,7 +511,7 @@ const index = () => {
               <Form.Item
                 name="BudgetApproved"
                 label="If the budget has been approved"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group>
                   <Radio value={1}>Yes</Radio>
@@ -510,7 +524,7 @@ const index = () => {
               <Form.Item
                 name="ContractSumWithinBudget"
                 label="Is the contract sum within the approved budget"
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group>
                   <Radio value={1}>Yes</Radio>
@@ -564,7 +578,7 @@ const index = () => {
                     )}{' '}
                   </>
                 }
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Select
                   placeholder="-----select--------"
@@ -591,7 +605,7 @@ const index = () => {
                 <Form.Item
                   name="NeededReasonExplain"
                   label="Please explain the reason"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: 'Please input' }]}
                 >
                   <Input.TextArea placeholder="Please input" />
                 </Form.Item>
@@ -614,7 +628,7 @@ const index = () => {
                     )}
                   </>
                 }
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group
                   onChange={(val) => {
@@ -637,7 +651,7 @@ const index = () => {
                 <Form.Item
                   name="Background"
                   label="Please provide the background"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: 'Please input' }]}
                 >
                   <Input.TextArea placeholder="Please input" />
                 </Form.Item>
@@ -647,6 +661,7 @@ const index = () => {
               <Form.Item
                 name="HasLicense"
                 required={false}
+                rules={[{ required: true, message: 'Please select' }]}
                 label={
                   <>
                     Whether the subcontractor has license to operate ("LTO")
@@ -677,7 +692,7 @@ const index = () => {
                 <Form.Item
                   name="InsertLTO"
                   label="Please insert the LTO of the subcontractor"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: 'Please input' }]}
                 >
                   <Input placeholder="Please input" />
                 </Form.Item>
@@ -687,7 +702,7 @@ const index = () => {
                 <Form.Item
                   name="NoLicenseReason"
                   label="Please explain the reason"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: 'Please input' }]}
                 >
                   <Input.TextArea placeholder="Please input" />
                 </Form.Item>
@@ -713,7 +728,7 @@ const index = () => {
                     )}
                   </>
                 }
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group
                   onChange={(val: any) => {
@@ -745,7 +760,7 @@ const index = () => {
                     </span>
                   </>
                 }
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group
                   onChange={(val: any) => {
@@ -770,7 +785,7 @@ const index = () => {
                     </span>
                   </>
                 }
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group>
                   <Radio value={1}>Yes</Radio>
@@ -810,7 +825,7 @@ const index = () => {
                     )}
                   </>
                 }
-                rules={[{ required: true }]}
+                rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group
                   onChange={(val: any) => {
@@ -846,7 +861,12 @@ const index = () => {
                     return e && e.fileList;
                   }}
                   label="Upload Contract Attachment"
-                  rules={[{ required: true }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Contract Attachment is required',
+                    },
+                  ]}
                 >
                   <Upload {...uploadProps} listType="picture-card">
                     <div className="file_upload">
@@ -876,30 +896,60 @@ const index = () => {
         <ApprovalActions
           formValidataion={onSubmit}
           callBack={(result: any) => {
+            if (!result) {
+              setLoading(false);
+              return;
+            }
             let _listFile = form.getFieldValue('file');
             let res: any;
-            formService
-              .uploadFile(_listFile[0].name, _listFile[0].originFileObj)
-              .then((result1) => {
+            let aryPromise: Promise<any>[] = [];
+            _listFile.forEach(
+              (element: { name: string; originFileObj: File }) => {
+                aryPromise.push(
+                  formService.uploadFile(element.name, element.originFileObj),
+                );
+              },
+            );
+            Promise.all(aryPromise).then((resultArr) => {
+              let filesPromise: Promise<any>[] = [];
+              resultArr.forEach((result1) => {
                 //  上传文件，并添加id
                 res = result1;
-                //   存储文件
-                return formService.getFile(
-                  res.d.ListItemAllFields.__deferred.uri,
+                filesPromise.push(
+                  formService.getFile(res.d.ListItemAllFields.__deferred.uri),
                 );
-              })
-              .then((resultMiddle) => {
-                return formService.updateFileItem(resultMiddle, {
-                  ProcName: listName,
-                  ProcId: result.ID,
-                });
-              })
-              .then((result) => {
-                message.success('Operate Success!');
-              })
-              .catch((e) => {
-                message.error(e);
               });
+              Promise.all(filesPromise)
+                .then((resultMiddleArr) => {
+                  let resultMiddlePromise: Promise<any>[] = [];
+                  resultMiddleArr.forEach((resultMiddle) => {
+                    //  上传文件，并添加id
+
+                    resultMiddlePromise.push(
+                      formService.updateFileItem(resultMiddle, {
+                        ProcName: listName,
+                        ProcId: result.ID,
+                      }),
+                    );
+                  });
+
+                  Promise.all(resultMiddlePromise).then(() => {
+                    setLoading(false);
+                    message.success('Operate Success!');
+                    window.location.href =
+                      'https://serviceme.sharepoint.com/sites/DPA_DEV_Community/SitePages/DPA.aspx#/dashboard';
+                  });
+                })
+                .catch((e) => {
+                  message.error(e);
+                  setLoading(false);
+                })
+                .catch((e) => {
+                  message.error(e);
+                  setLoading(false);
+                });
+            });
+
             // formService.uploadFile()
           }}
           approvalRender={
@@ -982,6 +1032,7 @@ const index = () => {
           }
         ></ApprovalActions>
       </Form>
+      {loading ? <Loading /> : null}
     </>
   );
 };

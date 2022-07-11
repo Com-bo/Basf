@@ -14,10 +14,12 @@ import {
 } from 'antd';
 
 interface IProps {
+  applicationNo?: string; //流水号
   wfFlowName?: string;
   formValidataion: Function;
   approvalRender: React.ReactNode;
   callBack?: Function;
+  setLoading?: any;
 }
 
 interface IBForm {
@@ -36,14 +38,14 @@ const index = (props: IProps) => {
 
   //获取按钮类型
   useEffect(() => {
-    if (props.wfFlowName) {
+    if (props.applicationNo) {
       spService
         .getLastTaskInfo(
           [
             {
-              type: 'filter eq',
-              value: props.wfFlowName,
-              properties: ['WFFlowName'],
+              type: 'filter contains',
+              value: `[${props.applicationNo}]`,
+              properties: ['Title'],
             },
           ],
           [],
@@ -68,24 +70,29 @@ const index = (props: IProps) => {
         console.error(e);
       });
       if (valid) {
+        // 需要生成applicarionno
         Modal.confirm({
           title: 'Tips',
           content: '是否确认发起流程？',
           okText: '确认发起',
           cancelText: '取消',
           onOk: async () => {
-            var spRes = await spService.submitBizForm(
-              res.listName,
-              res.formData,
-              res.formLink,
-              res.wfFlowName,
-              true,
-            );
+            try {
+              var spRes = await spService.submitBizForm(
+                res.listName,
+                res.formData,
+                res.formLink,
+                res.wfFlowName,
+                true,
+              );
+              props.callBack && props.callBack(spRes);
+            } catch (error) {}
           },
         });
       }
     } else {
       message.error('表单验证失败！');
+      props.callBack && props.callBack();
     }
   };
 
@@ -105,7 +112,7 @@ const index = (props: IProps) => {
               res.wfFlowName,
               true,
             );
-            props.callBack && props.callBack(res);
+            props.callBack && props.callBack(spRes);
           },
         });
       }
@@ -143,13 +150,20 @@ const index = (props: IProps) => {
           >
             Submit
           </Button>
-          <Button hidden={buttons.indexOf('Approve') < 0}>同意</Button>
-          <Button hidden={buttons.indexOf('Reject') < 0}>拒绝</Button>
-          <Button hidden={buttons.indexOf('Trans') < 0}>转移任务</Button>
-          <Button hidden={buttons.indexOf('Add') < 0}>加签</Button>
-          <Button hidden={buttons.indexOf('Post') < 0}>提交</Button>
-          <Button hidden={buttons.indexOf('Return') < 0}>退回</Button>
-          <Button hidden={buttons.indexOf('NotAllow') < 0}>不同意</Button>
+          {/* 同意 */}
+          <Button hidden={buttons.indexOf('Approve') < 0}>Approve</Button>
+          {/* 拒绝 */}
+          <Button hidden={buttons.indexOf('Reject') < 0}>Reject</Button>
+          {/* 转移任务 */}
+          <Button hidden={buttons.indexOf('Trans') < 0}>Trans</Button>
+          {/* 加签 */}
+          <Button hidden={buttons.indexOf('Add') < 0}>Add</Button>
+          {/* 提交 */}
+          <Button hidden={buttons.indexOf('Post') < 0}>Post</Button>
+          {/* 退回 */}
+          <Button hidden={buttons.indexOf('Return') < 0}>Return</Button>
+          {/* 不同意 */}
+          <Button hidden={buttons.indexOf('NotAllow') < 0}>NotAllow</Button>
         </Space>
       </div>
     </>

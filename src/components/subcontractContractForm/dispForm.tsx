@@ -22,6 +22,7 @@ import {
 import FormService from '@/services/form.service';
 import moment from 'moment';
 import ApprovalActions from '@/components/procOptions/procOptions';
+import Loading from '@/components/loading/Loading';
 import {
   CloudUploadOutlined,
   InfoCircleOutlined,
@@ -32,21 +33,23 @@ interface OptionItem {
   key: number;
   Title: string;
 }
-const index = () => {
+const index = (props: any) => {
   //#region   固定模板
   const formLink = 'http://bv_dpa.com:8001/subcontractContract?ID=';
   const wfFlowName = '6C941EF0-0464-088B-E2EF-7022F59C1CA5';
   const listName = 'SubContractContract';
-
+  const [applicationNo, setApplicationNo] = useState('');
   const [form] = Form.useForm();
   // const spService = new SpService();
   const formService = new FormService();
+  const [loading, setLoading] = useState(false);
 
   //#endregion
 
   const { Option } = Select;
   const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
+    setLoading(true);
     return form.validateFields().then((res) => {
       const params = {
         ...form.getFieldsValue(),
@@ -56,40 +59,21 @@ const index = () => {
         isOK: true,
         formData: params,
         formLink,
+        applicationNo,
         wfFlowName,
         listName,
       };
     });
   };
-
-  const [sBUOptions, setSBUOptions] = useState([]);
-  const [bvEntityOptions, setBVEntityOptions] = useState([]);
-  const [siteOptions, setSiteOptions] = useState([]);
-  const [regionOptions, setRegion] = useState([]);
-  const [countryOptions, setCountry] = useState([]);
-  const [contractAmountOptions, setContractAmount] = useState([]);
-  const [paymentTermsOptions, setPaymentTerms] = useState([]);
-  const [hideLocatedInCountryListed, setHideLocatedInCountryListed] =
-    useState(true);
-  const [hideProposedServicesConnection, setHideProposedServicesConnection] =
-    useState(true);
-  const [contractTermsOptions, setContractTerms] = useState([]);
-  const [hideTermExplainReason, setHideTermExplainReason] = useState(true);
-  const [hideBackground, setHideBackground] = useState(true);
-  const [hasLicense, setHasLicense] = useState(null);
-  const [familyMemberHere, setFamilyMemberHere] = useState(null);
-  const [unethicalBehaviorRequired, setUnethicalBehaviorRequired] =
-    useState(null);
-  const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   useEffect(() => {
-    // 附件之初始化
+    // 附件之初始化获取id
     formService
       .getTableData(
         listName,
         [
           {
             type: 'filter eq',
-            value: 26,
+            value: props.location.query?.ID,
             properties: ['ID'],
           },
         ],
@@ -98,12 +82,13 @@ const index = () => {
       .then((res) => {
         if (res && res.length) {
           console.log(res[0]);
+          setApplicationNo(res[0].ApplicationNo);
           form.setFieldsValue({
             ...res[0],
             RequestDate: moment(res[0].RequestDate),
           });
         }
-        return formService.getFileItems(listName, 26);
+        return formService.getFileItems(listName, props.location.query?.ID);
       })
       .then((res) => {
         if (res && res.length) {
@@ -112,24 +97,9 @@ const index = () => {
           });
         }
       });
-    // 获取表单
-
-    // return formService.updateFileItem(file, { ProcName: 'hhh', ProcId: 299 })
-    // formService.getTableDataAll("ProcAttachList").then(res=>{
-
-    // })
-    // 获取下拉options
-    // form.setFieldsValue({
-    //   RequestDate: moment(),
-    // });
   }, []);
 
   const uploadProps = {
-    // onRemove: (file, fileList) => {
-    //   if (file.id) {
-    //     return formService.deleteFileItem(file.name);
-    //   }
-    // },
     beforeUpload: (file: any, fileList: any) => {
       return false;
     },
@@ -200,50 +170,9 @@ const index = () => {
         return '';
     }
   };
-  const onValuesChange = ({
-    EntityOfBVCPS,
-    LocatedInCountryListed,
-  }: {
-    EntityOfBVCPS: number;
-    LocatedInCountryListed: number;
-  }) => {
-    if (EntityOfBVCPS === 0) {
-      setHideLocatedInCountryListed(false);
-    } else if (EntityOfBVCPS === 1) {
-      setHideLocatedInCountryListed(true);
-    }
-    if (LocatedInCountryListed === 0) {
-      setHideProposedServicesConnection(false);
-    } else if (LocatedInCountryListed === 1) {
-      setHideProposedServicesConnection(true);
-    }
-  };
-  const requiredOtherPaymentTerm = () => {
-    if (form.getFieldValue('paymentTerm') == 'others') {
-      return Promise.reject(new Error('Please enter details'));
-    } else {
-      return Promise.resolve();
-    }
-  };
-  const validHasMaterialChanges = (rule: any, value: any) => {
-    if (
-      form.getFieldValue('UseMandatoryTemplate') == 1 &&
-      value === undefined
-    ) {
-      return Promise.reject(new Error('Please select'));
-    } else {
-      return Promise.resolve();
-    }
-  };
-
   return (
     <>
-      <Form
-        form={form}
-        layout="vertical"
-        className="subcontractContractForm"
-        onValuesChange={onValuesChange}
-      >
+      <Form form={form} layout="vertical" className="subcontractContractForm">
         <Card title="A. General Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
@@ -371,7 +300,7 @@ const index = () => {
                     </Radio.Group>
                   </Form.Item>
                 </Col>
-                {!hideLocatedInCountryListed ? (
+                {form.getFieldValue('EntityOfBVCPS') == 1 ? (
                   <Col span={24}>
                     <Form.Item
                       name="LocatedInCountryListed"
@@ -387,9 +316,7 @@ const index = () => {
                 ) : (
                   ''
                 )}
-                {hideProposedServicesConnection ? (
-                  ''
-                ) : (
+                {form.getFieldValue('LocatedInCountryListed') ? (
                   <Col span={24}>
                     <Form.Item
                       name="ProposedServicesConnection"
@@ -411,6 +338,8 @@ const index = () => {
                       </Radio.Group>
                     </Form.Item>
                   </Col>
+                ) : (
+                  ''
                 )}
               </Row>
             </div>
@@ -483,7 +412,6 @@ const index = () => {
               <Form.Item
                 name="OthersPaymentTerm"
                 label="Please provide the others payment term"
-                rules={[{ validator: requiredOtherPaymentTerm }]}
               >
                 <Input placeholder="Please input" disabled />
               </Form.Item>
@@ -516,9 +444,7 @@ const index = () => {
                 <Input placeholder="Please input" disabled />
               </Form.Item>
             </Col>
-            {hideTermExplainReason ? (
-              ''
-            ) : (
+            {form.getFieldValue('NeededReason') === 'Others' ? (
               <Col span={24}>
                 <Form.Item
                   name="NeededReasonExplain"
@@ -528,6 +454,8 @@ const index = () => {
                   <Input.TextArea placeholder="Please input" disabled />
                 </Form.Item>
               </Col>
+            ) : (
+              ''
             )}
             <Col span={12}>
               <Form.Item
@@ -554,7 +482,7 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            {hideBackground ? (
+            {form.getFieldValue('RequestService') ? (
               ''
             ) : (
               <Col span={24}>
@@ -592,7 +520,7 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            {hasLicense == 1 ? (
+            {form.getFieldValue('HasLicense') == 1 ? (
               <Col span={12}>
                 <Form.Item
                   name="InsertLTO"
@@ -602,7 +530,7 @@ const index = () => {
                   <Input placeholder="Please input" />
                 </Form.Item>
               </Col>
-            ) : hasLicense === 0 ? (
+            ) : form.getFieldValue('HasLicense') === 0 ? (
               <Col span={24}>
                 <Form.Item
                   name="NoLicenseReason"
@@ -734,7 +662,6 @@ const index = () => {
               <Form.Item
                 name="HasMaterialChanges"
                 label="Whether there is any material changes to any term of the agreement"
-                rules={[{ validator: validHasMaterialChanges }]}
               >
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
@@ -782,9 +709,12 @@ const index = () => {
           </Row>
         </Card>
         <ApprovalActions
+          applicationNo={applicationNo}
           formValidataion={onSubmit}
           callBack={(result: any) => {
-            // formService.uploadFile()
+            setLoading(false);
+            window.location.href =
+              'https://serviceme.sharepoint.com/sites/DPA_DEV_Community/SitePages/DPA.aspx#/dashboard';
           }}
           approvalRender={
             <Card title="F. Approver Information" bordered={false}>
@@ -866,6 +796,7 @@ const index = () => {
           }
         ></ApprovalActions>
       </Form>
+      {loading ? <Loading /> : null}
     </>
   );
 };
