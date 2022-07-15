@@ -21,6 +21,8 @@ import ApprovalActions from '@/components/procOptions/procOptions';
 
 import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
 import Loading from '@/components/loading/Loading';
+import { getSerialNum } from '@/tools/utils';
+
 interface OptionItem {
   key: number;
   Title: string;
@@ -32,30 +34,24 @@ const index = () => {
   const listName = 'SubContractContract';
   const [applicationNo, setApplicationNo] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const [approveData, setApproveData] = useState<any>({});
   const [form] = Form.useForm();
   const formService = new FormService();
 
   //获取流水号
-  const getSerialNum = () => {
-    let code = '';
-    for (var i = 0; i < 5; i++) {
-      code += parseInt(Math.random() * 10);
-    }
-    return 'SC' + moment(new Date(), 'YYYYMMDD' + code);
-  };
 
   //#endregion
-
-  const { Option } = Select;
-  const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
     return form.validateFields().then((res) => {
       const params = {
         ...form.getFieldsValue(),
+        ...approveData,
       };
-      params.Title = getSerialNum();
-      params.ApplicationNo = getSerialNum();
+      let _no = getSerialNum();
+      params.Title = _no;
+      params.ApplicationNo = _no;
+
+      // 审批人封装
       delete params.file;
       return {
         isOK: true,
@@ -68,8 +64,10 @@ const index = () => {
     });
   };
 
-  const [sBUOptions, setSBUOptions] = useState([]);
-  const [bvEntityOptions, setBVEntityOptions] = useState([]);
+  const [buOptions, setBUOptions] = useState<any>([]);
+  const [sbuOptions, setSBUOptions] = useState<any>([]);
+  const [proOptions, setProOptions] = useState<any>([]);
+  const [bvEntityOptions, setBVEntityOptions] = useState<any>([]);
   const [siteOptions, setSiteOptions] = useState([]);
   const [regionOptions, setRegion] = useState([]);
   const [countryOptions, setCountry] = useState([]);
@@ -81,7 +79,7 @@ const index = () => {
     useState(true);
   const [contractTermsOptions, setContractTerms] = useState([]);
   const [hideTermExplainReason, setHideTermExplainReason] = useState(true);
-  const [hideBackground, setHideBackground] = useState(true);
+  const [hideBackground, setHideBackground] = useState<boolean | null>(null);
   const [hasLicense, setHasLicense] = useState(null);
   const [familyMemberHere, setFamilyMemberHere] = useState(null);
   const [unethicalBehaviorRequired, setUnethicalBehaviorRequired] =
@@ -97,6 +95,7 @@ const index = () => {
     });
   }, []);
   const getCountry = (_region: string) => {
+    setLoading(true);
     return formService
       .getTableData(
         'Country',
@@ -111,6 +110,191 @@ const index = () => {
       )
       .then((res) => {
         setCountry(res);
+        setLoading(false);
+        setBVEntityOptions([]);
+        setBUOptions([]);
+        setSBUOptions([]);
+        setProOptions([]);
+        form.setFieldsValue({
+          Country: '',
+          BVSigningEntity: '',
+          SBU: '',
+          BU: '',
+          ProductLine: '',
+        });
+        // 清空Country 、entity和sbu
+      })
+      .catch((e) => {
+        setLoading(false);
+      });
+  };
+  // 去重复字段
+  const _delRepeat = (originalData: any[], name: string) => {
+    let temp: string[] = [];
+    let targetArr = [];
+    for (let i = 0; i < originalData.length; i++) {
+      if (temp.indexOf(originalData[i][name]) < 0) {
+        temp.push(originalData[i][name]);
+        targetArr.push(originalData[i]);
+      }
+    }
+    return targetArr;
+  };
+  // 通过国家获取entity
+  const getEntityByCountry = (_country: string) => {
+    return formService
+      .getTableData(
+        'BUList',
+        [
+          {
+            type: 'filter eq',
+            value: _country,
+            properties: ['Countries'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('Region'),
+            properties: ['Region'],
+          },
+        ],
+        [],
+      )
+      .then((res) => {
+        // 去重
+        setBVEntityOptions(_delRepeat(res, 'EntityName'));
+        setBUOptions([]);
+        setSBUOptions([]);
+        setProOptions([]);
+        // 清空entity和sbu
+        form.setFieldsValue({
+          BVSigningEntity: '',
+          SBU: '',
+          BU: '',
+          ProductLine: '',
+        });
+      })
+      .catch((e) => {});
+  };
+  // 通过entity获取bu
+  const getBUByEntity = (_entity: string) => {
+    return formService
+      .getTableData(
+        'BUList',
+        [
+          {
+            type: 'filter eq',
+            value: _entity,
+            properties: ['EntityName'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('Region'),
+            properties: ['Region'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('Country'),
+            properties: ['Countries'],
+          },
+        ],
+        [],
+      )
+      .then((res) => {
+        setBUOptions(_delRepeat(res, 'BU'));
+        setSBUOptions([]);
+        setProOptions([]);
+        form.setFieldsValue({
+          BU: '',
+          SBU: '',
+          ProductLine: '',
+        });
+      })
+      .catch((e) => {});
+  };
+  const getSBUByBU = (_bu?: string) => {
+    if (!_bu) {
+      setSBUOptions([]);
+      return;
+    }
+    return formService
+      .getTableData(
+        'BUList',
+        [
+          {
+            type: 'filter eq',
+            value: _bu,
+            properties: ['BUCode'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('Region'),
+            properties: ['Region'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('Country'),
+            properties: ['Countries'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('BVSigningEntity'),
+            properties: ['EntityName'],
+          },
+        ],
+        [],
+      )
+      .then((res) => {
+        setSBUOptions(_delRepeat(res, 'SBU'));
+        setProOptions([]);
+        form.setFieldsValue({
+          SBU: '',
+          ProductLine: '',
+        });
+      })
+      .catch((e) => {});
+  };
+  const getProLineBySBU = (_sbu?: string) => {
+    if (!_sbu) {
+      setProOptions([]);
+      return;
+    }
+    return formService
+      .getTableData(
+        'BUList',
+        [
+          {
+            type: 'filter eq',
+            value: _sbu,
+            properties: ['SBU'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('BU'),
+            properties: ['BUCode'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('Region'),
+            properties: ['Region'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('Country'),
+            properties: ['Countries'],
+          },
+          {
+            type: 'filter eq',
+            value: form.getFieldValue('BVSigningEntity'),
+            properties: ['EntityName'],
+          },
+        ],
+        [],
+      )
+      .then((res) => {
+        setProOptions(_delRepeat(res, 'ProductLine'));
+        form.setFieldsValue({
+          ProductLine: '',
+        });
       })
       .catch((e) => {});
   };
@@ -118,10 +302,10 @@ const index = () => {
   const _getOps = async () => {
     setLoading(true);
     try {
-      const drop1 = await formService.getTableDataAll('SBU');
-      setSBUOptions(drop1);
-      const drop2 = await formService.getTableDataAll('BVSigningEntity');
-      setBVEntityOptions(drop2);
+      // const drop1 = await formService.getTableDataAll('SBU');
+      // setSBUOptions(drop1);
+      // const drop2 = await formService.getTableDataAll('BVSigningEntity');
+      // setBVEntityOptions(drop2);
       const drop3 = await formService.getTableDataAll('Site');
       setSiteOptions(drop3);
       const drop4 = await formService.getTableDataAll('Region');
@@ -234,7 +418,7 @@ const index = () => {
     }
   };
   const requiredOtherPaymentTerm = () => {
-    if (form.getFieldValue('paymentTerm') == 'others') {
+    if (form.getFieldValue('PaymentTerm') == 'others') {
       return Promise.reject(new Error('Please enter details'));
     } else {
       return Promise.resolve();
@@ -316,23 +500,17 @@ const index = () => {
                     label="Country"
                     rules={[{ required: true, message: 'Please select' }]}
                   >
-                    <Select placeholder="----select------">
+                    <Select
+                      placeholder="----select------"
+                      onChange={(val) => {
+                        if (val) {
+                          getEntityByCountry(val);
+                        } else {
+                          setBVEntityOptions([]);
+                        }
+                      }}
+                    >
                       {countryOptions.map((item: OptionItem, index) => (
-                        <Select.Option value={item?.Title} key={index}>
-                          {item?.Title}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="SBU"
-                    label="SBU"
-                    rules={[{ required: true, message: 'Please select' }]}
-                  >
-                    <Select placeholder="-----select--------">
-                      {sBUOptions.map((item: OptionItem, index) => (
                         <Select.Option value={item?.Title} key={index}>
                           {item?.Title}
                         </Select.Option>
@@ -346,10 +524,104 @@ const index = () => {
                     label="BV Signing Entity"
                     rules={[{ required: true, message: 'Please select' }]}
                   >
-                    <Select placeholder="-----select--------">
-                      {bvEntityOptions.map((item: OptionItem, index) => (
-                        <Select.Option value={item?.Title} key={index}>
-                          {item?.Title}
+                    <Select
+                      placeholder="-----select--------"
+                      onChange={(val) => {
+                        if (val) {
+                          getBUByEntity(val);
+                        } else {
+                          setBUOptions([]);
+                        }
+                      }}
+                    >
+                      {bvEntityOptions.map((item: any, index: number) => (
+                        <Select.Option value={item?.EntityName} key={index}>
+                          {item?.EntityName}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="BU"
+                    label="BU"
+                    rules={[{ required: true, message: 'Please select' }]}
+                  >
+                    <Select
+                      placeholder="-----select--------"
+                      onChange={getSBUByBU}
+                    >
+                      {buOptions.map((item: any, index: number) => (
+                        <Select.Option value={item?.BUCode} key={index}>
+                          {item?.BUDescription}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="SBU"
+                    label="SBU"
+                    rules={[{ required: true, message: 'Please select' }]}
+                  >
+                    <Select
+                      placeholder="-----select--------"
+                      onChange={getProLineBySBU}
+                    >
+                      {sbuOptions.map((item: any, index: number) => (
+                        <Select.Option value={item?.SBU} key={index}>
+                          {item?.SBU}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+
+                <Col span={12}>
+                  <Form.Item
+                    name="ProductLine"
+                    label="Product Line"
+                    rules={[{ required: true, message: 'Please select' }]}
+                  >
+                    <Select
+                      placeholder="-----select--------"
+                      onChange={(val) => {
+                        if (val) {
+                          let _data: any = proOptions.find(
+                            (item: any) => item.ProductLine == val,
+                          );
+                          let functionApprovers: any = [];
+                          let fucntions = [
+                            'Procurement',
+                            'FinanceController',
+                            'DataSecurity',
+                            'Legal',
+                          ];
+                          fucntions.forEach((element) => {
+                            if (_data[element]) {
+                              functionApprovers.push(_data[element]);
+                            }
+                          });
+                          setApproveData({
+                            FunctionApprovers: functionApprovers.join(';'),
+                            SiteGMApprovers: _data.SiteGM,
+                            CountryManageGMApprovers: _data.CountryManagerGM,
+                            RegionalVPApprovers: _data.RegionalVP,
+                            CFOApprovers: _data.CFO,
+                          });
+                          form.setFieldsValue({
+                            ..._data,
+                          });
+                        } else {
+                          setApproveData({});
+                        }
+                      }}
+                    >
+                      {proOptions.map((item: any, index: number) => (
+                        <Select.Option value={item?.ProductLine} key={index}>
+                          {item?.ProductLine}
                         </Select.Option>
                       ))}
                     </Select>
@@ -442,7 +714,8 @@ const index = () => {
                 ) : (
                   ''
                 )}
-                {hideProposedServicesConnection ? (
+                {hideProposedServicesConnection ||
+                hideLocatedInCountryListed ? (
                   ''
                 ) : (
                   <Col span={24}>
@@ -570,12 +843,7 @@ const index = () => {
                   <>
                     Please describe why the subcontractor is needed{' '}
                     <span className="dot_required">*</span>{' '}
-                    {getLevel(
-                      form.getFieldValue('NeededReason') !== 'Others' &&
-                        form.getFieldValue('NeededReason')
-                        ? 'Low'
-                        : '',
-                    )}{' '}
+                    {getLevel(hideTermExplainReason ? 'Low' : '')}{' '}
                   </>
                 }
                 rules={[{ required: true, message: 'Please select' }]}
@@ -611,7 +879,7 @@ const index = () => {
                 </Form.Item>
               </Col>
             )}
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 required={false}
                 name="RequestService"
@@ -620,9 +888,9 @@ const index = () => {
                     Did a BV customer or government official request the
                     service?<span className="dot_required">*</span>
                     {getLevel(
-                      form.getFieldValue('RequestService') == 1
+                      hideBackground === false
                         ? 'High'
-                        : form.getFieldValue('RequestService') === 0
+                        : hideBackground === true
                         ? 'Low'
                         : '',
                     )}
@@ -688,7 +956,7 @@ const index = () => {
               </Form.Item>
             </Col>
             {hasLicense == 1 ? (
-              <Col span={12}>
+              <Col span={24}>
                 <Form.Item
                   name="InsertLTO"
                   label="Please insert the LTO of the subcontractor"
@@ -740,7 +1008,7 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 required={false}
                 name="FamilyMemberHere"
@@ -772,7 +1040,7 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
                 required={false}
                 name="ProcessInfo"
@@ -893,6 +1161,78 @@ const index = () => {
             </Col>
           </Row>
         </Card>
+        <Card title="F. Approver Information" bordered={false}>
+          <Row gutter={20}>
+            <Col span={12}>
+              <Form.Item
+                name="Procurement"
+                label="Procurement"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="FinanceController"
+                label="Finance Controller"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="DataSecurity"
+                label="Data Security"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="Legal"
+                label="Legal"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="SiteGM"
+                label="Site GM"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="CountryManagerGM"
+                label="Country Manager/GM"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="RegionalVP"
+                label="Regional VP"
+                rules={[{ required: true }]}
+              >
+                <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="CFO" label="CFO" rules={[{ required: true }]}>
+                <Input placeholder="Please input" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
         <ApprovalActions
           formValidataion={onSubmit}
           callBack={(result: any) => {
@@ -952,84 +1292,6 @@ const index = () => {
 
             // formService.uploadFile()
           }}
-          approvalRender={
-            <Card title="F. Approver Information" bordered={false}>
-              <Row gutter={20}>
-                <Col span={12}>
-                  <Form.Item
-                    name="Procurement"
-                    label="Procurement"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="FinanceController"
-                    label="Finance Controller"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="DataSecurity"
-                    label="Data Security"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="Legal"
-                    label="Legal"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="SiteGM"
-                    label="Site GM"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="CountryManagerGM"
-                    label="Country Manager/GM"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="RegionalVP"
-                    label="Regional VP"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="CFO"
-                    label="CFO"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Card>
-          }
         ></ApprovalActions>
       </Form>
       {loading ? <Loading /> : null}

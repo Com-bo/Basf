@@ -17,7 +17,7 @@ interface IProps {
   applicationNo?: string; //流水号
   wfFlowName?: string;
   formValidataion: Function;
-  approvalRender: React.ReactNode;
+  // approvalRender: React.ReactNode;
   callBack?: Function;
   setLoading?: any;
 }
@@ -123,17 +123,15 @@ const index = (props: IProps) => {
 
   return (
     <>
-      {/* <Card title="Process Info" bordered={false}>
+      {/* {props.approvalRender} */}
+      <Card title="Process Info" bordered={false}>
         <Form.Item label="Comments">
           <TextArea
             onChange={(e) => setComments(e.target.value)}
             value={comments}
           ></TextArea>
         </Form.Item>
-
-      </Card> */}
-
-      {props.approvalRender}
+      </Card>
       <div className="actionWrapper">
         <Space size={20}>
           <Button

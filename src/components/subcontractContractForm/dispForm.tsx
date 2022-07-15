@@ -28,7 +28,7 @@ import {
   InfoCircleOutlined,
   BellOutlined,
 } from '@ant-design/icons';
-import { getapplicationNo } from '@/tools/utils';
+// import { getapplicationNo } from '@/tools/utils';
 interface OptionItem {
   key: number;
   Title: string;
@@ -50,6 +50,7 @@ const index = (props: any) => {
   const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
     setLoading(true);
+    console.log(form.getFieldsValue());
     return form.validateFields().then((res) => {
       const params = {
         ...form.getFieldsValue(),
@@ -316,7 +317,8 @@ const index = (props: any) => {
                 ) : (
                   ''
                 )}
-                {form.getFieldValue('LocatedInCountryListed') ? (
+                {form.getFieldValue('LocatedInCountryListed') &&
+                form.getFieldValue('EntityOfBVCPS') == 1 ? (
                   <Col span={24}>
                     <Form.Item
                       name="ProposedServicesConnection"
