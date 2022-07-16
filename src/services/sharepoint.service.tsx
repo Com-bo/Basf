@@ -80,8 +80,8 @@ export default class SharepointService {
 
   private formatTable(listName: string) {
     let table = formatTable(listName);
-    console.log(table);
-    console.log(listName);
+    // console.log(table);
+    // console.log(listName);
     return {
       name: table[this.config.Type],
       expand: table.UserExpand,
@@ -733,8 +733,8 @@ export default class SharepointService {
         item.ProcName +
         "','ProcId':'" +
         item.ProcId +
-        "','Title':'" +
-        'sub' +
+        "','FieldName':'" +
+        item.FieldName +
         "'}";
       return await this._http.post(file.uri, {
         data: body,

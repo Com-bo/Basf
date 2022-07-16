@@ -988,6 +988,20 @@ export const TableTypeMap: any = {
     ],
     UserExpand: ['WFApplicant'],
   },
+  LeaseType: {
+    SPList: 'LeaseType',
+    CDSTable: 'LeaseType',
+    Fields: [
+      { Key: 'Title', SPList: 'Title', CDSTable: 'Title', Type: 'Text' },
+    ],
+  },
+  DepositAmount: {
+    SPList: 'DepositAmount',
+    CDSTable: 'DepositAmount',
+    Fields: [
+      { Key: 'Title', SPList: 'Title', CDSTable: 'Title', Type: 'Text' },
+    ],
+  },
   BUList: {
     SPList: 'BUList',
     CDSTable: 'BUList',

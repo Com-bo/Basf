@@ -1,33 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import styles from './index.less';
+import { useState, useEffect } from 'react';
 
 import './index.less';
 import {
   Form,
   Input,
-  Button,
-  InputNumber,
   Select,
   Card,
   Row,
   Col,
   Radio,
-  Tabs,
   Upload,
-  Space,
   message,
   DatePicker,
   Tooltip,
+  InputNumber,
 } from 'antd';
 import FormService from '@/services/form.service';
 import moment from 'moment';
 import ApprovalActions from '@/components/procOptions/procOptions';
-import {
-  CloudUploadOutlined,
-  InfoCircleOutlined,
-  BellOutlined,
-} from '@ant-design/icons';
-import { getapplicationNo } from '@/tools/utils';
+import Loading from '@/components/loading/Loading';
+import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
+import { getSerialNum } from '@/tools/utils';
 interface OptionItem {
   key: number;
   Title: string;
@@ -37,32 +30,38 @@ const index = (props: any) => {
   const formLink = 'http://bv_dpa.com:8001/leaseEstateContract?ID=';
   const wfFlowName = '3FCF0B04-C380-0ECF-1509-B8CF153924B4';
   const listName = 'LeaseEstateContract';
+  const [loading, setLoading] = useState(false);
   const [applicationNo, setApplicationNo] = useState('');
   const [form] = Form.useForm();
-  // const spService = new SpService();
   const formService = new FormService();
 
   //#endregion
 
-  const { Option } = Select;
-  const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
     return form.validateFields().then((res) => {
       const params = {
         ...form.getFieldsValue(),
       };
+      let _no = getSerialNum();
+      params.Title = _no;
+      params.ApplicationNo = _no;
       delete params.file;
       return {
         isOK: true,
         formData: params,
         formLink,
         applicationNo,
+        wfFlowName,
         listName,
       };
     });
   };
+
   useEffect(() => {
     // 附件之初始化获取id
+    if (props.location.query?.ID) {
+      return;
+    }
     formService
       .getTableData(
         listName,
@@ -89,17 +88,32 @@ const index = (props: any) => {
       .then((res) => {
         if (res && res.length) {
           form.setFieldsValue({
-            file: res,
+            file: res.filter((item: any) => item.fieldName == 'file'),
+            lessorFile: res.filter(
+              (item: any) => item.fieldName == 'lessorFile',
+            ),
+            certificateFile: res.filter(
+              (item: any) => item.fieldName == 'certificateFile',
+            ),
+            agreementFile: res.filter(
+              (item: any) => item.fieldName == 'agreementFile',
+            ),
           });
         }
       });
   }, []);
 
   const uploadProps = {
+    // onRemove: (file, fileList) => {
+    //   if (file.id) {
+    //     return formService.deleteFileItem(file.name);
+    //   }
+    // },
     beforeUpload: (file: any, fileList: any) => {
       return false;
     },
   };
+
   const getLevel = (type: string) => {
     switch (type) {
       case 'Low':
@@ -166,6 +180,7 @@ const index = (props: any) => {
         return '';
     }
   };
+
   return (
     <>
       <Form form={form} layout="vertical" className="subcontractContractForm">
@@ -196,47 +211,38 @@ const index = (props: any) => {
             <div className="sec-content">
               <Row gutter={20}>
                 <Col span={12}>
-                  <Form.Item
-                    name="Region"
-                    label="Region"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="Region" label="Region">
                     <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="Country"
-                    label="Country"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="Country" label="Country">
                     <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="SBU"
-                    label="SBU"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="BVSigningEntity" label="BV Signing Entity">
                     <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="BVSigningEntity"
-                    label="BV Signing Entity"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="BU" label="BU">
                     <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="Site"
-                    label="Site"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="SBU" label="SBU">
+                    <Input disabled />
+                  </Form.Item>
+                </Col>
+
+                <Col span={12}>
+                  <Form.Item name="ProductLine" label="Product Line">
+                    <Input disabled />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item name="Site" label="Site">
                     <Input disabled />
                   </Form.Item>
                 </Col>
@@ -249,25 +255,22 @@ const index = (props: any) => {
                   <Form.Item
                     name="NameofCounterparty"
                     label="Name of Counterparty"
-                    rules={[{ required: true }]}
                   >
-                    <Input placeholder="Please input" disabled />
+                    <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
                     name="SupplierCode"
                     label="Please upload the supplier code"
-                    rules={[{ required: true }]}
                   >
-                    <Input placeholder="Please input" disabled />
+                    <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="CoEOrBPCCSigned"
-                    label="CoE / BPCC declaration signed or not"
-                    rules={[{ required: true }]}
+                    name="BPCCSigned"
+                    label="BPCC declaration signed or not"
                   >
                     <Radio.Group disabled>
                       <Radio value={1}>Yes</Radio>
@@ -276,67 +279,52 @@ const index = (props: any) => {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="EntityOfBVCPS"
-                    required={false}
-                    label={
-                      <>
-                        Whether the subcontractor is an entity of BVCPS
-                        <span className="dot_required">*</span>
-                        <Tooltip title="Note, the CoE/BPCC declaration must be signed before or together with the contract.">
-                          <BellOutlined />
-                        </Tooltip>
-                      </>
-                    }
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="LeaseYear" label="Term of Lease (year)">
+                    <Input disabled />
+                  </Form.Item>
+                </Col>
+
+                <Col span={12}>
+                  <Form.Item name="LeaseOrRenewal" label="New lease or renewal">
                     <Radio.Group disabled>
-                      <Radio value={1}>Yes</Radio>
-                      <Radio value={0}>No</Radio>
+                      <Radio value={0}>New Lease</Radio>
+                      <Radio value={1}>Renewal</Radio>
                     </Radio.Group>
                   </Form.Item>
                 </Col>
-                {form.getFieldValue('EntityOfBVCPS') == 1 ? (
-                  <Col span={24}>
+                <Col span={12}>
+                  <Form.Item name="LeaseArea" label="Lease Area">
+                    <Input disabled />
+                  </Form.Item>
+                </Col>
+                <Col span={24}>
+                  <div className="fileWrapper">
                     <Form.Item
-                      name="LocatedInCountryListed"
-                      label="Whether the subcontractor is located in a country listed under BV Sanctions policy"
-                      rules={[{ required: true }]}
+                      name="file"
+                      valuePropName="fileList"
+                      getValueFromEvent={(e: any) => {
+                        if (Array.isArray(e)) {
+                          return e;
+                        }
+                        return e && e.fileList;
+                      }}
+                      label="Please upload the last lease agreement if it is a  renewa"
                     >
-                      <Radio.Group disabled>
-                        <Radio value={1}>Yes</Radio>
-                        <Radio value={0}>No</Radio>
-                      </Radio.Group>
+                      <Upload listType="picture-card" disabled>
+                        <div className="file_upload">
+                          <CloudUploadOutlined />
+                          <br />
+                          <span>Add Attachment</span>
+                        </div>
+                      </Upload>
                     </Form.Item>
-                  </Col>
-                ) : (
-                  ''
-                )}
-                {form.getFieldValue('LocatedInCountryListed') ? (
-                  <Col span={24}>
-                    <Form.Item
-                      name="ProposedServicesConnection"
-                      label={
-                        <>
-                          Whether the proposed services provided by the
-                          subcontractor will have any connection to any country
-                          listed under BV Sanctions policy
-                          <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / ">
-                            <BellOutlined />
-                          </Tooltip>
-                        </>
-                      }
-                      rules={[{ required: true }]}
-                    >
-                      <Radio.Group disabled>
-                        <Radio value={1}>Yes</Radio>
-                        <Radio value={0}>No</Radio>
-                      </Radio.Group>
-                    </Form.Item>
-                  </Col>
-                ) : (
-                  ''
-                )}
+                  </div>
+                </Col>
+                <Col span={24}>
+                  <Form.Item name="LeaseType" label="Type of lease">
+                    <Input disabled />
+                  </Form.Item>
+                </Col>
               </Row>
             </div>
           </div>
@@ -345,37 +333,18 @@ const index = (props: any) => {
           <Row gutter={20}>
             <Col span={24}>
               <Form.Item
-                name="ContractAmount"
-                label="Contract Amount for one year of service"
-                rules={[{ required: true }]}
+                name="MonthLyAmount"
+                label="Monthly rental amount"
+                rules={[{ required: true, message: 'Please input' }]}
               >
-                <Input placeholder="Please input" disabled />
+                <Input disabled />
               </Form.Item>
             </Col>
             <Col span={24}>
               <Form.Item
-                name="AnnualContractSum"
+                name="PaymentTerm"
                 required={false}
-                label={
-                  <>
-                    Please state the annual contract sum (if known) or provide
-                    an estimate annual contract sum
-                    <span className="dot_required">*</span>
-                    <Tooltip title="The applicant can fill in either the local currency or USD">
-                      <BellOutlined />
-                    </Tooltip>
-                  </>
-                }
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" disabled />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="BudgetApproved"
-                label="If the budget has been approved"
-                rules={[{ required: true }]}
+                label="Payment term"
               >
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
@@ -387,90 +356,19 @@ const index = (props: any) => {
             <Col span={12}>
               <Form.Item
                 name="ContractSumWithinBudget"
-                label="Is the contract sum within the approved budget"
-                rules={[{ required: true }]}
-              >
-                <Radio.Group disabled>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="PaymentTerm"
-                label="Please summarize the payment term"
-              >
-                <Input placeholder="Please input" disabled />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="OthersPaymentTerm"
-                label="Please provide the others payment term"
-              >
-                <Input placeholder="Please input" disabled />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
-        <Card
-          title="C. Technical Aspects of Project and Contract Terms"
-          bordered={false}
-        >
-          <Row gutter={20}>
-            <Col span={12}>
-              <Form.Item
                 required={false}
-                name="NeededReason"
                 label={
                   <>
-                    Please describe why the subcontractor is needed{' '}
-                    <span className="dot_required">*</span>{' '}
+                    Is the contract sum within the approved budget
                     {getLevel(
-                      form.getFieldValue('NeededReason') !== 'Others' &&
-                        form.getFieldValue('NeededReason')
+                      form.getFieldValue('ContractSumWithinBudget')
                         ? 'Low'
+                        : form.getFieldValue('ContractSumWithinBudget') === 0
+                        ? 'High'
                         : '',
                     )}{' '}
                   </>
                 }
-                rules={[{ required: true }]}
-              >
-                <Input placeholder="Please input" disabled />
-              </Form.Item>
-            </Col>
-            {form.getFieldValue('NeededReason') === 'Others' ? (
-              <Col span={24}>
-                <Form.Item
-                  name="NeededReasonExplain"
-                  label="Please explain the reason"
-                  rules={[{ required: true }]}
-                >
-                  <Input.TextArea placeholder="Please input" disabled />
-                </Form.Item>
-              </Col>
-            ) : (
-              ''
-            )}
-            <Col span={12}>
-              <Form.Item
-                required={false}
-                name="RequestService"
-                label={
-                  <>
-                    Did a BV customer or government official request the
-                    service?<span className="dot_required">*</span>
-                    {getLevel(
-                      form.getFieldValue('RequestService') == 1
-                        ? 'High'
-                        : form.getFieldValue('RequestService') === 0
-                        ? 'Low'
-                        : '',
-                    )}
-                  </>
-                }
-                rules={[{ required: true }]}
               >
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
@@ -478,32 +376,141 @@ const index = (props: any) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            {form.getFieldValue('RequestService') ? (
-              ''
-            ) : (
-              <Col span={24}>
-                <Form.Item
-                  name="Background"
-                  label="Please provide the background"
-                  rules={[{ required: true }]}
-                >
-                  <Input.TextArea placeholder="Please input" disabled />
+            <Col span={12}>
+              <Form.Item
+                name="BudgetApproved"
+                label={
+                  <>
+                    Within the approved budget or not
+                    {getLevel(
+                      form.getFieldValue('BudgetApproved')
+                        ? 'Low'
+                        : form.getFieldValue('BudgetApproved') === 0
+                        ? 'High'
+                        : '',
+                    )}{' '}
+                  </>
+                }
+              >
+                <Radio.Group disabled>
+                  <Radio value={1}>Yes</Radio>
+                  <Radio value={0}>No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="MgmtFee"
+                label="Property management fee actual amount"
+              >
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="DepositAmount" label="Deposit actual amount">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            {form.getFieldValue('DepositAmount') == 'Others' ? (
+              <Col span={12}>
+                <Form.Item name="OthersDeposit" label="Others deposit amount">
+                  <Input disabled />
                 </Form.Item>
               </Col>
+            ) : (
+              ''
+            )}
+          </Row>
+        </Card>
+        <Card title="C. Property Information" bordered={false}>
+          <Row gutter={20}>
+            <Col span={24}>
+              <div className="fileWrapper">
+                <Form.Item
+                  name="certificateFile"
+                  valuePropName="fileList"
+                  getValueFromEvent={(e: any) => {
+                    if (Array.isArray(e)) {
+                      return e;
+                    }
+                    return e && e.fileList;
+                  }}
+                  label="Please upload the certificate of property ownership"
+                >
+                  <Upload {...uploadProps} listType="picture-card" disabled>
+                    <div className="file_upload">
+                      <CloudUploadOutlined />
+                      <br />
+                      <span>Add Attachment</span>
+                    </div>
+                  </Upload>
+                </Form.Item>
+              </div>
+            </Col>
+            <Col span={24}>
+              <Form.Item
+                required={false}
+                name="LessorIsOwner"
+                label={
+                  <>
+                    Whether the lessor is the owner of the property
+                    {getLevel(
+                      form.getFieldValue('LessorIsOwner')
+                        ? 'Low'
+                        : form.getFieldValue('LessorIsOwner') === 0
+                        ? 'High'
+                        : '',
+                    )}{' '}
+                  </>
+                }
+              >
+                <Radio.Group disabled>
+                  <Radio value={1}>Yes</Radio>
+                  <Radio value={0}>No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+
+            {form.getFieldValue('LessorIsOwner') === 0 ? (
+              <Col span={24}>
+                <div className="fileWrapper">
+                  <Form.Item
+                    name="lessorFile"
+                    valuePropName="fileList"
+                    getValueFromEvent={(e: any) => {
+                      if (Array.isArray(e)) {
+                        return e;
+                      }
+                      return e && e.fileList;
+                    }}
+                    label="Please upload the documents to demonstrate the lessor has the right to rent, such as lease contract and power of attorney"
+                    rules={[{ required: true, message: 'file is required' }]}
+                  >
+                    <Upload {...uploadProps} listType="picture-card" disabled>
+                      <div className="file_upload">
+                        <CloudUploadOutlined />
+                        <br />
+                        <span>Add Attachment</span>
+                      </div>
+                    </Upload>
+                  </Form.Item>
+                </div>
+              </Col>
+            ) : (
+              ''
             )}
             <Col span={24}>
               <Form.Item
-                name="HasLicense"
+                name="Mortgage"
                 required={false}
                 label={
                   <>
-                    Whether the subcontractor has license to operate ("LTO")
-                    required by the project?
-                    <span className="dot_required">*</span>
+                    Any mortgage and/or seize on the property that restricted
+                    the lessor from leasing
                     {getLevel(
-                      form.getFieldValue('HasLicense') == 1
+                      form.getFieldValue('Mortgage')
                         ? 'High'
-                        : form.getFieldValue('HasLicense') === 0
+                        : form.getFieldValue('Mortgage') === 0
                         ? 'Low'
                         : '',
                     )}
@@ -516,110 +523,84 @@ const index = (props: any) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            {form.getFieldValue('HasLicense') == 1 ? (
-              <Col span={12}>
-                <Form.Item
-                  name="InsertLTO"
-                  label="Please insert the LTO of the subcontractor"
-                  rules={[{ required: true }]}
-                >
-                  <Input placeholder="Please input" />
-                </Form.Item>
-              </Col>
-            ) : form.getFieldValue('HasLicense') === 0 ? (
-              <Col span={24}>
-                <Form.Item
-                  name="NoLicenseReason"
-                  label="Please explain the reason"
-                  rules={[{ required: true }]}
-                >
-                  <Input.TextArea placeholder="Please input" disabled />
-                </Form.Item>
-              </Col>
-            ) : (
-              ''
-            )}
+            <Col span={24}>
+              <Form.Item
+                name="UsePropertyRecord"
+                label="Use of property recorded in the certificate of property ownership"
+              >
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item
+                name="EnvironmentalProtectMeet"
+                label={
+                  <>
+                    Environmental protection, fire prevention and/or any other
+                    necessary requirement of the property are met or not
+                    {getLevel(
+                      form.getFieldValue('EnvironmentalProtectMeet')
+                        ? 'Low'
+                        : form.getFieldValue('EnvironmentalProtectMeet') === 0
+                        ? 'High'
+                        : '',
+                    )}{' '}
+                  </>
+                }
+              >
+                <Radio.Group disabled>
+                  <Radio value={1}>Yes</Radio>
+                  <Radio value={0}>No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
 
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item
-                required={false}
-                name="UnethicalBehaviorRequired"
+                name="PriorityOfRenew"
                 label={
                   <>
-                    Does the contracting process require unethical behavior?
-                    <span className="dot_required">*</span>
+                    Whether BV has the priority to renew the lease
                     {getLevel(
-                      form.getFieldValue('UnethicalBehaviorRequired') === 1
+                      form.getFieldValue('PriorityOfRenew')
+                        ? 'Low'
+                        : form.getFieldValue('PriorityOfRenew') === 0
+                        ? 'Medium'
+                        : '',
+                    )}{' '}
+                  </>
+                }
+              >
+                <Radio.Group disabled>
+                  <Radio value={1}>Yes</Radio>
+                  <Radio value={0}>No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                name="AdvanceNoticeClause"
+                label={
+                  <>
+                    Whether there is any provision in the lease that allows the
+                    lessor to serve a prior notice to break/terminate the lease
+                    term (e.g due to redevelopment reason or self-use reason)
+                    and without paying any compensation
+                    {getLevel(
+                      form.getFieldValue('AdvanceNoticeClause')
                         ? 'High'
-                        : form.getFieldValue('UnethicalBehaviorRequired') === 0
+                        : form.getFieldValue('AdvanceNoticeClause') === 0
                         ? 'Low'
                         : '',
                     )}
                   </>
                 }
-                rules={[{ required: true }]}
               >
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                required={false}
-                name="FamilyMemberHere"
-                label={
-                  <>
-                    <span>
-                      Do you or your family member have any interest in the
-                      subcontractor or does your family member work for or in
-                      the subcontractor?<span className="dot_required">*</span>
-                      {getLevel(
-                        form.getFieldValue('FamilyMemberHere') == 1
-                          ? 'High'
-                          : form.getFieldValue('FamilyMemberHere') === 0
-                          ? 'Low'
-                          : '',
-                      )}
-                    </span>
-                  </>
-                }
-                rules={[{ required: true }]}
-              >
-                <Radio.Group disabled>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                required={false}
-                name="ProcessInfo"
-                label={
-                  <>
-                    <span>
-                      Will the subcontractor be processing personal data on
-                      behalf of BV or accessing any of BV’s Information System?
-                      <span className="dot_required">*</span>
-                    </span>
-                  </>
-                }
-                rules={[{ required: true }]}
-              >
-                <Radio.Group disabled>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="Agreement"
-                label="Please provide the term of the agreement"
-              >
-                <Input placeholder="Please input" disabled />
               </Form.Item>
             </Col>
           </Row>
@@ -629,24 +610,21 @@ const index = (props: any) => {
             <Col span={12}>
               <Form.Item
                 name="UseMandatoryTemplate"
-                required={false}
                 label={
                   <>
                     Whether to use a BV Mandatory template
-                    <span className="dot_required">*</span>
                     <Tooltip title="In principle, BV entities shall use our standard template for subcontractor agreements.">
                       <BellOutlined />
                     </Tooltip>
                     {getLevel(
                       form.getFieldValue('UseMandatoryTemplate') === 0
                         ? 'High'
-                        : form.getFieldValue('UseMandatoryTemplate') === 1
+                        : form.getFieldValue('UseMandatoryTemplate')
                         ? 'Low'
                         : '',
                     )}
                   </>
                 }
-                rules={[{ required: true }]}
               >
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
@@ -677,7 +655,12 @@ const index = (props: any) => {
                     return e && e.fileList;
                   }}
                   label="Upload Contract Attachment"
-                  rules={[{ required: true }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Contract Attachment is required',
+                    },
+                  ]}
                 >
                   <Upload {...uploadProps} listType="picture-card" disabled>
                     <div className="file_upload">
@@ -704,91 +687,76 @@ const index = (props: any) => {
             </Col>
           </Row>
         </Card>
+        <Card title="E. Approver Information" bordered={false}>
+          <Row gutter={20}>
+            <Col span={12}>
+              <Form.Item name="Procurement" label="Procurement">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="FinanceController" label="Finance Controller">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="DataSecurity" label="Data Security">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="Legal" label="Legal">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="SiteGM" label="Site GM">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="CountryManagerGM" label="Country Manager/GM">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="RegionalVP" label="Regional VP">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="CFO" label="CFO">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item name="HSE" label="HSE">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="HR" label="HR">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="CFO" label="CFO">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
         <ApprovalActions
           formValidataion={onSubmit}
           callBack={(result: any) => {
-            // formService.uploadFile()
+            setLoading(false);
+            window.location.href =
+              'https://serviceme.sharepoint.com/sites/DPA_DEV_Community/SitePages/DPA.aspx#/dashboard';
           }}
-          approvalRender={
-            <Card title="F. Approver Information" bordered={false}>
-              <Row gutter={20}>
-                <Col span={12}>
-                  <Form.Item
-                    name="Procurement"
-                    label="Procurement"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="FinanceController"
-                    label="Finance Controller"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="DataSecurity"
-                    label="Data Security"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="Legal"
-                    label="Legal"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="SiteGM"
-                    label="Site GM"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="CountryManagerGM"
-                    label="Country Manager/GM"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="RegionalVP"
-                    label="Regional VP"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="CFO"
-                    label="CFO"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Card>
-          }
         ></ApprovalActions>
       </Form>
+      {loading ? <Loading /> : null}
     </>
   );
 };

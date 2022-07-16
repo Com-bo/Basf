@@ -23,11 +23,8 @@ import FormService from '@/services/form.service';
 import moment from 'moment';
 import ApprovalActions from '@/components/procOptions/procOptions';
 import Loading from '@/components/loading/Loading';
-import {
-  CloudUploadOutlined,
-  InfoCircleOutlined,
-  BellOutlined,
-} from '@ant-design/icons';
+import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
+
 // import { getapplicationNo } from '@/tools/utils';
 interface OptionItem {
   key: number;
@@ -43,11 +40,6 @@ const index = (props: any) => {
   // const spService = new SpService();
   const formService = new FormService();
   const [loading, setLoading] = useState(false);
-
-  //#endregion
-
-  const { Option } = Select;
-  const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
     setLoading(true);
     console.log(form.getFieldsValue());
@@ -68,6 +60,9 @@ const index = (props: any) => {
   };
   useEffect(() => {
     // 附件之初始化获取id
+    if (props.location.query?.ID) {
+      return;
+    }
     formService
       .getTableData(
         listName,
@@ -710,6 +705,50 @@ const index = (props: any) => {
             </Col>
           </Row>
         </Card>
+        <Card title="F. Approver Information" bordered={false}>
+          <Row gutter={20}>
+            <Col span={12}>
+              <Form.Item name="Procurement" label="Procurement">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="FinanceController" label="Finance Controller">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="DataSecurity" label="Data Security">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="Legal" label="Legal">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="SiteGM" label="Site GM">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="CountryManagerGM" label="Country Manager/GM">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="RegionalVP" label="Regional VP">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="CFO" label="CFO">
+                <Input disabled />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
         <ApprovalActions
           applicationNo={applicationNo}
           formValidataion={onSubmit}
@@ -718,84 +757,6 @@ const index = (props: any) => {
             window.location.href =
               'https://serviceme.sharepoint.com/sites/DPA_DEV_Community/SitePages/DPA.aspx#/dashboard';
           }}
-          approvalRender={
-            <Card title="F. Approver Information" bordered={false}>
-              <Row gutter={20}>
-                <Col span={12}>
-                  <Form.Item
-                    name="Procurement"
-                    label="Procurement"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="FinanceController"
-                    label="Finance Controller"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="DataSecurity"
-                    label="Data Security"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="Legal"
-                    label="Legal"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="SiteGM"
-                    label="Site GM"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="CountryManagerGM"
-                    label="Country Manager/GM"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="RegionalVP"
-                    label="Regional VP"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="CFO"
-                    label="CFO"
-                    rules={[{ required: true }]}
-                  >
-                    <Input placeholder="Please input" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Card>
-          }
         ></ApprovalActions>
       </Form>
       {loading ? <Loading /> : null}

@@ -1182,11 +1182,7 @@ const index = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="DataSecurity"
-                label="Data Security"
-                rules={[{ required: true }]}
-              >
+              <Form.Item name="DataSecurity" label="Data Security">
                 <Input placeholder="Please input" />
               </Form.Item>
             </Col>
@@ -1269,6 +1265,7 @@ const index = () => {
                       formService.updateFileItem(resultMiddle, {
                         ProcName: listName,
                         ProcId: result.ID,
+                        FieldName: 'file',
                       }),
                     );
                   });

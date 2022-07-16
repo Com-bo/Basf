@@ -1,6 +1,6 @@
 import SpService from '@/services/sharepoint.service';
 import { IFilter } from '@/models/type';
-import useItems from 'antd/lib/menu/hooks/useItems';
+
 interface FileForm {
   ProcName: string;
   ProcId: number;
@@ -21,11 +21,6 @@ export default class FormService {
   // 上传单个文件接口
   async uploadFile(fileName: string, fileObject: any, id?: string) {
     let token = this._getToken();
-    // let index = fileName.lastIndexOf('.');
-    // let newFileName =
-    //   fileName.substring(0, index) +
-    //   new Date().getTime() +
-    //   fileName.substring(index);
     return this._spService
       .uploadFile(fileName, this._fileListName, fileObject, token)
       .catch((error: any) => {
@@ -113,11 +108,13 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
-  getFileItems(ProcName: string, ProcId: number) {
+  getFileItems(ProcName: string, ProcId: number, fieldName?: string) {
     let token: string = this._getToken();
     let listIndex: number[] = [];
+    let filePropertysList: any[] = [];
     return this.getFilesProperty()
       .then((filePropertys) => {
+        filePropertysList = filePropertys;
         filePropertys.forEach((element: FileForm, index: number) => {
           if (element.ProcId == ProcId) {
             listIndex.push(index);
@@ -133,9 +130,11 @@ export default class FormService {
           if (listIndex.indexOf(index) != -1) {
             files.push({
               id: element.ServerRelativeUrl,
+              fieldName: filePropertysList[index].FieldName, //一个表单多个文件字段时
               name: element.Name,
               status: 'done',
               url: process.env.host + element.ServerRelativeUrl,
+              thumbUrl: './file.png',
             });
           }
         });

@@ -14,7 +14,7 @@ const index = (props: any) => {
       case 'New':
         return <NewForm />;
       case 'Edit':
-        return <EditForm />;
+        return <EditForm {...props} />;
       case 'View':
         return <DispForm {...props} />;
     }
