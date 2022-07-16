@@ -278,17 +278,14 @@ const index = (props: any) => {
                 <Col span={12}>
                   <Form.Item
                     name="EntityOfBVCPS"
-                    required={false}
                     label={
                       <>
                         Whether the subcontractor is an entity of BVCPS
-                        <span className="dot_required">*</span>
                         <Tooltip title="Note, the CoE/BPCC declaration must be signed before or together with the contract.">
                           <BellOutlined />
                         </Tooltip>
                       </>
                     }
-                    rules={[{ required: true }]}
                   >
                     <Radio.Group disabled>
                       <Radio value={1}>Yes</Radio>
@@ -356,18 +353,15 @@ const index = (props: any) => {
             <Col span={24}>
               <Form.Item
                 name="AnnualContractSum"
-                required={false}
                 label={
                   <>
                     Please state the annual contract sum (if known) or provide
                     an estimate annual contract sum
-                    <span className="dot_required">*</span>
                     <Tooltip title="The applicant can fill in either the local currency or USD">
                       <BellOutlined />
                     </Tooltip>
                   </>
                 }
-                rules={[{ required: true }]}
               >
                 <Input placeholder="Please input" disabled />
               </Form.Item>
@@ -376,7 +370,6 @@ const index = (props: any) => {
               <Form.Item
                 name="BudgetApproved"
                 label="If the budget has been approved"
-                rules={[{ required: true }]}
               >
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
@@ -389,7 +382,6 @@ const index = (props: any) => {
               <Form.Item
                 name="ContractSumWithinBudget"
                 label="Is the contract sum within the approved budget"
-                rules={[{ required: true }]}
               >
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
@@ -427,7 +419,6 @@ const index = (props: any) => {
                 label={
                   <>
                     Please describe why the subcontractor is needed{' '}
-                    <span className="dot_required">*</span>{' '}
                     {getLevel(
                       form.getFieldValue('NeededReason') !== 'Others' &&
                         form.getFieldValue('NeededReason')
@@ -630,11 +621,9 @@ const index = (props: any) => {
             <Col span={12}>
               <Form.Item
                 name="UseMandatoryTemplate"
-                required={false}
                 label={
                   <>
                     Whether to use a BV Mandatory template
-                    <span className="dot_required">*</span>
                     <Tooltip title="In principle, BV entities shall use our standard template for subcontractor agreements.">
                       <BellOutlined />
                     </Tooltip>
@@ -647,7 +636,6 @@ const index = (props: any) => {
                     )}
                   </>
                 }
-                rules={[{ required: true }]}
               >
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
