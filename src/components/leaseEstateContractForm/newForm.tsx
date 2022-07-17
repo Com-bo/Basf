@@ -79,6 +79,7 @@ const index = () => {
   const [advanceNoticeClause, setAdvanceNoticeClause] = useState<any>();
   const [useMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   const [leaseType, setLeaseType] = useState<any>();
+  const [userList, setUserList] = useState<any>([]);
 
   useEffect(() => {
     _getOps();
@@ -102,6 +103,8 @@ const index = () => {
       setRegion(drop4);
       const drop5 = await formService.getTableDataAll('ContractAmountScope');
       setContractAmount(drop5);
+      let drop8 = await formService.getUserList();
+      setUserList(drop8);
     } catch (error) {
       console.error(error);
     }
@@ -112,6 +115,21 @@ const index = () => {
     },
   };
   const getCountry = (_region: string) => {
+    if (!_region) {
+      setCountry([]);
+      setBVEntityOptions([]);
+      setBUOptions([]);
+      setSBUOptions([]);
+      setProOptions([]);
+      form.setFieldsValue({
+        Country: '',
+        BVSigningEntity: '',
+        SBU: '',
+        BU: '',
+        ProductLine: '',
+      });
+      return;
+    }
     setLoading(true);
     return formService
       .getTableData(
@@ -159,6 +177,20 @@ const index = () => {
   };
   // 通过国家获取entity
   const getEntityByCountry = (_country: string) => {
+    if (!_country) {
+      setBVEntityOptions([]);
+      setBUOptions([]);
+      setSBUOptions([]);
+      setProOptions([]);
+      // 清空entity和sbu
+      form.setFieldsValue({
+        BVSigningEntity: '',
+        SBU: '',
+        BU: '',
+        ProductLine: '',
+      });
+      return;
+    }
     return formService
       .getTableData(
         'BUList',
@@ -194,6 +226,17 @@ const index = () => {
   };
   // 通过entity获取bu
   const getBUByEntity = (_entity: string) => {
+    if (!_entity) {
+      setBUOptions([]);
+      setSBUOptions([]);
+      setProOptions([]);
+      form.setFieldsValue({
+        BU: '',
+        SBU: '',
+        ProductLine: '',
+      });
+      return;
+    }
     return formService
       .getTableData(
         'BUList',
@@ -231,6 +274,11 @@ const index = () => {
   const getSBUByBU = (_bu?: string) => {
     if (!_bu) {
       setSBUOptions([]);
+      setProOptions([]);
+      form.setFieldsValue({
+        SBU: '',
+        ProductLine: '',
+      });
       return;
     }
     return formService
@@ -272,6 +320,7 @@ const index = () => {
   };
   const getProLineBySBU = (_sbu?: string) => {
     if (!_sbu) {
+      setProOptions([]);
       setProOptions([]);
       return;
     }
@@ -491,13 +540,7 @@ const index = () => {
                     <Select
                       placeholder="----select------"
                       allowClear
-                      onChange={(val) => {
-                        if (val) {
-                          getCountry(val);
-                        } else {
-                          setCountry([]);
-                        }
-                      }}
+                      onChange={getCountry}
                     >
                       {regionOptions.map((item: OptionItem, index) => (
                         <Select.Option value={item?.Title} key={index}>
@@ -515,13 +558,7 @@ const index = () => {
                   >
                     <Select
                       placeholder="----select------"
-                      onChange={(val) => {
-                        if (val) {
-                          getEntityByCountry(val);
-                        } else {
-                          setBVEntityOptions([]);
-                        }
-                      }}
+                      onChange={getEntityByCountry}
                     >
                       {countryOptions.map((item: OptionItem, index) => (
                         <Select.Option value={item?.Title} key={index}>
@@ -539,13 +576,7 @@ const index = () => {
                   >
                     <Select
                       placeholder="-----select--------"
-                      onChange={(val) => {
-                        if (val) {
-                          getBUByEntity(val);
-                        } else {
-                          setBUOptions([]);
-                        }
-                      }}
+                      onChange={getBUByEntity}
                     >
                       {bvEntityOptions.map((item: any, index: number) => (
                         <Select.Option value={item?.EntityName} key={index}>
@@ -602,12 +633,91 @@ const index = () => {
                       placeholder="-----select--------"
                       onChange={(val) => {
                         if (val) {
+                          setLoading(true);
                           let _data: any = proOptions.find(
                             (item: any) => item.ProductLine == val,
                           );
-                          form.setFieldsValue({
-                            ..._data,
+                          let approvers = [
+                            'CFOStringId',
+                            'DataSecurityStringId',
+                            'CountryManagerGMStringId',
+                            'LegalStringId',
+                            'ProcurementStringId',
+                            'RegionalVPStringId',
+                            'FinanceControllerStringId',
+                            'SiteGMStringId',
+                            'HSEStringId',
+                            'HRStringId',
+                          ];
+                          let aryPromise: Promise<any>[] = [];
+                          let approveDic: any = {};
+                          approvers.forEach((element: any) => {
+                            if (_data[element]) {
+                              let _key = element.replace('StringId', '');
+                              approveDic[_key] = aryPromise.length;
+                              aryPromise.push(
+                                formService.getUserById(_data[element]),
+                              );
+                            }
                           });
+                          Promise.all(aryPromise)
+                            .then((resLst) => {
+                              setLoading(false);
+                              form.setFieldsValue({
+                                CFOId:
+                                  approveDic['CFO'] || approveDic['CFO'] === 0
+                                    ? resLst[approveDic['CFO']][0]?.Id
+                                    : null,
+                                DataSecurityId:
+                                  approveDic['DataSecurity'] ||
+                                  approveDic['DataSecurity'] === 0
+                                    ? resLst[approveDic['DataSecurity']][0]?.Id
+                                    : null,
+                                LegalId:
+                                  approveDic['Legal'] ||
+                                  approveDic['Legal'] === 0
+                                    ? resLst[approveDic['Legal']][0]?.Id
+                                    : null,
+                                ProcurementId:
+                                  approveDic['Procurement'] ||
+                                  approveDic['Procurement'] === 0
+                                    ? resLst[approveDic['Procurement']][0]?.Id
+                                    : null,
+                                RegionalVPId:
+                                  approveDic['RegionalVP'] ||
+                                  approveDic['RegionalVP'] === 0
+                                    ? resLst[approveDic['RegionalVP']][0]?.Id
+                                    : null,
+                                FinanceControllerId:
+                                  approveDic['FinanceController'] ||
+                                  approveDic['FinanceController'] === 0
+                                    ? resLst[approveDic['FinanceController']][0]
+                                        ?.Id
+                                    : null,
+                                SiteGMId:
+                                  approveDic['SiteGM'] ||
+                                  approveDic['SiteGM'] === 0
+                                    ? resLst[approveDic['SiteGM']][0]?.Id
+                                    : null,
+                                CountryManagerGMId:
+                                  approveDic['CountryManagerGM'] ||
+                                  approveDic['CountryManagerGM'] === 0
+                                    ? resLst[approveDic['CountryManagerGM']][0]
+                                        ?.Id
+                                    : null,
+                                HSEId:
+                                  approveDic['HSE'] || approveDic['HSE'] === 0
+                                    ? resLst[approveDic['HSEId']][0]?.Id
+                                    : null,
+                                HRId:
+                                  approveDic['HR'] || approveDic['HR'] === 0
+                                    ? resLst[approveDic['HR']][0]?.Id
+                                    : null,
+                              });
+                            })
+                            .catch((e) => {
+                              setLoading(false);
+                            });
                         } else {
                           form.setFieldsValue({
                             Procurement: '',
@@ -1205,77 +1315,135 @@ const index = () => {
           <Row gutter={20}>
             <Col span={12}>
               <Form.Item
-                name="Procurement"
+                name="ProcurementId"
                 label="Procurement"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="FinanceController"
+                name="FinanceControllerId"
                 label="Finance Controller"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="DataSecurity" label="Data Security">
-                <Input placeholder="Please input" />
+              <Form.Item name="DataSecurityId" label="Data Security">
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Legal"
+                name="LegalId"
                 label="Legal"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="SiteGM"
+                name="SiteGMId"
                 label="Site GM"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="CountryManagerGM"
+                name="CountryManagerGMId"
                 label="Country Manager/GM"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="RegionalVP"
+                name="RegionalVPId"
                 label="Regional VP"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             {leaseType == 'Residential lease' ? (
               <>
                 <Col span={12}>
                   <Form.Item
-                    name="HSE"
+                    name="HSEId"
                     label="HSE"
                     rules={[{ required: true }]}
                   >
-                    <Input placeholder="Please input" />
+                    <Select placeholder="Please select" allowClear>
+                      {userList.map((item: any, index: number) => (
+                        <Select.Option value={item?.Id} key={index}>
+                          {item?.WorkEmail}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item name="HR" label="HR" rules={[{ required: true }]}>
-                    <Input placeholder="Please input" />
+                  <Form.Item
+                    name="HRId"
+                    label="HR"
+                    rules={[{ required: true }]}
+                  >
+                    <Select placeholder="Please select" allowClear>
+                      {userList.map((item: any, index: number) => (
+                        <Select.Option value={item?.Id} key={index}>
+                          {item?.WorkEmail}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
               </>
@@ -1284,8 +1452,14 @@ const index = () => {
             )}
 
             <Col span={12}>
-              <Form.Item name="CFO" label="CFO" rules={[{ required: true }]}>
-                <Input placeholder="Please input" />
+              <Form.Item name="CFOId" label="CFO" rules={[{ required: true }]}>
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
           </Row>

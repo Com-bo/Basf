@@ -1269,7 +1269,7 @@ const index = () => {
             </Col>
           </Row>
         </Card>
-        <Card title="F. Approver Information" bordered={false}>
+        <Card title="E. Approver Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
               <Form.Item

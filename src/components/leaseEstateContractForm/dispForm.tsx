@@ -54,12 +54,14 @@ const index = (props: any) => {
       };
     });
   };
-
+  const [buOptions, setBUOptions] = useState<any>([]);
+  const [userList, setUserList] = useState<any>([]);
   useEffect(() => {
     // 附件之初始化获取id
     if (!props.location.query?.ID) {
       return;
     }
+    setLoading(true);
     formService
       .getTableData(
         listName,
@@ -81,6 +83,7 @@ const index = (props: any) => {
             RequestDate: moment(res[0].RequestDate),
           });
         }
+        getBUByEntity(res[0].BVSigningEntity, res[0].Region, res[0].Country);
         return formService.getFileItems(listName, props.location.query?.ID);
       })
       .then((res) => {
@@ -98,6 +101,14 @@ const index = (props: any) => {
             ),
           });
         }
+        return formService.getUserList();
+      })
+      .then((ops) => {
+        setLoading(false);
+        setUserList(ops);
+      })
+      .catch((e) => {
+        setLoading(false);
       });
   }, []);
 
@@ -110,6 +121,49 @@ const index = (props: any) => {
     beforeUpload: (file: any, fileList: any) => {
       return false;
     },
+  };
+  const _delRepeat = (originalData: any[], name: string) => {
+    let temp: string[] = [];
+    let targetArr = [];
+    for (let i = 0; i < originalData.length; i++) {
+      if (temp.indexOf(originalData[i][name]) < 0) {
+        temp.push(originalData[i][name]);
+        targetArr.push(originalData[i]);
+      }
+    }
+    return targetArr;
+  };
+  const getBUByEntity = (
+    _entity: string,
+    _region: string,
+    _country: string,
+  ) => {
+    return formService
+      .getTableData(
+        'BUList',
+        [
+          {
+            type: 'filter eq',
+            value: _entity,
+            properties: ['EntityName'],
+          },
+          {
+            type: 'filter eq',
+            value: _region,
+            properties: ['Region'],
+          },
+          {
+            type: 'filter eq',
+            value: _country,
+            properties: ['Countries'],
+          },
+        ],
+        [],
+      )
+      .then((res) => {
+        setBUOptions(_delRepeat(res, 'BU'));
+      })
+      .catch((e) => {});
   };
 
   const getLevel = (type: string) => {
@@ -225,7 +279,13 @@ const index = (props: any) => {
                 </Col>
                 <Col span={12}>
                   <Form.Item name="BU" label="BU">
-                    <Input disabled />
+                    <Select placeholder="-----select--------" disabled>
+                      {buOptions.map((item: any, index: number) => (
+                        <Select.Option value={item?.BUCode} key={index}>
+                          {item?.BUDescription}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={12}>
@@ -688,59 +748,120 @@ const index = (props: any) => {
         <Card title="E. Approver Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="Procurement" label="Procurement">
-                <Input disabled />
+              <Form.Item name="ProcurementId" label="Procurement">
+                <Select placeholder="Please select" allowClear disabled>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="FinanceController" label="Finance Controller">
-                <Input disabled />
+              <Form.Item name="FinanceControllerId" label="Finance Controller">
+                <Select placeholder="Please select" allowClear disabled>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="DataSecurity" label="Data Security">
-                <Input disabled />
+              <Form.Item name="DataSecurityId" label="Data Security">
+                <Select placeholder="Please select" allowClear disabled>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="Legal" label="Legal">
-                <Input disabled />
+              <Form.Item name="LegalId" label="Legal">
+                <Select placeholder="Please select" allowClear disabled>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="SiteGM" label="Site GM">
-                <Input disabled />
+              <Form.Item name="SiteGMId" label="Site GM">
+                <Select placeholder="Please select" allowClear disabled>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="CountryManagerGM" label="Country Manager/GM">
-                <Input disabled />
+              <Form.Item name="CountryManagerGMId" label="Country Manager/GM">
+                <Select placeholder="Please select" allowClear disabled>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="RegionalVP" label="Regional VP">
-                <Input disabled />
+              <Form.Item name="RegionalVPId" label="Regional VP">
+                <Select placeholder="Please select" allowClear disabled>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item name="CFO" label="CFO">
-                <Input disabled />
-              </Form.Item>
-            </Col>
+            {form.getFieldValue('LeaseType') == 'Residential lease' ? (
+              <>
+                <Col span={12}>
+                  <Form.Item name="HSEId" label="HSE">
+                    <Select placeholder="Please select" allowClear disabled>
+                      {userList.map((item: any, index: number) => (
+                        <Select.Option value={item?.Id} key={index}>
+                          {item?.WorkEmail}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item name="HRId" label="HR">
+                    <Select placeholder="Please select" allowClear disabled>
+                      {userList.map((item: any, index: number) => (
+                        <Select.Option value={item?.Id} key={index}>
+                          {item?.WorkEmail}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </>
+            ) : (
+              ''
+            )}
 
             <Col span={12}>
-              <Form.Item name="HSE" label="HSE">
-                <Input disabled />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="HR" label="HR">
-                <Input disabled />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="CFO" label="CFO">
-                <Input disabled />
+              <Form.Item name="CFOId" label="CFO">
+                <Select placeholder="Please select" allowClear disabled>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Id} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
           </Row>
