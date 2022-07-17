@@ -995,6 +995,30 @@ export default class SharepointService {
       });
   }
 
+  getUserList() {
+    var token = this.getToken();
+    let url = `${process.env.host}${process.env.relativePath}/_api/web/siteusers`;
+    return this._http
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'content-type': 'application/json;odata=verbose',
+          accept: 'application/json;odata=verbose',
+        },
+      })
+      .then((response: any) => {
+        let value = response.data;
+        return value.d.results.map(
+          (e: { Title: any; Email: any; UserPrincipalName: any }) => ({
+            Title: e.Title,
+            WorkEmail: e.Email,
+            WFCellPhone: '',
+            PrincipalName: e.UserPrincipalName,
+          }),
+        );
+      });
+  }
+
   private getEnsureUserById(userId: string, token: any) {
     let url = `${process.env.host}${process.env.relativePath}/_api/web/EnsureUser`;
     return this._http

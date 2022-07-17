@@ -103,7 +103,9 @@ const index = () => {
   const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   useEffect(() => {
     _getOps();
-
+    new spService().getUserList().then((res) => {
+      console.log(res);
+    });
     form.setFieldsValue({
       ApplicationNo: 'To Be Generated',
       RequestDate: moment(),
