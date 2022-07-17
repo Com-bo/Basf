@@ -32,30 +32,27 @@ const index = () => {
   const wfFlowName = '3FCF0B04-C380-0ECF-1509-B8CF153924B4';
   const listName = 'LeaseEstateContract';
   const [loading, setLoading] = useState(false);
-  const [applicationNo, setApplicationNo] = useState('');
-  const [approveData, setApproveData] = useState<any>({});
   const [form] = Form.useForm();
   const formService = new FormService();
 
   //#endregion
 
-  const { Option } = Select;
-  const [fileList, setFileList] = useState([]);
   const onSubmit = () => {
     return form.validateFields().then((res) => {
       const params = {
         ...form.getFieldsValue(),
-        ...approveData,
       };
-      let _no = getSerialNum();
+      let _no = getSerialNum('LC');
       params.Title = _no;
-      params.ApplicationNo = _no;
       delete params.file;
+      delete params.lessorFile;
+      delete params.certificateFile;
+      delete params.agreementFile;
       return {
         isOK: true,
         formData: params,
         formLink,
-        applicationNo,
+        applicationNo: _no,
         wfFlowName,
         listName,
       };
@@ -87,7 +84,7 @@ const index = () => {
     _getOps();
 
     form.setFieldsValue({
-      ApplicationNo: 'To Be Generated',
+      Title: 'To Be Generated',
       RequestDate: moment(),
       Requester: new spService().getSpPageContextInfo().userEmail,
     });
@@ -462,7 +459,7 @@ const index = () => {
         <Card title="A. General Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="ApplicationNo" label="Application No.">
+              <Form.Item name="Title" label="Application No.">
                 <Input disabled />
               </Form.Item>
             </Col>
@@ -608,30 +605,20 @@ const index = () => {
                           let _data: any = proOptions.find(
                             (item: any) => item.ProductLine == val,
                           );
-                          let functionApprovers: any = [];
-                          let fucntions = [
-                            'Procurement',
-                            'FinanceController',
-                            'DataSecurity',
-                            'Legal',
-                          ];
-                          fucntions.forEach((element) => {
-                            if (_data[element]) {
-                              functionApprovers.push(_data[element]);
-                            }
-                          });
-                          setApproveData({
-                            FunctionApprovers: functionApprovers.join(';'),
-                            SiteGMApprovers: _data.SiteGM,
-                            CountryManageGMApprovers: _data.CountryManagerGM,
-                            RegionalVPApprovers: _data.RegionalVP,
-                            CFOApprovers: _data.CFO,
-                          });
                           form.setFieldsValue({
                             ..._data,
                           });
                         } else {
-                          setApproveData({});
+                          form.setFieldsValue({
+                            Procurement: '',
+                            FinanceController: '',
+                            DataSecurity: '',
+                            Legal: '',
+                            SiteGM: '',
+                            CountryManagerGM: '',
+                            RegionalVP: '',
+                            CFO: '',
+                          });
                         }
                       }}
                     >

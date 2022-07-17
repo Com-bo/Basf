@@ -1153,7 +1153,11 @@ export default class SharepointService {
       item.WFFormStatus = 'Submitted';
       let res = await this.addItem(listName, item, token);
       item.ID = res.ID;
-      await this.submitTaskForm(item, link, isSubmit);
+      return await this.submitTaskForm(item, link, isSubmit).then((res) => {
+        return {
+          ID: res.ID,
+        };
+      });
       return {
         ID: res.ID,
       };

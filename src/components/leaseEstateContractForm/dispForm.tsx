@@ -39,12 +39,10 @@ const index = (props: any) => {
 
   const onSubmit = () => {
     return form.validateFields().then((res) => {
+      // 获取审批人
       const params = {
         ...form.getFieldsValue(),
       };
-      let _no = getSerialNum();
-      params.Title = _no;
-      params.ApplicationNo = _no;
       delete params.file;
       return {
         isOK: true,
@@ -77,7 +75,7 @@ const index = (props: any) => {
       .then((res) => {
         if (res && res.length) {
           console.log(res[0]);
-          setApplicationNo(res[0].ApplicationNo);
+          setApplicationNo(res[0].Title);
           form.setFieldsValue({
             ...res[0],
             RequestDate: moment(res[0].RequestDate),
@@ -187,7 +185,7 @@ const index = (props: any) => {
         <Card title="A. General Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="ApplicationNo" label="Application No.">
+              <Form.Item name="Title" label="Application No.">
                 <Input disabled />
               </Form.Item>
             </Col>

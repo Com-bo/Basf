@@ -43,13 +43,26 @@ const index = (props: any) => {
   //#endregion
   const onSubmit = () => {
     return form.validateFields().then((res) => {
+      let functionApprovers: any = [];
+      let fucntions = [
+        'Procurement',
+        'FinanceController',
+        'DataSecurity',
+        'Legal',
+      ];
+      fucntions.forEach((element) => {
+        if (form.getFieldValue([element])) {
+          functionApprovers.push(form.getFieldValue([element]));
+        }
+      });
       const params = {
         ...form.getFieldsValue(),
-        ...approveData,
+        FunctionApprovers: Array.from(new Set(functionApprovers)).join(';'),
+        SiteGMApprovers: form.getFieldValue('SiteGM'),
+        CountryManageGMApprovers: form.getFieldValue('CountryManagerGM'),
+        RegionalVPApprovers: form.getFieldValue('RegionalVP'),
+        CFOApprovers: form.getFieldValue('CFO'),
       };
-      let _no = getSerialNum();
-      params.Title = _no;
-      params.ApplicationNo = _no;
 
       // 审批人封装
       delete params.file;
@@ -106,7 +119,7 @@ const index = (props: any) => {
       .then((res) => {
         if (res && res.length) {
           console.log(res[0]);
-          setApplicationNo(res[0].ApplicationNo);
+          setApplicationNo(res[0].Title);
           form.setFieldsValue({
             ...res[0],
             RequestDate: moment(res[0].RequestDate),
@@ -622,30 +635,20 @@ const index = (props: any) => {
                           let _data: any = proOptions.find(
                             (item: any) => item.ProductLine == val,
                           );
-                          let functionApprovers: any = [];
-                          let fucntions = [
-                            'Procurement',
-                            'FinanceController',
-                            'DataSecurity',
-                            'Legal',
-                          ];
-                          fucntions.forEach((element) => {
-                            if (_data[element]) {
-                              functionApprovers.push(_data[element]);
-                            }
-                          });
-                          setApproveData({
-                            FunctionApprovers: functionApprovers.join(';'),
-                            SiteGMApprovers: _data.SiteGM,
-                            CountryManageGMApprovers: _data.CountryManagerGM,
-                            RegionalVPApprovers: _data.RegionalVP,
-                            CFOApprovers: _data.CFO,
-                          });
                           form.setFieldsValue({
                             ..._data,
                           });
                         } else {
-                          setApproveData({});
+                          form.setFieldsValue({
+                            Procurement: '',
+                            FinanceController: '',
+                            DataSecurity: '',
+                            Legal: '',
+                            SiteGM: '',
+                            CountryManagerGM: '',
+                            RegionalVP: '',
+                            CFO: '',
+                          });
                         }
                       }}
                     >

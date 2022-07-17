@@ -25,7 +25,6 @@ import ApprovalActions from '@/components/procOptions/procOptions';
 import Loading from '@/components/loading/Loading';
 import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
 
-// import { getapplicationNo } from '@/tools/utils';
 interface OptionItem {
   key: number;
   Title: string;
@@ -44,8 +43,27 @@ const index = (props: any) => {
     setLoading(true);
     console.log(form.getFieldsValue());
     return form.validateFields().then((res) => {
+      // 计算审批人
+
+      let functionApprovers: any = [];
+      let fucntions = [
+        'Procurement',
+        'FinanceController',
+        'DataSecurity',
+        'Legal',
+      ];
+      fucntions.forEach((element) => {
+        if (form.getFieldValue([element])) {
+          functionApprovers.push(form.getFieldValue([element]));
+        }
+      });
       const params = {
         ...form.getFieldsValue(),
+        FunctionApprovers: Array.from(new Set(functionApprovers)).join(';'),
+        SiteGMApprovers: form.getFieldValue('SiteGM'),
+        CountryManageGMApprovers: form.getFieldValue('CountryManagerGM'),
+        RegionalVPApprovers: form.getFieldValue('RegionalVP'),
+        CFOApprovers: form.getFieldValue('CFO'),
       };
       delete params.file;
       return {
@@ -78,7 +96,7 @@ const index = (props: any) => {
       .then((res) => {
         if (res && res.length) {
           console.log(res[0]);
-          setApplicationNo(res[0].ApplicationNo);
+          setApplicationNo(res[0].Title);
           form.setFieldsValue({
             ...res[0],
             RequestDate: moment(res[0].RequestDate),
@@ -172,7 +190,7 @@ const index = (props: any) => {
         <Card title="A. General Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="ApplicationNo" label="Application No.">
+              <Form.Item name="Title" label="Application No.">
                 <Input disabled />
               </Form.Item>
             </Col>

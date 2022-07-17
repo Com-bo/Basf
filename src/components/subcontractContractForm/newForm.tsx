@@ -43,11 +43,27 @@ const index = () => {
   //#endregion
   const onSubmit = () => {
     return form.validateFields().then((res) => {
+      let functionApprovers: any = [];
+      let fucntions = [
+        'Procurement',
+        'FinanceController',
+        'DataSecurity',
+        'Legal',
+      ];
+      fucntions.forEach((element) => {
+        if (form.getFieldValue([element])) {
+          functionApprovers.push(form.getFieldValue([element]));
+        }
+      });
       const params = {
         ...form.getFieldsValue(),
-        ...approveData,
+        FunctionApprovers: Array.from(new Set(functionApprovers)).join(';'),
+        SiteGMApprovers: form.getFieldValue('SiteGM'),
+        CountryManageGMApprovers: form.getFieldValue('CountryManagerGM'),
+        RegionalVPApprovers: form.getFieldValue('RegionalVP'),
+        CFOApprovers: form.getFieldValue('CFO'),
       };
-      let _no = getSerialNum();
+      let _no = getSerialNum('SC');
       params.Title = _no;
       params.ApplicationNo = _no;
 
@@ -592,30 +608,20 @@ const index = () => {
                           let _data: any = proOptions.find(
                             (item: any) => item.ProductLine == val,
                           );
-                          let functionApprovers: any = [];
-                          let fucntions = [
-                            'Procurement',
-                            'FinanceController',
-                            'DataSecurity',
-                            'Legal',
-                          ];
-                          fucntions.forEach((element) => {
-                            if (_data[element]) {
-                              functionApprovers.push(_data[element]);
-                            }
-                          });
-                          setApproveData({
-                            FunctionApprovers: functionApprovers.join(';'),
-                            SiteGMApprovers: _data.SiteGM,
-                            CountryManageGMApprovers: _data.CountryManagerGM,
-                            RegionalVPApprovers: _data.RegionalVP,
-                            CFOApprovers: _data.CFO,
-                          });
                           form.setFieldsValue({
                             ..._data,
                           });
                         } else {
-                          setApproveData({});
+                          form.setFieldsValue({
+                            Procurement: '',
+                            FinanceController: '',
+                            DataSecurity: '',
+                            Legal: '',
+                            SiteGM: '',
+                            CountryManagerGM: '',
+                            RegionalVP: '',
+                            CFO: '',
+                          });
                         }
                       }}
                     >

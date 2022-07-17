@@ -21,7 +21,6 @@ import spService from '@/services/sharepoint.service';
 import ApprovalActions from '@/components/procOptions/procOptions';
 import Loading from '@/components/loading/Loading';
 import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
-import { getSerialNum } from '@/tools/utils';
 interface OptionItem {
   key: number;
   Title: string;
@@ -33,7 +32,6 @@ const index = (props: any) => {
   const listName = 'LeaseEstateContract';
   const [loading, setLoading] = useState(false);
   const [applicationNo, setApplicationNo] = useState('');
-  const [approveData, setApproveData] = useState<any>({});
   const [form] = Form.useForm();
   const formService = new FormService();
 
@@ -42,12 +40,11 @@ const index = (props: any) => {
     return form.validateFields().then((res) => {
       const params = {
         ...form.getFieldsValue(),
-        ...approveData,
       };
-      let _no = getSerialNum();
-      params.Title = _no;
-      params.ApplicationNo = _no;
       delete params.file;
+      delete params.lessorFile;
+      delete params.certificateFile;
+      delete params.agreementFile;
       return {
         isOK: true,
         formData: params,
@@ -99,7 +96,7 @@ const index = (props: any) => {
       .then((res) => {
         if (res && res.length) {
           console.log(res[0]);
-          setApplicationNo(res[0].ApplicationNo);
+          setApplicationNo(res[0].Title);
           form.setFieldsValue({
             ...res[0],
             RequestDate: moment(res[0].RequestDate),
@@ -141,11 +138,6 @@ const index = (props: any) => {
     } catch (error) {}
   };
   const uploadProps = {
-    // onRemove: (file, fileList) => {
-    //   if (file.id) {
-    //     return formService.deleteFileItem(file.name);
-    //   }
-    // },
     beforeUpload: (file: any, fileList: any) => {
       return false;
     },
@@ -436,7 +428,7 @@ const index = (props: any) => {
         <Card title="A. General Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="ApplicationNo" label="Application No.">
+              <Form.Item name="Title" label="Application No.">
                 <Input disabled />
               </Form.Item>
             </Col>
@@ -582,32 +574,20 @@ const index = (props: any) => {
                           let _data: any = proOptions.find(
                             (item: any) => item.ProductLine == val,
                           );
-                          let functionApprovers: any = [];
-                          let fucntions = [
-                            'Procurement',
-                            'FinanceController',
-                            'DataSecurity',
-                            'Legal',
-                          ];
-                          fucntions.forEach((element) => {
-                            if (_data[element]) {
-                              functionApprovers.push(_data[element]);
-                            }
-                          });
-                          setApproveData({
-                            FunctionApprovers: functionApprovers.join(';'),
-                            SiteGMApprovers: _data.SiteGM,
-                            CountryManageGMApprovers: _data.CountryManagerGM,
-                            RegionalVPApprovers: _data.RegionalVP,
-                            CFOApprovers: _data.CFO,
-                            HSE: _data.HSE,
-                            HR: _data.HR,
-                          });
                           form.setFieldsValue({
                             ..._data,
                           });
                         } else {
-                          setApproveData({});
+                          form.setFieldsValue({
+                            Procurement: '',
+                            FinanceController: '',
+                            DataSecurity: '',
+                            Legal: '',
+                            SiteGM: '',
+                            CountryManagerGM: '',
+                            RegionalVP: '',
+                            CFO: '',
+                          });
                         }
                       }}
                     >
