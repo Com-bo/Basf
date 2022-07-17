@@ -7,5 +7,5 @@ export const getSerialNum = (type: string) => {
   for (var i = 0; i < 5; i++) {
     code += (Math.random() * 10).toFixed(0);
   }
-  return type + moment().format('YYYY/MM/DD') + code;
+  return type + moment().format('YYYYMMDD') + code;
 };

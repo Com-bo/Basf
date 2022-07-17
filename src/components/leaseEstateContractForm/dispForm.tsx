@@ -57,7 +57,7 @@ const index = (props: any) => {
 
   useEffect(() => {
     // 附件之初始化获取id
-    if (props.location.query?.ID) {
+    if (!props.location.query?.ID) {
       return;
     }
     formService

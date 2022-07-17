@@ -78,7 +78,7 @@ const index = (props: any) => {
   const [leaseType, setLeaseType] = useState<any>();
 
   useEffect(() => {
-    if (props.location.query?.ID) {
+    if (!props.location.query?.ID) {
       return;
     }
     formService

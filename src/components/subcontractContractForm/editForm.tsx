@@ -45,10 +45,10 @@ const index = (props: any) => {
     return form.validateFields().then((res) => {
       let functionApprovers: any = [];
       let fucntions = [
-        'Procurement',
-        'FinanceController',
-        'DataSecurity',
-        'Legal',
+        'ProcurementId',
+        'FinanceControllerId',
+        'DataSecurityId',
+        'LegalId',
       ];
       fucntions.forEach((element) => {
         if (form.getFieldValue([element])) {
@@ -57,13 +57,12 @@ const index = (props: any) => {
       });
       const params = {
         ...form.getFieldsValue(),
-        FunctionApprovers: Array.from(new Set(functionApprovers)).join(';'),
-        SiteGMApprovers: form.getFieldValue('SiteGM'),
-        CountryManageGMApprovers: form.getFieldValue('CountryManagerGM'),
-        RegionalVPApprovers: form.getFieldValue('RegionalVP'),
-        CFOApprovers: form.getFieldValue('CFO'),
+        FunctionApproversId: Array.from(new Set(functionApprovers)).join(';'),
+        SiteGMApproversId: form.getFieldValue('SiteGMId'),
+        CountryManageGMApproversId: form.getFieldValue('CountryManagerGMId'),
+        RegionalVPApproversId: form.getFieldValue('RegionalVPId'),
+        CFOApproversId: form.getFieldValue('CFOId'),
       };
-
       // 审批人封装
       delete params.file;
       return {
@@ -98,10 +97,11 @@ const index = (props: any) => {
   const [unethicalBehaviorRequired, setUnethicalBehaviorRequired] =
     useState(null);
   const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
+  const [userList, setUserList] = useState<any>([]);
 
   useEffect(() => {
     // 附件之初始化获取id
-    if (props.location.query?.ID) {
+    if (!props.location.query?.ID) {
       return;
     }
     formService
@@ -361,6 +361,8 @@ const index = (props: any) => {
         'SubcontractorContractTerms',
       );
       setContractTerms(drop7);
+      let drop8 = await formService.getUserList();
+      setUserList(drop8);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -632,12 +634,81 @@ const index = (props: any) => {
                       placeholder="-----select--------"
                       onChange={(val) => {
                         if (val) {
+                          setLoading(true);
                           let _data: any = proOptions.find(
                             (item: any) => item.ProductLine == val,
                           );
-                          form.setFieldsValue({
-                            ..._data,
+                          let approvers = [
+                            'CFOStringId',
+                            'DataSecurityStringId',
+                            'CountryManagerGMStringId',
+                            'LegalStringId',
+                            'ProcurementStringId',
+                            'RegionalVPStringId',
+                            'FinanceControllerStringId',
+                            'SiteGMStringId',
+                          ];
+                          let aryPromise: Promise<any>[] = [];
+                          let approveDic: any = {};
+                          approvers.forEach((element: any) => {
+                            if (_data[element]) {
+                              let _key = element.replace('StringId', '');
+                              approveDic[_key] = aryPromise.length;
+                              aryPromise.push(
+                                formService.getUserById(_data[element]),
+                              );
+                            }
                           });
+                          Promise.all(aryPromise)
+                            .then((resLst) => {
+                              setLoading(false);
+                              form.setFieldsValue({
+                                CFOId:
+                                  approveDic['CFO'] || approveDic['CFO'] === 0
+                                    ? resLst[approveDic['CFO']][0]?.Id
+                                    : null,
+                                DataSecurityId:
+                                  approveDic['DataSecurity'] ||
+                                  approveDic['DataSecurity'] === 0
+                                    ? resLst[approveDic['DataSecurity']][0]?.Id
+                                    : null,
+                                LegalId:
+                                  approveDic['Legal'] ||
+                                  approveDic['Legal'] === 0
+                                    ? resLst[approveDic['Legal']][0]?.Id
+                                    : null,
+                                ProcurementId:
+                                  approveDic['Procurement'] ||
+                                  approveDic['Procurement'] === 0
+                                    ? resLst[approveDic['Procurement']][0]?.Id
+                                    : null,
+                                RegionalVPId:
+                                  approveDic['RegionalVP'] ||
+                                  approveDic['RegionalVP'] === 0
+                                    ? resLst[approveDic['RegionalVP']][0]?.Id
+                                    : null,
+                                FinanceControllerId:
+                                  approveDic['FinanceController'] ||
+                                  approveDic['FinanceController'] === 0
+                                    ? resLst[approveDic['FinanceController']][0]
+                                        ?.Id
+                                    : null,
+                                SiteGMId:
+                                  approveDic['SiteGM'] ||
+                                  approveDic['SiteGM'] === 0
+                                    ? resLst[approveDic['SiteGM']][0]?.Id
+                                    : null,
+                                CountryManagerGMId:
+                                  approveDic['CountryManagerGM'] ||
+                                  approveDic['CountryManagerGM'] === 0
+                                    ? resLst[approveDic['CountryManagerGM']][0]
+                                        ?.Id
+                                    : null,
+                              });
+                            })
+                            .catch((e) => {
+                              setLoading(false);
+                            });
                         } else {
                           form.setFieldsValue({
                             Procurement: '',
@@ -1198,70 +1269,118 @@ const index = (props: any) => {
           <Row gutter={20}>
             <Col span={12}>
               <Form.Item
-                name="Procurement"
+                name="ProcurementId"
                 label="Procurement"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Title} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="FinanceController"
+                name="FinanceControllerId"
                 label="Finance Controller"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Title} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="DataSecurity"
+                name="DataSecurityId"
                 label="Data Security"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Title} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Legal"
+                name="LegalId"
                 label="Legal"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Title} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="SiteGM"
+                name="SiteGMId"
                 label="Site GM"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Title} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="CountryManagerGM"
+                name="CountryManagerGMId"
                 label="Country Manager/GM"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Title} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name="RegionalVP"
+                name="RegionalVPId"
                 label="Regional VP"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Please input" />
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Title} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="CFO" label="CFO" rules={[{ required: true }]}>
-                <Input placeholder="Please input" />
+              <Form.Item name="CFOId" label="CFO" rules={[{ required: true }]}>
+                <Select placeholder="Please select" allowClear>
+                  {userList.map((item: any, index: number) => (
+                    <Select.Option value={item?.Title} key={index}>
+                      {item?.WorkEmail}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
           </Row>

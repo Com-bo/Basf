@@ -177,6 +177,18 @@ export const TableTypeMap: any = {
         Type: 'Text',
       },
       {
+        Key: 'BU',
+        SPList: 'BU',
+        CDSTable: 'BU',
+        Type: 'Text',
+      },
+      {
+        Key: 'ProductLine',
+        SPList: 'ProductLine',
+        CDSTable: 'ProductLine',
+        Type: 'Text',
+      },
+      {
         Key: 'BVSigningEntity',
         SPList: 'BVSigningEntity',
         CDSTable: 'BVSigningEntity',
@@ -361,6 +373,12 @@ export const TableTypeMap: any = {
         },
       },
       {
+        Key: 'ProcurementId',
+        SPList: 'ProcurementId',
+        CDSTable: 'ProcurementId',
+        Type: 'Number',
+      },
+      {
         Key: 'FinanceController',
         SPList: 'FinanceController',
         CDSTable: 'FinanceController',
@@ -369,6 +387,12 @@ export const TableTypeMap: any = {
           SPList: ['Title'],
           CDSTable: ['fullname', 'internalemailaddress'],
         },
+      },
+      {
+        Key: 'FinanceControllerId',
+        SPList: 'FinanceControllerId',
+        CDSTable: 'FinanceControllerId',
+        Type: 'Number',
       },
       {
         Key: 'DataSecurity',
@@ -381,6 +405,13 @@ export const TableTypeMap: any = {
         },
       },
       {
+        Key: 'DataSecurityId',
+        SPList: 'DataSecurityId',
+        CDSTable: 'DataSecurityId',
+        Type: 'Number',
+      },
+
+      {
         Key: 'Legal',
         SPList: 'Legal',
         CDSTable: 'Legal',
@@ -389,6 +420,12 @@ export const TableTypeMap: any = {
           SPList: ['Title'],
           CDSTable: ['fullname', 'internalemailaddress'],
         },
+      },
+      {
+        Key: 'LegalId',
+        SPList: 'LegalId',
+        CDSTable: 'LegalId',
+        Type: 'Number',
       },
       {
         Key: 'SiteGM',
@@ -401,6 +438,12 @@ export const TableTypeMap: any = {
         },
       },
       {
+        Key: 'SiteGMId',
+        SPList: 'SiteGMId',
+        CDSTable: 'SiteGMId',
+        Type: 'Number',
+      },
+      {
         Key: 'CountryManagerGM',
         SPList: 'CountryManagerGM',
         CDSTable: 'CountryManagerGM',
@@ -409,6 +452,12 @@ export const TableTypeMap: any = {
           SPList: ['Title'],
           CDSTable: ['fullname', 'internalemailaddress'],
         },
+      },
+      {
+        Key: 'CountryManagerGMId',
+        SPList: 'CountryManagerGMId',
+        CDSTable: 'CountryManagerGMId',
+        Type: 'Number',
       },
       {
         Key: 'RegionalVP',
@@ -421,6 +470,12 @@ export const TableTypeMap: any = {
         },
       },
       {
+        Key: 'RegionalVPId',
+        SPList: 'RegionalVPId',
+        CDSTable: 'RegionalVPId',
+        Type: 'Number',
+      },
+      {
         Key: 'CFO',
         SPList: 'CFO',
         CDSTable: 'CFO',
@@ -430,6 +485,22 @@ export const TableTypeMap: any = {
           CDSTable: ['fullname', 'internalemailaddress'],
         },
       },
+      {
+        Key: 'CFOId',
+        SPList: 'CFOId',
+        CDSTable: 'CFOId',
+        Type: 'Number',
+      },
+    ],
+    UserExpand: [
+      'CFO',
+      'RegionalVP',
+      'CountryManagerGM',
+      'SiteGM',
+      'Legal',
+      'DataSecurity',
+      'FinanceController',
+      'Procurement',
     ],
   },
   LeaseEstateContract: {
@@ -1092,13 +1163,21 @@ export const TableTypeMap: any = {
         Key: 'DataSecurity',
         SPList: 'DataSecurity',
         CDSTable: 'DataSecurity',
-        Type: 'Text',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
       },
       {
         Key: 'Procurement',
         SPList: 'Procurement',
         CDSTable: 'Procurement',
-        Type: 'Text',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
       },
       {
         Key: 'ProductLine',
@@ -1106,28 +1185,136 @@ export const TableTypeMap: any = {
         CDSTable: 'ProductLine',
         Type: 'Text',
       },
-      { Key: 'GR', SPList: 'GR', CDSTable: 'GR', Type: 'Text' },
+      {
+        Key: 'GR',
+        SPList: 'GR',
+        CDSTable: 'GR',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
+      },
       {
         Key: 'FinanceController',
         SPList: 'FinanceController',
         CDSTable: 'FinanceController',
-        Type: 'Text',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
       },
-      { Key: 'SiteGM', SPList: 'SiteGM', CDSTable: 'SiteGM', Type: 'Text' },
-      { Key: 'Legal', SPList: 'Legal', CDSTable: 'Legal', Type: 'Text' },
+      {
+        Key: 'SiteGM',
+        SPList: 'SiteGM',
+        CDSTable: 'SiteGM',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
+      },
+      {
+        Key: 'Legal',
+        SPList: 'Legal',
+        CDSTable: 'Legal',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
+      },
       {
         Key: 'CountryManagerGM',
         SPList: 'CountryManagerGM',
         CDSTable: 'CountryManagerGM',
-        Type: 'Text',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
       },
       {
         Key: 'RegionalVP',
         SPList: 'RegionalVP',
         CDSTable: 'RegionalVP',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
+      },
+      {
+        Key: 'CFO',
+        SPList: 'CFO',
+        CDSTable: 'CFO',
+        Type: 'User',
+        expandProperties: {
+          SPList: ['Title'],
+          CDSTable: ['fullname', 'internalemailaddress'],
+        },
+      },
+      {
+        Key: 'CFOStringId',
+        SPList: 'CFOStringId',
+        CDSTable: 'CFOStringId',
         Type: 'Text',
       },
-      { Key: 'CFO', SPList: 'CFO', CDSTable: 'CFO', Type: 'Text' },
+      {
+        Key: 'DataSecurityStringId',
+        SPList: 'DataSecurityStringId',
+        CDSTable: 'DataSecurityStringId',
+        Type: 'Text',
+      },
+      {
+        Key: 'CountryManagerGMStringId',
+        SPList: 'CountryManagerGMStringId',
+        CDSTable: 'CountryManagerGMStringId',
+        Type: 'Text',
+      },
+      {
+        Key: 'HRStringId',
+        SPList: 'HRStringId',
+        CDSTable: 'HRStringId',
+        Type: 'Text',
+      },
+      {
+        Key: 'HSEStringId',
+        SPList: 'HSEStringId',
+        CDSTable: 'HSEStringId',
+        Type: 'Text',
+      },
+      {
+        Key: 'LegalStringId',
+        SPList: 'LegalStringId',
+        CDSTable: 'LegalStringId',
+        Type: 'Text',
+      },
+      {
+        Key: 'ProcurementStringId',
+        SPList: 'ProcurementStringId',
+        CDSTable: 'ProcurementStringId',
+        Type: 'Text',
+      },
+      {
+        Key: 'RegionalVPStringId',
+        SPList: 'RegionalVPStringId',
+        CDSTable: 'RegionalVPStringId',
+        Type: 'Text',
+      },
+      {
+        Key: 'FinanceControllerStringId',
+        SPList: 'FinanceControllerStringId',
+        CDSTable: 'FinanceControllerStringId',
+        Type: 'Text',
+      },
+      {
+        Key: 'SiteGMStringId',
+        SPList: 'SiteGMStringId',
+        CDSTable: 'SiteGMStringId',
+        Type: 'Text',
+      },
     ],
   },
   WFAdditionalApproval: {

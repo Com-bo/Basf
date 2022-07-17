@@ -158,4 +158,18 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
+  getUserList() {
+    return this._spService.getUserList().catch((error: any) => {
+      // this._logService.logError(error)
+      console.error(error);
+      return Promise.reject(error);
+    });
+  }
+  getUserById(id: string | number) {
+    return this._spService.getUserById(id).catch((error: any) => {
+      // this._logService.logError(error)
+      console.error(error);
+      return Promise.reject(error);
+    });
+  }
 }

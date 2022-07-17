@@ -942,7 +942,8 @@ export default class SharepointService {
       });
   }
 
-  getUserById(userKey: string, token: any) {
+  getUserByUserKey(userKey: string) {
+    var token = this.getToken();
     let url = `${process.env.host}${
       process.env.relativePath
     }/_api/web/siteusers(@v1)?@v1='${encodeURIComponent(
@@ -967,7 +968,8 @@ export default class SharepointService {
       });
   }
 
-  getUserByName(userId: string, token: any) {
+  getUserById(userId: string | number) {
+    var token = this.getToken();
     let url = `${process.env.host}${process.env.relativePath}/_api/web/siteusers?$filter=Id eq ${userId}`;
     return this._http
       .get(url, {
@@ -980,7 +982,7 @@ export default class SharepointService {
       .then((response: any) => {
         let value = response.data;
         return value.d.results.map(
-          (e: { Title: any; Email: any; UserPrincipalName: any }) => ({
+          (e: { Title: any; Email: any; UserPrincipalName: any; Id: any }) => ({
             // Employee: e,
             // Title: e.DisplayText,
             // WorkEmail: e.EntityData.Email || e.EntityData?.OtherMails || '',
@@ -990,6 +992,7 @@ export default class SharepointService {
             WorkEmail: e.Email,
             WFCellPhone: '',
             PrincipalName: e.UserPrincipalName,
+            Id: e.Id,
           }),
         );
       });
@@ -1008,12 +1011,14 @@ export default class SharepointService {
       })
       .then((response: any) => {
         let value = response.data;
+
         return value.d.results.map(
-          (e: { Title: any; Email: any; UserPrincipalName: any }) => ({
+          (e: { Title: any; Email: any; UserPrincipalName: any; Id: any }) => ({
             Title: e.Title,
             WorkEmail: e.Email,
             WFCellPhone: '',
             PrincipalName: e.UserPrincipalName,
+            Id: e.Id,
           }),
         );
       });
@@ -1182,9 +1187,6 @@ export default class SharepointService {
           ID: res.ID,
         };
       });
-      return {
-        ID: res.ID,
-      };
     } catch {
       window.parent.postMessage(
         {

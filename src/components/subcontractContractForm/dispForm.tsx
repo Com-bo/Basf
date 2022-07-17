@@ -45,25 +45,25 @@ const index = (props: any) => {
     return form.validateFields().then((res) => {
       // 计算审批人
 
-      let functionApprovers: any = [];
-      let fucntions = [
-        'Procurement',
-        'FinanceController',
-        'DataSecurity',
-        'Legal',
-      ];
-      fucntions.forEach((element) => {
-        if (form.getFieldValue([element])) {
-          functionApprovers.push(form.getFieldValue([element]));
-        }
-      });
+      // let functionApprovers: any = [];
+      // let fucntions = [
+      //   'Procurement',
+      //   'FinanceController',
+      //   'DataSecurity',
+      //   'Legal',
+      // ];
+      // fucntions.forEach((element) => {
+      //   if (form.getFieldValue([element])) {
+      //     functionApprovers.push(form.getFieldValue([element]));
+      //   }
+      // });
       const params = {
         ...form.getFieldsValue(),
-        FunctionApprovers: Array.from(new Set(functionApprovers)).join(';'),
-        SiteGMApprovers: form.getFieldValue('SiteGM'),
-        CountryManageGMApprovers: form.getFieldValue('CountryManagerGM'),
-        RegionalVPApprovers: form.getFieldValue('RegionalVP'),
-        CFOApprovers: form.getFieldValue('CFO'),
+        // FunctionApprovers: Array.from(new Set(functionApprovers)).join(';'),
+        // SiteGMApprovers: form.getFieldValue('SiteGM'),
+        // CountryManageGMApprovers: form.getFieldValue('CountryManagerGM'),
+        // RegionalVPApprovers: form.getFieldValue('RegionalVP'),
+        // CFOApprovers: form.getFieldValue('CFO'),
       };
       delete params.file;
       return {
@@ -78,9 +78,11 @@ const index = (props: any) => {
   };
   useEffect(() => {
     // 附件之初始化获取id
-    if (props.location.query?.ID) {
+    if (!props.location.query?.ID) {
       return;
     }
+    let res0: any;
+
     formService
       .getTableData(
         listName,
@@ -97,6 +99,7 @@ const index = (props: any) => {
         if (res && res.length) {
           console.log(res[0]);
           setApplicationNo(res[0].Title);
+          res0 = res[0];
           form.setFieldsValue({
             ...res[0],
             RequestDate: moment(res[0].RequestDate),
@@ -110,6 +113,22 @@ const index = (props: any) => {
             file: res,
           });
         }
+        return formService.getTableData(
+          'BUList',
+          [
+            {
+              type: 'filter eq',
+              value: res0.BU,
+              properties: ['BUCode'],
+            },
+          ],
+          [],
+        );
+      })
+      .then((resData) => {
+        form.setFieldsValue({
+          BU: resData[0].BUDescription,
+        });
       });
   }, []);
 
@@ -233,15 +252,6 @@ const index = (props: any) => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    name="SBU"
-                    label="SBU"
-                    rules={[{ required: true }]}
-                  >
-                    <Input disabled />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
                     name="BVSigningEntity"
                     label="BV Signing Entity"
                     rules={[{ required: true }]}
@@ -249,6 +259,21 @@ const index = (props: any) => {
                     <Input disabled />
                   </Form.Item>
                 </Col>
+                <Col span={12}>
+                  <Form.Item name="BU" label="BU" rules={[{ required: true }]}>
+                    <Input disabled />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="SBU"
+                    label="SBU"
+                    rules={[{ required: true }]}
+                  >
+                    <Input disabled />
+                  </Form.Item>
+                </Col>
+
                 <Col span={12}>
                   <Form.Item
                     name="Site"
