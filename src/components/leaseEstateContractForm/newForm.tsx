@@ -630,6 +630,7 @@ const index = () => {
                     rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select
+                      allowClear
                       placeholder="-----select--------"
                       onChange={(val) => {
                         if (val) {
@@ -707,7 +708,7 @@ const index = () => {
                                     : null,
                                 HSEId:
                                   approveDic['HSE'] || approveDic['HSE'] === 0
-                                    ? resLst[approveDic['HSEId']][0]?.Id
+                                    ? resLst[approveDic['HSE']][0]?.Id
                                     : null,
                                 HRId:
                                   approveDic['HR'] || approveDic['HR'] === 0
@@ -720,14 +721,15 @@ const index = () => {
                             });
                         } else {
                           form.setFieldsValue({
-                            Procurement: '',
-                            FinanceController: '',
-                            DataSecurity: '',
-                            Legal: '',
-                            SiteGM: '',
-                            CountryManagerGM: '',
-                            RegionalVP: '',
-                            CFO: '',
+                            ProcurementId: '',
+                            FinanceControllerId: '',
+                            DataSecurityId: '',
+                            LegalId: '',
+                            SiteGMId: '',
+                            CountryManagerGMId: '',
+                            RegionalVPId: '',
+                            HRId: '',
+                            HSEId: '',
                           });
                         }
                       }}

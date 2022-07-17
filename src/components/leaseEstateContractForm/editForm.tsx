@@ -653,7 +653,7 @@ const index = (props: any) => {
                                     : null,
                                 HSEId:
                                   approveDic['HSE'] || approveDic['HSE'] === 0
-                                    ? resLst[approveDic['HSEId']][0]?.Id
+                                    ? resLst[approveDic['HSE']][0]?.Id
                                     : null,
                                 HRId:
                                   approveDic['HR'] || approveDic['HR'] === 0

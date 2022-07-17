@@ -713,12 +713,12 @@ const index = (props: any) => {
                     return e && e.fileList;
                   }}
                   label="Upload Contract Attachment"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Contract Attachment is required',
-                    },
-                  ]}
+                  // rules={[
+                  //   {
+                  //     required: true,
+                  //     message: 'Contract Attachment is required',
+                  //   },
+                  // ]}
                 >
                   <Upload {...uploadProps} listType="picture-card" disabled>
                     <div className="file_upload">

@@ -715,14 +715,14 @@ const index = () => {
                             });
                         } else {
                           form.setFieldsValue({
-                            Procurement: '',
-                            FinanceController: '',
-                            DataSecurity: '',
-                            Legal: '',
-                            SiteGM: '',
-                            CountryManagerGM: '',
-                            RegionalVP: '',
-                            CFO: '',
+                            ProcurementId: '',
+                            FinanceControllerId: '',
+                            DataSecurityId: '',
+                            LegalId: '',
+                            SiteGMId: '',
+                            CountryManagerGMId: '',
+                            RegionalVPId: '',
+                            HRId: '',
                           });
                         }
                       }}
