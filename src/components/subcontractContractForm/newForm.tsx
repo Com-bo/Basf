@@ -74,8 +74,8 @@ const index = () => {
   const [hideProposedServicesConnection, setHideProposedServicesConnection] =
     useState(true);
   const [contractTermsOptions, setContractTerms] = useState([]);
-  const [hideTermExplainReason, setHideTermExplainReason] = useState(true);
-  const [hideBackground, setHideBackground] = useState<boolean | null>(null);
+  const [neededReason, setNeededReason] = useState<any>();
+  const [requestService, setRequestService] = useState<any>();
   const [hasLicense, setHasLicense] = useState(null);
   const [familyMemberHere, setFamilyMemberHere] = useState(null);
   const [unethicalBehaviorRequired, setUnethicalBehaviorRequired] =
@@ -880,7 +880,7 @@ const index = () => {
                   <>
                     Please describe why the subcontractor is needed{' '}
                     <span className="dot_required">*</span>{' '}
-                    {getLevel(hideTermExplainReason ? 'Low' : '')}{' '}
+                    {getLevel(neededReason != 'Others' ? 'Low' : '')}{' '}
                   </>
                 }
                 rules={[{ required: true, message: 'Please select' }]}
@@ -888,11 +888,7 @@ const index = () => {
                 <Select
                   placeholder="-----select--------"
                   onChange={(val) => {
-                    if (val == 'Others') {
-                      setHideTermExplainReason(false);
-                    } else {
-                      setHideTermExplainReason(true);
-                    }
+                    setNeededReason(val);
                   }}
                 >
                   {contractTermsOptions.map((item: OptionItem, index) => (
@@ -903,9 +899,7 @@ const index = () => {
                 </Select>
               </Form.Item>
             </Col>
-            {hideTermExplainReason ? (
-              ''
-            ) : (
+            {neededReason == 'Others' ? (
               <Col span={24}>
                 <Form.Item
                   name="NeededReasonExplain"
@@ -915,6 +909,8 @@ const index = () => {
                   <Input.TextArea placeholder="Please input" />
                 </Form.Item>
               </Col>
+            ) : (
+              ''
             )}
             <Col span={24}>
               <Form.Item
@@ -925,9 +921,9 @@ const index = () => {
                     Did a BV customer or government official request the
                     service?<span className="dot_required">*</span>
                     {getLevel(
-                      hideBackground === false
+                      requestService === 0
                         ? 'High'
-                        : hideBackground === true
+                        : requestService === 1
                         ? 'Low'
                         : '',
                     )}
@@ -937,11 +933,7 @@ const index = () => {
               >
                 <Radio.Group
                   onChange={(val) => {
-                    if (val.target.value === 1) {
-                      setHideBackground(false);
-                    } else {
-                      setHideBackground(true);
-                    }
+                    setRequestService(val.target.value);
                   }}
                 >
                   <Radio value={1}>Yes</Radio>
@@ -949,9 +941,7 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            {hideBackground ? (
-              ''
-            ) : (
+            {requestService === 0 ? (
               <Col span={24}>
                 <Form.Item
                   name="Background"
@@ -961,6 +951,8 @@ const index = () => {
                   <Input.TextArea placeholder="Please input" />
                 </Form.Item>
               </Col>
+            ) : (
+              ''
             )}
             <Col span={24}>
               <Form.Item
@@ -1056,9 +1048,9 @@ const index = () => {
                       subcontractor or does your family member work for or in
                       the subcontractor?<span className="dot_required">*</span>
                       {getLevel(
-                        form.getFieldValue('FamilyMemberHere') == 1
+                        familyMemberHere == 1
                           ? 'High'
-                          : form.getFieldValue('FamilyMemberHere') === 0
+                          : familyMemberHere === 0
                           ? 'Low'
                           : '',
                       )}

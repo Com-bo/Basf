@@ -268,29 +268,17 @@ const index = (props: any) => {
             <div className="sec-content">
               <Row gutter={20}>
                 <Col span={12}>
-                  <Form.Item
-                    name="Region"
-                    label="Region"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="Region" label="Region">
                     <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="Country"
-                    label="Country"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="Country" label="Country">
                     <Input disabled />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="BVSigningEntity"
-                    label="BV Signing Entity"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="BVSigningEntity" label="BV Signing Entity">
                     <Input disabled />
                   </Form.Item>
                 </Col>
@@ -306,21 +294,13 @@ const index = (props: any) => {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="SBU"
-                    label="SBU"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="SBU" label="SBU">
                     <Input disabled />
                   </Form.Item>
                 </Col>
 
                 <Col span={12}>
-                  <Form.Item
-                    name="Site"
-                    label="Site"
-                    rules={[{ required: true }]}
-                  >
+                  <Form.Item name="Site" label="Site">
                     <Input disabled />
                   </Form.Item>
                 </Col>
@@ -333,7 +313,6 @@ const index = (props: any) => {
                   <Form.Item
                     name="NameofCounterparty"
                     label="Name of Counterparty"
-                    rules={[{ required: true }]}
                   >
                     <Input placeholder="Please input" disabled />
                   </Form.Item>
@@ -342,7 +321,6 @@ const index = (props: any) => {
                   <Form.Item
                     name="SupplierCode"
                     label="Please upload the supplier code"
-                    rules={[{ required: true }]}
                   >
                     <Input placeholder="Please input" disabled />
                   </Form.Item>
@@ -351,7 +329,6 @@ const index = (props: any) => {
                   <Form.Item
                     name="CoEOrBPCCSigned"
                     label="CoE / BPCC declaration signed or not"
-                    rules={[{ required: true }]}
                   >
                     <Radio.Group disabled>
                       <Radio value={1}>Yes</Radio>
@@ -377,12 +354,11 @@ const index = (props: any) => {
                     </Radio.Group>
                   </Form.Item>
                 </Col>
-                {form.getFieldValue('EntityOfBVCPS') == 1 ? (
+                {form.getFieldValue('EntityOfBVCPS') === 0 ? (
                   <Col span={24}>
                     <Form.Item
                       name="LocatedInCountryListed"
                       label="Whether the subcontractor is located in a country listed under BV Sanctions policy"
-                      rules={[{ required: true }]}
                     >
                       <Radio.Group disabled>
                         <Radio value={1}>Yes</Radio>
@@ -393,8 +369,8 @@ const index = (props: any) => {
                 ) : (
                   ''
                 )}
-                {form.getFieldValue('LocatedInCountryListed') &&
-                form.getFieldValue('EntityOfBVCPS') == 1 ? (
+                {form.getFieldValue('LocatedInCountryListed') === 0 &&
+                form.getFieldValue('EntityOfBVCPS') === 0 ? (
                   <Col span={24}>
                     <Form.Item
                       name="ProposedServicesConnection"
@@ -408,7 +384,6 @@ const index = (props: any) => {
                           </Tooltip>
                         </>
                       }
-                      rules={[{ required: true }]}
                     >
                       <Radio.Group disabled>
                         <Radio value={1}>Yes</Radio>
@@ -429,7 +404,6 @@ const index = (props: any) => {
               <Form.Item
                 name="ContractAmount"
                 label="Contract Amount for one year of service"
-                rules={[{ required: true }]}
               >
                 <Input placeholder="Please input" disabled />
               </Form.Item>
@@ -599,7 +573,7 @@ const index = (props: any) => {
                   label="Please insert the LTO of the subcontractor"
                   rules={[{ required: true }]}
                 >
-                  <Input placeholder="Please input" />
+                  <Input placeholder="Please input" disabled />
                 </Form.Item>
               </Col>
             ) : form.getFieldValue('HasLicense') === 0 ? (
