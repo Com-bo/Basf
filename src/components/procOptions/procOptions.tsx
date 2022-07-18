@@ -96,6 +96,25 @@ const index = (props: IProps) => {
     }
   };
 
+  const flowSubmit = async (action: string) => {
+    let res: IBForm = await props.formValidataion().catch((e: any) => {
+      console.error(e);
+    });
+    if (res?.isOK) {
+      Modal.confirm({
+        title: 'Tips',
+        content: `Confirm ${action} this flow？`,
+        okText: 'Confirm',
+        cancelText: 'Cancel',
+        onOk: async () => {
+          if (!res.formData?.id) return;
+          var spRes = await spService.submitFlowForm(res.formData?.id, action);
+          props.callBack && props.callBack(spRes);
+        },
+      });
+    }
+  };
+
   const onSave = () => {
     props.formValidataion().then((res: IBForm) => {
       if (res.isOK) {
@@ -149,19 +168,70 @@ const index = (props: IProps) => {
             Submit
           </Button>
           {/* 同意 */}
-          <Button hidden={buttons.indexOf('Approve') < 0}>Approve</Button>
+          <Button
+            hidden={buttons.indexOf('Approve') < 0}
+            type="primary"
+            onClick={() => {
+              flowSubmit('Approve');
+            }}
+          >
+            Approve
+          </Button>
           {/* 拒绝 */}
-          <Button hidden={buttons.indexOf('Reject') < 0}>Reject</Button>
+          <Button
+            hidden={buttons.indexOf('Reject') < 0}
+            type="default"
+            onClick={() => {
+              flowSubmit('Reject');
+            }}
+          >
+            Reject
+          </Button>
           {/* 转移任务 */}
-          <Button hidden={buttons.indexOf('Trans') < 0}>Trans</Button>
+          <Button
+            hidden={buttons.indexOf('Trans') < 0}
+            onClick={() => {
+              flowSubmit('Trans');
+            }}
+          >
+            Trans
+          </Button>
           {/* 加签 */}
-          <Button hidden={buttons.indexOf('Add') < 0}>Add</Button>
+          <Button
+            hidden={buttons.indexOf('Add') < 0}
+            onClick={() => {
+              flowSubmit('Add');
+            }}
+          >
+            Add
+          </Button>
           {/* 提交 */}
-          <Button hidden={buttons.indexOf('Post') < 0}>Post</Button>
+          <Button
+            hidden={buttons.indexOf('Post') < 0}
+            onClick={() => {
+              flowSubmit('Post');
+            }}
+          >
+            Post
+          </Button>
           {/* 退回 */}
-          <Button hidden={buttons.indexOf('Return') < 0}>Return</Button>
+          <Button
+            hidden={buttons.indexOf('Return') < 0}
+            onClick={() => {
+              flowSubmit('Return');
+            }}
+          >
+            Return
+          </Button>
           {/* 不同意 */}
-          <Button hidden={buttons.indexOf('NotAllow') < 0}>NotAllow</Button>
+          <Button
+            hidden={buttons.indexOf('NotAllow') < 0}
+            onClick={() => {
+              flowSubmit('NotAllow');
+            }}
+          >
+            NotAllow
+          </Button>
         </Space>
       </div>
     </>

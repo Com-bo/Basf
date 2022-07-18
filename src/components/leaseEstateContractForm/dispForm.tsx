@@ -390,20 +390,12 @@ const index = (props: any) => {
         <Card title="B.Contract Amount and Payment" bordered={false}>
           <Row gutter={20}>
             <Col span={24}>
-              <Form.Item
-                name="MonthLyAmount"
-                label="Monthly rental amount"
-                rules={[{ required: true, message: 'Please input' }]}
-              >
+              <Form.Item name="MonthLyAmount" label="Monthly rental amount">
                 <Input disabled />
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item
-                name="PaymentTerm"
-                required={false}
-                label="Payment term"
-              >
+              <Form.Item name="PaymentTerm" label="Payment term">
                 <Radio.Group disabled>
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
@@ -414,7 +406,6 @@ const index = (props: any) => {
             <Col span={12}>
               <Form.Item
                 name="ContractSumWithinBudget"
-                required={false}
                 label={
                   <>
                     Is the contract sum within the approved budget
@@ -507,7 +498,6 @@ const index = (props: any) => {
             </Col>
             <Col span={24}>
               <Form.Item
-                required={false}
                 name="LessorIsOwner"
                 label={
                   <>
@@ -542,7 +532,6 @@ const index = (props: any) => {
                       return e && e.fileList;
                     }}
                     label="Please upload the documents to demonstrate the lessor has the right to rent, such as lease contract and power of attorney"
-                    rules={[{ required: true, message: 'file is required' }]}
                   >
                     <Upload {...uploadProps} listType="picture-card" disabled>
                       <div className="file_upload">
@@ -560,7 +549,6 @@ const index = (props: any) => {
             <Col span={24}>
               <Form.Item
                 name="Mortgage"
-                required={false}
                 label={
                   <>
                     Any mortgage and/or seize on the property that restricted

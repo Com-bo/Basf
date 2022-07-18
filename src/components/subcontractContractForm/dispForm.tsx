@@ -40,7 +40,7 @@ const index = (props: any) => {
   const formService = new FormService();
   const [loading, setLoading] = useState(false);
   const onSubmit = () => {
-    setLoading(true);
+    // setLoading(true);
     console.log(form.getFieldsValue());
     return form.validateFields().then((res) => {
       // 计算审批人
@@ -59,6 +59,7 @@ const index = (props: any) => {
       // });
       const params = {
         ...form.getFieldsValue(),
+        id: props.location.query?.ID,
         // FunctionApprovers: Array.from(new Set(functionApprovers)).join(';'),
         // SiteGMApprovers: form.getFieldValue('SiteGM'),
         // CountryManageGMApprovers: form.getFieldValue('CountryManagerGM'),
