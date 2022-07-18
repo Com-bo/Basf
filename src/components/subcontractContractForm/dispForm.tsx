@@ -119,7 +119,7 @@ const index = (props: any) => {
         return formService.getUserList();
       })
       .then((options) => {
-        setUserList(options);
+        setUserList([...options.filter((item: any) => !!item.WorkEmail)]);
         setLoading(false);
       })
       .catch((e) => setLoading(false));
@@ -780,10 +780,10 @@ const index = (props: any) => {
         <Card title="E. Approver Information" bordered={false}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="ProcurementId" label="Procurement">
+              <Form.Item name="Procurement" label="Procurement">
                 <Select placeholder="Please select" allowClear disabled>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -791,10 +791,10 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="FinanceControllerId" label="Finance Controller">
+              <Form.Item name="FinanceController" label="Finance Controller">
                 <Select placeholder="Please select" allowClear disabled>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -802,10 +802,10 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="DataSecurityId" label="Data Security">
+              <Form.Item name="DataSecurity" label="Data Security">
                 <Select placeholder="Please select" allowClear disabled>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -813,10 +813,10 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="LegalId" label="Legal">
+              <Form.Item name="Legal" label="Legal">
                 <Select placeholder="Please select" allowClear disabled>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -824,10 +824,10 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="SiteGMId" label="Site GM">
+              <Form.Item name="SiteGM" label="Site GM">
                 <Select placeholder="Please select" allowClear disabled>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -835,10 +835,10 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="CountryManagerGMId" label="Country Manager/GM">
+              <Form.Item name="CountryManagerGM" label="Country Manager/GM">
                 <Select placeholder="Please select" allowClear disabled>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -846,10 +846,10 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="RegionalVPId" label="Regional VP">
+              <Form.Item name="RegionalVP" label="Regional VP">
                 <Select placeholder="Please select" allowClear disabled>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -857,10 +857,10 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="CFOId" label="CFO">
+              <Form.Item name="CFO" label="CFO">
                 <Select placeholder="Please select" allowClear disabled>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}

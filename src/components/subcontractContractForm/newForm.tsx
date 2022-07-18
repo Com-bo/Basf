@@ -42,25 +42,8 @@ const index = () => {
   //#endregion
   const onSubmit = () => {
     return form.validateFields().then((res) => {
-      let functionApprovers: any = [];
-      let fucntions = [
-        'ProcurementId',
-        'FinanceControllerId',
-        'DataSecurityId',
-        'LegalId',
-      ];
-      fucntions.forEach((element) => {
-        if (form.getFieldValue([element])) {
-          functionApprovers.push(form.getFieldValue([element]));
-        }
-      });
       const params = {
         ...form.getFieldsValue(),
-        FunctionApproversId: Array.from(new Set(functionApprovers)).join(';'),
-        SiteGMApproversId: form.getFieldValue('SiteGMId'),
-        CountryManageGMApproversId: form.getFieldValue('CountryManagerGMId'),
-        RegionalVPApproversId: form.getFieldValue('RegionalVPId'),
-        CFOApproversId: form.getFieldValue('CFOId'),
       };
       let _no = getSerialNum('SC');
       params.Title = _no;
@@ -379,7 +362,7 @@ const index = () => {
       );
       setContractTerms(drop7);
       let drop8 = await formService.getUserList();
-      setUserList(drop8);
+      setUserList([...drop8.filter((item: any) => !!item.WorkEmail)]);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -638,91 +621,37 @@ const index = () => {
                       placeholder="-----select--------"
                       onChange={(val) => {
                         if (val) {
-                          setLoading(true);
                           let _data: any = proOptions.find(
                             (item: any) => item.ProductLine == val,
                           );
                           let approvers = [
-                            'CFOStringId',
-                            'DataSecurityStringId',
-                            'CountryManagerGMStringId',
-                            'LegalStringId',
-                            'ProcurementStringId',
-                            'RegionalVPStringId',
-                            'FinanceControllerStringId',
-                            'SiteGMStringId',
+                            'CFO',
+                            'DataSecurity',
+                            'CountryManagerGM',
+                            'Legal',
+                            'Procurement',
+                            'RegionalVP',
+                            'FinanceController',
+                            'SiteGM',
                           ];
-                          let aryPromise: Promise<any>[] = [];
-                          let approveDic: any = {};
+                          let newData: any = {};
                           approvers.forEach((element: any) => {
                             if (_data[element]) {
-                              let _key = element.replace('StringId', '');
-                              approveDic[_key] = aryPromise.length;
-                              aryPromise.push(
-                                formService.getUserById(_data[element]),
-                              );
+                              newData[element] = _data[element];
                             }
                           });
-                          Promise.all(aryPromise)
-                            .then((resLst) => {
-                              setLoading(false);
-                              form.setFieldsValue({
-                                CFOId:
-                                  approveDic['CFO'] || approveDic['CFO'] === 0
-                                    ? resLst[approveDic['CFO']][0]?.Id
-                                    : null,
-                                DataSecurityId:
-                                  approveDic['DataSecurity'] ||
-                                  approveDic['DataSecurity'] === 0
-                                    ? resLst[approveDic['DataSecurity']][0]?.Id
-                                    : null,
-                                LegalId:
-                                  approveDic['Legal'] ||
-                                  approveDic['Legal'] === 0
-                                    ? resLst[approveDic['Legal']][0]?.Id
-                                    : null,
-                                ProcurementId:
-                                  approveDic['Procurement'] ||
-                                  approveDic['Procurement'] === 0
-                                    ? resLst[approveDic['Procurement']][0]?.Id
-                                    : null,
-                                RegionalVPId:
-                                  approveDic['RegionalVP'] ||
-                                  approveDic['RegionalVP'] === 0
-                                    ? resLst[approveDic['RegionalVP']][0]?.Id
-                                    : null,
-                                FinanceControllerId:
-                                  approveDic['FinanceController'] ||
-                                  approveDic['FinanceController'] === 0
-                                    ? resLst[approveDic['FinanceController']][0]
-                                        ?.Id
-                                    : null,
-                                SiteGMId:
-                                  approveDic['SiteGM'] ||
-                                  approveDic['SiteGM'] === 0
-                                    ? resLst[approveDic['SiteGM']][0]?.Id
-                                    : null,
-                                CountryManagerGMId:
-                                  approveDic['CountryManagerGM'] ||
-                                  approveDic['CountryManagerGM'] === 0
-                                    ? resLst[approveDic['CountryManagerGM']][0]
-                                        ?.Id
-                                    : null,
-                              });
-                            })
-                            .catch((e) => {
-                              setLoading(false);
-                            });
+                          form.setFieldsValue({
+                            ...newData,
+                          });
                         } else {
                           form.setFieldsValue({
-                            ProcurementId: '',
-                            FinanceControllerId: '',
-                            DataSecurityId: '',
-                            LegalId: '',
-                            SiteGMId: '',
-                            CountryManagerGMId: '',
-                            RegionalVPId: '',
-                            HRId: '',
+                            Procurement: '',
+                            FinanceController: '',
+                            DataSecurity: '',
+                            Legal: '',
+                            SiteGM: '',
+                            CountryManagerGM: '',
+                            RegionalVP: '',
                           });
                         }
                       }}
@@ -1273,13 +1202,13 @@ const index = () => {
           <Row gutter={20}>
             <Col span={12}>
               <Form.Item
-                name="ProcurementId"
+                name="Procurement"
                 label="Procurement"
                 rules={[{ required: true }]}
               >
                 <Select placeholder="Please select" allowClear>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -1288,13 +1217,13 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="FinanceControllerId"
+                name="FinanceController"
                 label="Finance Controller"
                 rules={[{ required: true }]}
               >
                 <Select placeholder="Please select" allowClear>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -1302,10 +1231,10 @@ const index = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="DataSecurityId" label="Data Security">
+              <Form.Item name="DataSecurity" label="Data Security">
                 <Select placeholder="Please select" allowClear>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -1314,13 +1243,13 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="LegalId"
+                name="Legal"
                 label="Legal"
                 rules={[{ required: true }]}
               >
                 <Select placeholder="Please select" allowClear>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -1329,13 +1258,13 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="SiteGMId"
+                name="SiteGM"
                 label="Site GM"
                 rules={[{ required: true }]}
               >
                 <Select placeholder="Please select" allowClear>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -1344,13 +1273,13 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="CountryManagerGMId"
+                name="CountryManagerGM"
                 label="Country Manager/GM"
                 rules={[{ required: true }]}
               >
                 <Select placeholder="Please select" allowClear>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -1359,13 +1288,13 @@ const index = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="RegionalVPId"
+                name="RegionalVP"
                 label="Regional VP"
                 rules={[{ required: true }]}
               >
                 <Select placeholder="Please select" allowClear>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
@@ -1373,10 +1302,10 @@ const index = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="CFOId" label="CFO" rules={[{ required: true }]}>
+              <Form.Item name="CFO" label="CFO" rules={[{ required: true }]}>
                 <Select placeholder="Please select" allowClear>
                   {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.Id} key={index}>
+                    <Select.Option value={item?.WorkEmail} key={index}>
                       {item?.WorkEmail}
                     </Select.Option>
                   ))}
