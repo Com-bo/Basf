@@ -45,26 +45,9 @@ const index = (props: any) => {
     return form.validateFields().then((res) => {
       // 计算审批人
 
-      // let functionApprovers: any = [];
-      // let fucntions = [
-      //   'Procurement',
-      //   'FinanceController',
-      //   'DataSecurity',
-      //   'Legal',
-      // ];
-      // fucntions.forEach((element) => {
-      //   if (form.getFieldValue([element])) {
-      //     functionApprovers.push(form.getFieldValue([element]));
-      //   }
-      // });
       const params = {
         ...form.getFieldsValue(),
         id: props.location.query?.ID,
-        // FunctionApprovers: Array.from(new Set(functionApprovers)).join(';'),
-        // SiteGMApprovers: form.getFieldValue('SiteGM'),
-        // CountryManageGMApprovers: form.getFieldValue('CountryManagerGM'),
-        // RegionalVPApprovers: form.getFieldValue('RegionalVP'),
-        // CFOApprovers: form.getFieldValue('CFO'),
       };
       delete params.file;
       return {
@@ -845,6 +828,7 @@ const index = (props: any) => {
           </Row>
         </Card>
         <ApprovalActions
+          keyId={props.location.query?.Key}
           applicationNo={applicationNo}
           formValidataion={onSubmit}
           callBack={(result: any) => {

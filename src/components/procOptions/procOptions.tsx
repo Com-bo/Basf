@@ -17,9 +17,9 @@ interface IProps {
   applicationNo?: string; //流水号
   wfFlowName?: string;
   formValidataion: Function;
-  // approvalRender: React.ReactNode;
   callBack?: Function;
   setLoading?: any;
+  keyId?: number;
 }
 
 interface IBForm {
@@ -49,8 +49,10 @@ const index = (props: IProps) => {
             },
           ],
           [],
+          props.keyId,
         )
         .then((res) => {
+          console.log(res);
           setButtons(JSON.parse(res?.ResponseOptions));
         });
     } else {
@@ -108,7 +110,7 @@ const index = (props: IProps) => {
         cancelText: 'Cancel',
         onOk: async () => {
           if (!res.formData?.id) return;
-          var spRes = await spService.submitFlowForm(res.formData?.id, action);
+          var spRes = await spService.submitFlowForm(props.keyId ?? 0, action);
           props.callBack && props.callBack(spRes);
         },
       });

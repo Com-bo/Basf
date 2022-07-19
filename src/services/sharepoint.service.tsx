@@ -1389,7 +1389,7 @@ export default class SharepointService {
   }
 
   //提交审批
-  submitFlowForm(id: string, action: string) {
+  submitFlowForm(id: number, action: string) {
     var token = this.getToken();
     var url = `https://serviceme.sharepoint.com/sites/DPA_DEV_Community/_api/web/GetList(@a1)/items(@a2)/ValidateUpdateListItem()?@a1='/sites/DPA_DEV_Community/WorkflowTasks'&@a2='${id}'`;
     return this._http
@@ -1406,7 +1406,7 @@ export default class SharepointService {
       });
   }
 
-  getLastTaskInfo(filter: IFilter[], expand: any[]) {
+  getLastTaskInfo(filter: IFilter[], expand: any[], key?: number) {
     filter.push({
       type: 'orderby desc',
       properties: ['Modified'],
@@ -1448,9 +1448,15 @@ export default class SharepointService {
         })
         .then((response: any) => {
           let res = response.data;
-          return res.d.results.map((e: any) =>
-            this.formatValue(e, 'WorkflowTasks'),
-          )[0];
+          return res.d.results
+            .filter((x: any) => {
+              if (key == null) {
+                return true;
+              } else {
+                return x.Id == key;
+              }
+            })
+            .map((e: any) => this.formatValue(e, 'WorkflowTasks'))[0];
         });
     } else {
       let url =
