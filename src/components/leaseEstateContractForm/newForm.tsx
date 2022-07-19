@@ -589,8 +589,8 @@ const index = () => {
                 <Col span={12}>
                   <Form.Item
                     name="BU"
-                    label="BU"
-                    rules={[{ required: true, message: 'Please select' }]}
+                    label="BU Code"
+                    // rules={[{ required: true, message: 'Please select' }]}
                   >
                     <Select
                       placeholder="-----select--------"

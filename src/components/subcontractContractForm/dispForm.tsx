@@ -268,7 +268,7 @@ const index = (props: any) => {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item name="BU" label="BU">
+                  <Form.Item name="BU" label="BU Code">
                     <Select placeholder="-----select--------" disabled>
                       {buOptions.map((item: any, index: number) => (
                         <Select.Option value={item?.BUCode} key={index}>
