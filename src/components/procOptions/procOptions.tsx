@@ -109,9 +109,15 @@ const index = (props: IProps) => {
         okText: 'Confirm',
         cancelText: 'Cancel',
         onOk: async () => {
-          if (!res.formData?.id) return;
-          var spRes = await spService.submitFlowForm(props.keyId ?? 0, action);
-          props.callBack && props.callBack(spRes);
+          try {
+            var spRes = await spService.submitFlowForm(
+              props.keyId ?? 0,
+              action,
+            );
+            props.callBack && props.callBack(spRes);
+          } catch (error) {
+            console.error(error);
+          }
         },
       });
     }
