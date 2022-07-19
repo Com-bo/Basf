@@ -1,9 +1,12 @@
 import SpService from '@/services/sharepoint.service';
 import { IFilter } from '@/models/type';
+import { StringGradients } from 'antd/lib/progress/progress';
 
 interface FileForm {
   ProcName: string;
   ProcId: number;
+  FieldName: string;
+  FileUrl: string;
 }
 export default class FormService {
   private _spService: SpService;
@@ -110,34 +113,45 @@ export default class FormService {
   }
   getFileItems(ProcName: string, ProcId: number, fieldName?: string) {
     let token: string = this._getToken();
-    let listIndex: number[] = [];
     let filePropertysList: any[] = [];
-
-    return this.getFilesProperty()
+    let fields: any = [];
+    return this.getFilesProperty(ProcName, ProcId, fieldName)
       .then((filePropertys) => {
         filePropertysList = filePropertys;
-        filePropertys.forEach((element: FileForm, index: number) => {
-          if (element.ProcId == ProcId) {
-            listIndex.push(index);
-          }
+        let aryPromise: Promise<any>[] = [];
+
+        filePropertys.forEach((element: FileForm) => {
+          fields.push({
+            filedName: element.FieldName,
+            url: process.env.host + element.FileUrl,
+            name: element.FileUrl.split('/').reverse()[0],
+          });
+          aryPromise.push(
+            this.getFile(
+              "https://serviceme.sharepoint.com/sites/DPA_DEV_Community/LevelRequest/_api/Web/GetFileByServerRelativePath(decodedurl='" +
+                element.FileUrl +
+                "')/ListItemAllFields",
+            ),
+          );
         });
-        return this._spService.getFileItems(this._fileListName, token);
+        return Promise.all(aryPromise);
       })
       .then((res) => {
-        let results = res.results;
+        let results = res;
+
         // 处理文件
         let files: any = [];
         results.forEach((element: any, index: number) => {
-          if (listIndex.indexOf(index) != -1) {
-            files.push({
-              id: element.ServerRelativeUrl,
-              fieldName: filePropertysList[index].FieldName, //一个表单多个文件字段时
-              name: element.Name,
-              status: 'done',
-              url: process.env.host + element.ServerRelativeUrl,
-              thumbUrl: './file.png',
-            });
-          }
+          files.push({
+            id: element.id,
+            type: element.type,
+            etag: element.etag,
+            fieldName: fields[index]['filedName'], //一个表单多个文件字段时
+            name: fields[index]['name'],
+            status: 'done',
+            url: fields[index]['url'],
+            thumbUrl: './file.png',
+          });
         });
         return files;
       })
@@ -147,8 +161,24 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
-  getFilesProperty() {
-    return this.getTableDataAll(this._fileListName);
+  getFilesProperty(proName: string, procId: number, fieldName?: string) {
+    return this.getTableData(
+      this._fileListName,
+      [
+        {
+          type: 'filter eq',
+          value: proName,
+          properties: ['ProcName'],
+        },
+        {
+          type: 'filter eq',
+          value: procId,
+          properties: ['ProcId'],
+        },
+      ],
+      [],
+    );
+    // return this.getTableDataAll(this._fileListName)
   }
   getTableData(listName: string, filter: IFilter[], expand: any[]) {
     return this._spService

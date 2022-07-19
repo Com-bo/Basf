@@ -469,12 +469,12 @@ const index = () => {
             let resultMiddlePromise: Promise<any>[] = [];
             resultMiddleArr.forEach((resultMiddle) => {
               //  上传文件，并添加id
-
               resultMiddlePromise.push(
                 formService.updateFileItem(resultMiddle, {
                   ProcName: listName,
                   ProcId: id,
                   FieldName: fieldName,
+                  FileUrl: res.d.ServerRelativeUrl,
                 }),
               );
             });

@@ -735,6 +735,8 @@ export default class SharepointService {
         item.ProcId +
         "','FieldName':'" +
         item.FieldName +
+        "','FileUrl':'" +
+        item.FileUrl +
         "'}";
       return await this._http.post(file.uri, {
         data: body,
@@ -788,7 +790,6 @@ export default class SharepointService {
   getField(url: string) {
     // 通过链接获取字段
   }
-
   async updateIcon(file: any, name: string, users: string | any[], token: any) {
     let imageUrl = await this.uploadFile(name, 'UserAvatars', file, token);
     console.log(imageUrl);

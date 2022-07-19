@@ -78,6 +78,68 @@ const index = (props: any) => {
   const [useMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   const [leaseType, setLeaseType] = useState<any>();
   const [userList, setUserList] = useState<any>([]);
+  const uploadFileMethods = (fieldName: string, id: string | number) => {
+    let _listFile = form.getFieldValue(fieldName);
+    if (!_listFile) {
+      return Promise.resolve();
+    }
+    let res: any;
+    let aryPromise: Promise<any>[] = [];
+    _listFile.forEach((element: { name: string; originFileObj: File }) => {
+      aryPromise.push(
+        formService.uploadFile(element.name, element.originFileObj),
+      );
+    });
+    if (!aryPromise.length) {
+      return;
+    }
+    return Promise.all(aryPromise)
+      .then((resultArr) => {
+        let filesPromise: Promise<any>[] = [];
+        resultArr.forEach((result1) => {
+          //  上传文件，并添加id
+          res = result1;
+          filesPromise.push(
+            formService.getFile(res.d.ListItemAllFields.__deferred.uri),
+          );
+        });
+        return Promise.all(filesPromise)
+          .then((resultMiddleArr) => {
+            let resultMiddlePromise: Promise<any>[] = [];
+            resultMiddleArr.forEach((resultMiddle) => {
+              //  上传文件，并添加id
+              resultMiddlePromise.push(
+                formService.updateFileItem(resultMiddle, {
+                  ProcName: listName,
+                  ProcId: id,
+                  FieldName: fieldName,
+                  FileUrl: res.d.ServerRelativeUrl,
+                }),
+              );
+            });
+
+            return Promise.all(resultMiddlePromise)
+              .then(() => {
+                return true;
+              })
+              .catch((e) => {
+                message.error(e);
+                setLoading(false);
+                return e;
+              });
+          })
+          .catch((e) => {
+            message.error(e);
+            setLoading(false);
+            return e;
+          });
+      })
+      .catch((e) => {
+        message.error(e);
+        setLoading(false);
+        return e;
+      });
+  };
   useEffect(() => {
     if (!props.location.query?.ID) {
       return;
@@ -1455,6 +1517,7 @@ const index = (props: any) => {
           </Row>
         </Card>
         <ApprovalActions
+          applicationNo={applicationNo}
           formValidataion={onSubmit}
           setLoading={setLoading}
           callBack={(result: any) => {
@@ -1462,58 +1525,27 @@ const index = (props: any) => {
               setLoading(false);
               return;
             }
-            let _listFile = form.getFieldValue('file');
-            let res: any;
-            let aryPromise: Promise<any>[] = [];
-            _listFile.forEach((element: any) => {
-              if (element.originFileObj) {
-                aryPromise.push(
-                  formService.uploadFile(element.name, element.originFileObj),
-                );
-              }
-            });
-            if (!aryPromise.length) {
-              return;
-            }
-            Promise.all(aryPromise).then((resultArr) => {
-              let filesPromise: Promise<any>[] = [];
-              resultArr.forEach((result1) => {
-                //  上传文件，并添加id
-                res = result1;
-                filesPromise.push(
-                  formService.getFile(res.d.ListItemAllFields.__deferred.uri),
-                );
+            // 四种文件上传 file lessorFile certificateFile agreementFile
+            uploadFileMethods('file', result.ID)
+              ?.then((res) => {
+                return uploadFileMethods('lessorFile', result.ID);
+              })
+              .then((res1) => {
+                return uploadFileMethods('certificateFile', result.ID);
+              })
+              .then((res1) => {
+                return uploadFileMethods('agreementFile', result.ID);
+              })
+              .then((res) => {
+                setLoading(false);
+                message.success('Operate Success!');
+                window.location.href =
+                  'https://serviceme.sharepoint.com/sites/DPA_DEV_Community/SitePages/DPA.aspx#/dashboard';
+              })
+              .catch((e) => {
+                console.error(e);
+                setLoading(false);
               });
-              Promise.all(filesPromise)
-                .then((resultMiddleArr) => {
-                  let resultMiddlePromise: Promise<any>[] = [];
-                  resultMiddleArr.forEach((resultMiddle) => {
-                    //  上传文件，并添加id
-
-                    resultMiddlePromise.push(
-                      formService.updateFileItem(resultMiddle, {
-                        ProcName: listName,
-                        ProcId: result.ID,
-                      }),
-                    );
-                  });
-
-                  Promise.all(resultMiddlePromise).then(() => {
-                    setLoading(false);
-                    message.success('Operate Success!');
-                    window.location.href =
-                      'https://serviceme.sharepoint.com/sites/DPA_DEV_Community/SitePages/DPA.aspx#/dashboard';
-                  });
-                })
-                .catch((e) => {
-                  message.error(e);
-                  setLoading(false);
-                })
-                .catch((e) => {
-                  message.error(e);
-                  setLoading(false);
-                });
-            });
           }}
         ></ApprovalActions>
       </Form>

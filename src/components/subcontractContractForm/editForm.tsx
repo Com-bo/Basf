@@ -1376,6 +1376,7 @@ const index = (props: any) => {
         <ApprovalActions
           formValidataion={onSubmit}
           setLoading={setLoading}
+          applicationNo={applicationNo}
           callBack={(result: any) => {
             if (!result) {
               setLoading(false);
@@ -1416,6 +1417,7 @@ const index = (props: any) => {
                           ProcName: listName,
                           ProcId: result.ID,
                           FieldName: 'file',
+                          FileUrl: res.d.ServerRelativeUrl,
                         }),
                       );
                     });

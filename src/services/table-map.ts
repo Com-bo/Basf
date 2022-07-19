@@ -19,6 +19,12 @@ export const TableTypeMap: any = {
         CDSTable: 'FieldName',
         Type: 'Text',
       },
+      {
+        Key: 'FileUrl',
+        SPList: 'FileUrl',
+        CDSTable: 'FileUrl',
+        Type: 'Text',
+      },
     ],
   },
   SBU: {

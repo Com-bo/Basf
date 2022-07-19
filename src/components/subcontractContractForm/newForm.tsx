@@ -1361,6 +1361,7 @@ const index = () => {
                         ProcName: listName,
                         ProcId: result.ID,
                         FieldName: 'file',
+                        FileUrl: res.d.ServerRelativeUrl,
                       }),
                     );
                   });
