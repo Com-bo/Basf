@@ -648,6 +648,7 @@ const index = () => {
                             'SiteGM',
                             'HSE',
                             'HR',
+                            'Quality',
                           ];
                           let newData: any = {};
                           approvers.forEach((element: any) => {
@@ -669,6 +670,7 @@ const index = () => {
                             RegionalVP: '',
                             HR: '',
                             HSE: '',
+                            Quality: '',
                           });
                         }
                       }}
@@ -1373,7 +1375,43 @@ const index = () => {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
+                  <Form.Item
+                    name="Quality"
+                    label="Quality"
+                    rules={[{ required: true }]}
+                  >
+                    <Select placeholder="Please select" allowClear>
+                      {userList.map((item: any, index: number) => (
+                        <Select.Option value={item?.WorkEmail} key={index}>
+                          {item?.WorkEmail}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
                   <Form.Item name="HR" label="HR" rules={[{ required: true }]}>
+                    <Select placeholder="Please select" allowClear>
+                      {userList.map((item: any, index: number) => (
+                        <Select.Option value={item?.WorkEmail} key={index}>
+                          {item?.WorkEmail}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </>
+            ) : (
+              ''
+            )}
+            {leaseType == 'Lab site lease' ? (
+              <>
+                <Col span={12}>
+                  <Form.Item
+                    name="Quality"
+                    label="Quality"
+                    rules={[{ required: true }]}
+                  >
                     <Select placeholder="Please select" allowClear>
                       {userList.map((item: any, index: number) => (
                         <Select.Option value={item?.WorkEmail} key={index}>
