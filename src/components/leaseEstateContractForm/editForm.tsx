@@ -818,7 +818,7 @@ const index = (props: any) => {
                 <Col span={24}>
                   <div className="fileWrapper">
                     <Form.Item
-                      name="file"
+                      name="agreementFile"
                       valuePropName="fileList"
                       getValueFromEvent={(e: any) => {
                         if (Array.isArray(e)) {
@@ -1457,7 +1457,6 @@ const index = (props: any) => {
         <ApprovalActions
           formValidataion={onSubmit}
           setLoading={setLoading}
-          applicationNo={form.getFieldValue('Title')}
           callBack={(result: any) => {
             if (!result) {
               setLoading(false);

@@ -355,7 +355,7 @@ const index = (props: any) => {
                 <Col span={24}>
                   <div className="fileWrapper">
                     <Form.Item
-                      name="file"
+                      name="agreementFile"
                       valuePropName="fileList"
                       getValueFromEvent={(e: any) => {
                         if (Array.isArray(e)) {

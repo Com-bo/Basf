@@ -13,7 +13,12 @@ export const TableTypeMap: any = {
         Type: 'Text',
       },
       { Key: 'ProcId', SPList: 'ProcId', CDSTable: 'ProcId', Type: 'Text' },
-      // { Key: 'Title', SPList: 'Title', CDSTable: 'title', Type: 'Text' },
+      {
+        Key: 'FieldName',
+        SPList: 'FieldName',
+        CDSTable: 'FieldName',
+        Type: 'Text',
+      },
     ],
   },
   SBU: {

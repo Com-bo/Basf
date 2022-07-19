@@ -112,6 +112,7 @@ export default class FormService {
     let token: string = this._getToken();
     let listIndex: number[] = [];
     let filePropertysList: any[] = [];
+
     return this.getFilesProperty()
       .then((filePropertys) => {
         filePropertysList = filePropertys;
