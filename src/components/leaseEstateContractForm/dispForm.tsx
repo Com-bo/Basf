@@ -47,6 +47,7 @@ const index = (props: any) => {
         applicationNo,
         wfFlowName,
         listName,
+        setLoading,
       };
     });
   };
@@ -852,6 +853,8 @@ const index = (props: any) => {
         <ApprovalActions
           keyId={props.location.query?.Key}
           formValidataion={onSubmit}
+          setLoading={setLoading}
+          applicationNo={applicationNo}
           callBack={(result: any) => {
             setLoading(false);
             window.location.href =

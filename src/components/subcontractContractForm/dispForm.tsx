@@ -57,6 +57,7 @@ const index = (props: any) => {
         applicationNo,
         wfFlowName,
         listName,
+        setLoading,
       };
     });
   };

@@ -104,7 +104,7 @@ const index = () => {
       const drop5 = await formService.getTableDataAll('ContractAmountScope');
       setContractAmount(drop5);
       let drop8 = await formService.getUserList();
-      setUserList(drop8);
+      setUserList([...drop8.filter((item: any) => !!item.WorkEmail)]);
     } catch (error) {
       console.error(error);
     }
@@ -1403,6 +1403,7 @@ const index = () => {
         </Card>
         <ApprovalActions
           formValidataion={onSubmit}
+          setLoading={setLoading}
           callBack={(result: any) => {
             if (!result) {
               setLoading(false);

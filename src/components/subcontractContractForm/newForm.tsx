@@ -56,6 +56,7 @@ const index = () => {
         applicationNo: _no,
         wfFlowName,
         listName,
+        setLoading,
       };
     });
   };
@@ -168,6 +169,7 @@ const index = () => {
       });
       return;
     }
+    setLoading(true);
     return formService
       .getTableData(
         'BUList',
@@ -198,8 +200,11 @@ const index = () => {
           BU: '',
           ProductLine: '',
         });
+        setLoading(false);
       })
-      .catch((e) => {});
+      .catch((e) => {
+        setLoading(false);
+      });
   };
   // 通过entity获取bu
   const getBUByEntity = (_entity: string) => {
@@ -214,6 +219,7 @@ const index = () => {
       });
       return;
     }
+    setLoading(true);
     return formService
       .getTableData(
         'BUList',
@@ -245,8 +251,11 @@ const index = () => {
           SBU: '',
           ProductLine: '',
         });
+        setLoading(false);
       })
-      .catch((e) => {});
+      .catch((e) => {
+        setLoading(false);
+      });
   };
   const getSBUByBU = (_bu?: string) => {
     if (!_bu) {
@@ -258,6 +267,7 @@ const index = () => {
       });
       return;
     }
+    setLoading(true);
     return formService
       .getTableData(
         'BUList',
@@ -292,8 +302,11 @@ const index = () => {
           SBU: '',
           ProductLine: '',
         });
+        setLoading(false);
       })
-      .catch((e) => {});
+      .catch((e) => {
+        setLoading(false);
+      });
   };
   const getProLineBySBU = (_sbu?: string) => {
     if (!_sbu) {
@@ -301,6 +314,7 @@ const index = () => {
       setProOptions([]);
       return;
     }
+    setLoading(true);
     return formService
       .getTableData(
         'BUList',
@@ -338,8 +352,11 @@ const index = () => {
         form.setFieldsValue({
           ProductLine: '',
         });
+        setLoading(false);
       })
-      .catch((e) => {});
+      .catch((e) => {
+        setLoading(false);
+      });
   };
 
   const _getOps = async () => {
@@ -1308,6 +1325,7 @@ const index = () => {
         </Card>
         <ApprovalActions
           formValidataion={onSubmit}
+          setLoading={setLoading}
           callBack={(result: any) => {
             if (!result) {
               setLoading(false);

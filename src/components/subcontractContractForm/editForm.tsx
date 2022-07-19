@@ -73,6 +73,7 @@ const index = (props: any) => {
         applicationNo,
         wfFlowName,
         listName,
+        setLoading,
       };
     });
   };
@@ -186,6 +187,21 @@ const index = (props: any) => {
   };
   // 通过国家获取entity
   const getEntityByCountry = (_country: string) => {
+    if (!_country) {
+      setBVEntityOptions([]);
+      setBUOptions([]);
+      setSBUOptions([]);
+      setProOptions([]);
+      // 清空entity和sbu
+      form.setFieldsValue({
+        BVSigningEntity: '',
+        SBU: '',
+        BU: '',
+        ProductLine: '',
+      });
+      return;
+    }
+    setLoading(true);
     return formService
       .getTableData(
         'BUList',
@@ -216,11 +232,26 @@ const index = (props: any) => {
           BU: '',
           ProductLine: '',
         });
+        setLoading(false);
       })
-      .catch((e) => {});
+      .catch((e) => {
+        setLoading(false);
+      });
   };
   // 通过entity获取bu
   const getBUByEntity = (_entity: string) => {
+    if (!_entity) {
+      setBUOptions([]);
+      setSBUOptions([]);
+      setProOptions([]);
+      form.setFieldsValue({
+        BU: '',
+        SBU: '',
+        ProductLine: '',
+      });
+      return;
+    }
+    setLoading(true);
     return formService
       .getTableData(
         'BUList',
@@ -252,14 +283,23 @@ const index = (props: any) => {
           SBU: '',
           ProductLine: '',
         });
+        setLoading(false);
       })
-      .catch((e) => {});
+      .catch((e) => {
+        setLoading(false);
+      });
   };
   const getSBUByBU = (_bu?: string) => {
     if (!_bu) {
       setSBUOptions([]);
+      setProOptions([]);
+      form.setFieldsValue({
+        SBU: '',
+        ProductLine: '',
+      });
       return;
     }
+    setLoading(true);
     return formService
       .getTableData(
         'BUList',
@@ -294,14 +334,19 @@ const index = (props: any) => {
           SBU: '',
           ProductLine: '',
         });
+        setLoading(false);
       })
-      .catch((e) => {});
+      .catch((e) => {
+        setLoading(false);
+      });
   };
   const getProLineBySBU = (_sbu?: string) => {
     if (!_sbu) {
       setProOptions([]);
+      setProOptions([]);
       return;
     }
+    setLoading(true);
     return formService
       .getTableData(
         'BUList',
@@ -339,8 +384,11 @@ const index = (props: any) => {
         form.setFieldsValue({
           ProductLine: '',
         });
+        setLoading(false);
       })
-      .catch((e) => {});
+      .catch((e) => {
+        setLoading(false);
+      });
   };
 
   const _getOps = async () => {
@@ -1327,6 +1375,7 @@ const index = (props: any) => {
         </Card>
         <ApprovalActions
           formValidataion={onSubmit}
+          setLoading={setLoading}
           callBack={(result: any) => {
             if (!result) {
               setLoading(false);

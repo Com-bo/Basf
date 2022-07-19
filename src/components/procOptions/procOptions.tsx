@@ -79,6 +79,7 @@ const index = (props: IProps) => {
           okText: '确认发起',
           cancelText: '取消',
           onOk: async () => {
+            props?.setLoading(true);
             try {
               var spRes = await spService.submitBizForm(
                 res.listName,
@@ -88,7 +89,9 @@ const index = (props: IProps) => {
                 true,
               );
               props.callBack && props.callBack(spRes);
-            } catch (error) {}
+            } catch (error) {
+              props?.setLoading(false);
+            }
           },
         });
       }
