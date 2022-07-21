@@ -10,7 +10,7 @@ const _config: any = {
   },
 };
 export default function (props: any) {
-  const [title, setTitle] = useState('Procurement  Contract Application Form');
+  const [title, setTitle] = useState('Procurement Contract Application Form');
 
   useEffect(() => {
     let _key = props.location.pathname.slice(1);
