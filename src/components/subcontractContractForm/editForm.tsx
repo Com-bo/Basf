@@ -511,8 +511,8 @@ const index = (props: any) => {
       setHideProposedServicesConnection(true);
     }
   };
-  const requiredOtherPaymentTerm = () => {
-    if (form.getFieldValue('PaymentTerm') == 'others') {
+  const requiredOtherPaymentTerm = (rule: any, value: any) => {
+    if (form.getFieldValue('PaymentTerm') == 'others' && !value) {
       return Promise.reject(new Error('Please enter details'));
     } else {
       return Promise.resolve();
@@ -826,7 +826,7 @@ const index = (props: any) => {
                           Whether the proposed services provided by the
                           subcontractor will have any connection to any country
                           listed under BV Sanctions policy
-                          <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / ">
+                          <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / factory / importer / exporter is incorporated or located, d) the subcontractor used is incorporated or located, or e) any other significant connection">
                             <BellOutlined />
                           </Tooltip>
                         </>
@@ -1124,7 +1124,7 @@ const index = (props: any) => {
               >
                 <Radio.Group
                   onChange={(val: any) => {
-                    setFamilyMemberHere(val);
+                    setFamilyMemberHere(val.target.value);
                   }}
                 >
                   <Radio value={1}>Yes</Radio>
@@ -1177,9 +1177,9 @@ const index = (props: any) => {
                       <BellOutlined />
                     </Tooltip>
                     {getLevel(
-                      form.getFieldValue('UseMandatoryTemplate') === 0
+                      UseMandatoryTemplate === 0
                         ? 'High'
-                        : form.getFieldValue('UseMandatoryTemplate') === 1
+                        : UseMandatoryTemplate === 1
                         ? 'Low'
                         : '',
                     )}
@@ -1189,7 +1189,7 @@ const index = (props: any) => {
               >
                 <Radio.Group
                   onChange={(val: any) => {
-                    setUseMandatoryTemplate(val);
+                    setUseMandatoryTemplate(val.target.value);
                   }}
                 >
                   <Radio value={1}>Yes</Radio>
@@ -1197,18 +1197,22 @@ const index = (props: any) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                name="HasMaterialChanges"
-                label="Whether there is any material changes to any term of the agreement"
-                rules={[{ validator: validHasMaterialChanges }]}
-              >
-                <Radio.Group>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
+            {UseMandatoryTemplate == 1 ? (
+              <Col span={12}>
+                <Form.Item
+                  name="HasMaterialChanges"
+                  label="Whether there is any material changes to any term of the agreement"
+                  rules={[{ validator: validHasMaterialChanges }]}
+                >
+                  <Radio.Group>
+                    <Radio value={1}>Yes</Radio>
+                    <Radio value={0}>No</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            ) : (
+              ''
+            )}
             <Col span={24}>
               <div className="fileWrapper">
                 <Form.Item

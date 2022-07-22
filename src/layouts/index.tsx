@@ -13,7 +13,9 @@ export default function (props: any) {
   const [title, setTitle] = useState('Procurement Contract Application Form');
 
   useEffect(() => {
-    let _key = props.location.pathname.slice(1);
+    console.log(222);
+    console.log(props.location.pathname);
+    let _key = props.location.pathname.replace(process.env.routePath, '');
     if (_config[_key]) {
       setTitle(_config[_key]?.title);
     }

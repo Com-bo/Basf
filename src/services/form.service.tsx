@@ -150,7 +150,7 @@ export default class FormService {
             name: fields[index]['name'],
             status: 'done',
             url: fields[index]['url'],
-            thumbUrl: './file.png',
+            // thumbUrl: './file.png',
           });
         });
         return files;

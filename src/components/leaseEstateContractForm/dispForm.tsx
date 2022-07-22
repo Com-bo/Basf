@@ -394,9 +394,9 @@ const index = (props: any) => {
             <Col span={24}>
               <Form.Item name="PaymentTerm" label="Payment term">
                 <Radio.Group disabled>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                  <Radio value={-1}>No approved budget is required</Radio>
+                  <Radio value={1}>Monthly</Radio>
+                  <Radio value={0}>Quarterly</Radio>
+                  <Radio value={-1}>6 momths or thers</Radio>
                 </Radio.Group>
               </Form.Item>
             </Col>
@@ -675,17 +675,21 @@ const index = (props: any) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                name="HasMaterialChanges"
-                label="Whether there is any material changes to any term of the agreement"
-              >
-                <Radio.Group disabled>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
+            {form.getFieldValue('UseMandatoryTemplate') === 1 ? (
+              <Col span={12}>
+                <Form.Item
+                  name="HasMaterialChanges"
+                  label="Whether there is any material changes to any term of the agreement"
+                >
+                  <Radio.Group disabled>
+                    <Radio value={1}>Yes</Radio>
+                    <Radio value={0}>No</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            ) : (
+              ''
+            )}
             <Col span={24}>
               <div className="fileWrapper">
                 <Form.Item

@@ -851,9 +851,9 @@ const index = () => {
                 rules={[{ required: true, message: 'Please select' }]}
               >
                 <Radio.Group>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                  <Radio value={-1}>No approved budget is required</Radio>
+                  <Radio value={1}>Monthly</Radio>
+                  <Radio value={0}>Quarterly</Radio>
+                  <Radio value={-1}>6 momths or thers</Radio>
                 </Radio.Group>
               </Form.Item>
             </Col>
@@ -941,11 +941,15 @@ const index = () => {
             </Col>
             {depositAmount == 'Others' ? (
               <Col span={12}>
-                <Form.Item name="OthersDeposit" label="Others deposit amount">
-                  <InputNumber
+                <Form.Item
+                  name="OthersDeposit"
+                  label="Others deposit amount"
+                  rules={[{ required: true, message: 'Please input' }]}
+                >
+                  <Input
                     placeholder="Please input"
-                    min={0}
-                    style={{ width: '100%' }}
+                    // min={0}
+                    // style={{ width: '100%' }}
                   />
                 </Form.Item>
               </Col>
@@ -1189,7 +1193,7 @@ const index = () => {
               >
                 <Radio.Group
                   onChange={(val: any) => {
-                    setUseMandatoryTemplate(val);
+                    setUseMandatoryTemplate(val.target.value);
                   }}
                 >
                   <Radio value={1}>Yes</Radio>
@@ -1197,19 +1201,23 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                required={useMandatoryTemplate}
-                name="HasMaterialChanges"
-                label="Whether there is any material changes to any term of the agreement"
-                rules={[{ validator: validHasMaterialChanges }]}
-              >
-                <Radio.Group>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
+            {useMandatoryTemplate === 1 ? (
+              <Col span={12}>
+                <Form.Item
+                  required={useMandatoryTemplate}
+                  name="HasMaterialChanges"
+                  label="Whether there is any material changes to any term of the agreement"
+                  rules={[{ validator: validHasMaterialChanges }]}
+                >
+                  <Radio.Group>
+                    <Radio value={1}>Yes</Radio>
+                    <Radio value={0}>No</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            ) : (
+              ''
+            )}
             <Col span={24}>
               <div className="fileWrapper">
                 <Form.Item
@@ -1455,10 +1463,10 @@ const index = () => {
               .then((res1) => {
                 return uploadFileMethods('certificateFile', result.ID);
               })
-              .then((res1) => {
+              .then((res2) => {
                 return uploadFileMethods('agreementFile', result.ID);
               })
-              .then((res) => {
+              .then((res3) => {
                 setLoading(false);
                 message.success('Operate Success!');
                 window.location.href =

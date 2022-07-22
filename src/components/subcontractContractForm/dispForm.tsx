@@ -364,7 +364,7 @@ const index = (props: any) => {
                           Whether the proposed services provided by the
                           subcontractor will have any connection to any country
                           listed under BV Sanctions policy
-                          <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / ">
+                          <Tooltip title="A “connection” can mean the country where a) the services are performed, b) the product will be imported, c) the related client / manufacturer / factory / importer / exporter is incorporated or located, d) the subcontractor used is incorporated or located, or e) any other significant connection">
                             <BellOutlined />
                           </Tooltip>
                         </>
