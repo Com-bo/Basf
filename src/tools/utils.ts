@@ -9,3 +9,14 @@ export const getSerialNum = (type: string) => {
   }
   return type + moment().format('YYYYMMDD') + code;
 };
+
+export const parseQueryStringArgs = (queryString: string) => {
+  let result: any = {};
+  queryString = queryString.substring(1);
+  let re = /([^&=]+)=([^&]*)/g;
+  let m;
+  while ((m = re.exec(queryString))) {
+    result[m[1]] = m[2];
+  }
+  return result;
+};

@@ -40,11 +40,8 @@ const index = (props: any) => {
   const formService = new FormService();
   const [loading, setLoading] = useState(false);
   const onSubmit = () => {
-    // setLoading(true);
-    console.log(form.getFieldsValue());
     return form.validateFields().then((res) => {
       // 计算审批人
-
       const params = {
         ...form.getFieldsValue(),
         id: props.location.query?.ID,
@@ -463,8 +460,9 @@ const index = (props: any) => {
                   <>
                     Please describe why the subcontractor is needed{' '}
                     {getLevel(
-                      form.getFieldValue('NeededReason') !== 'Others' &&
-                        form.getFieldValue('NeededReason')
+                      form.getFieldValue('NeededReason') === 'Others'
+                        ? 'High'
+                        : form.getFieldValue('NeededReason')
                         ? 'Low'
                         : '',
                     )}{' '}
@@ -513,7 +511,7 @@ const index = (props: any) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            {form.getFieldValue('RequestService') ? (
+            {!form.getFieldValue('RequestService') ? (
               ''
             ) : (
               <Col span={24}>
@@ -686,17 +684,21 @@ const index = (props: any) => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                name="HasMaterialChanges"
-                label="Whether there is any material changes to any term of the agreement"
-              >
-                <Radio.Group disabled>
-                  <Radio value={1}>Yes</Radio>
-                  <Radio value={0}>No</Radio>
-                </Radio.Group>
-              </Form.Item>
-            </Col>
+            {form.getFieldValue('UseMandatoryTemplate') == 1 ? (
+              <Col span={12}>
+                <Form.Item
+                  name="HasMaterialChanges"
+                  label="Whether there is any material changes to any term of the agreement"
+                >
+                  <Radio.Group disabled>
+                    <Radio value={1}>Yes</Radio>
+                    <Radio value={0}>No</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+            ) : (
+              ''
+            )}
             <Col span={24}>
               <div className="fileWrapper">
                 <Form.Item
@@ -760,17 +762,25 @@ const index = (props: any) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item name="DataSecurity" label="Data Security">
-                <Select placeholder="Please select" allowClear disabled>
-                  {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.WorkEmail} key={index}>
-                      {item?.WorkEmail}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
+            {form.getFieldValue('ProcessInfo') == 1 ? (
+              <Col span={12}>
+                <Form.Item
+                  name="DataSecurity"
+                  label="Data Security"
+                  rules={[{ required: true, message: 'Please select' }]}
+                >
+                  <Select placeholder="Please select" allowClear>
+                    {userList.map((item: any, index: number) => (
+                      <Select.Option value={item?.WorkEmail} key={index}>
+                        {item?.WorkEmail}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            ) : (
+              ''
+            )}
             <Col span={12}>
               <Form.Item name="Legal" label="Legal">
                 <Select placeholder="Please select" allowClear disabled>

@@ -32,7 +32,6 @@ const index = () => {
   const formLink = 'http://bv_dpa.com:8001/subcontractContract?ID=';
   const wfFlowName = '6C941EF0-0464-088B-E2EF-7022F59C1CA5';
   const listName = 'SubContractContract';
-  const [applicationNo, setApplicationNo] = useState('');
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const formService = new FormService();
@@ -40,25 +39,39 @@ const index = () => {
   //获取流水号
 
   //#endregion
-  const onSubmit = () => {
-    return form.validateFields().then((res) => {
-      const params = {
-        ...form.getFieldsValue(),
-      };
-      let _no = getSerialNum('SC');
-      params.Title = _no;
-      // 审批人封装
-      delete params.file;
-      return {
+  const onSubmit = (validation?: boolean) => {
+    const params = {
+      ...form.getFieldsValue(),
+    };
+    let _no = getSerialNum('SC');
+    params.Title = _no;
+    // 审批人封装
+    delete params.file;
+    if (validation) {
+      return form
+        .validateFields()
+        .then((res) => {
+          return {
+            isOK: true,
+            formData: params,
+            formLink,
+            applicationNo: _no,
+            wfFlowName,
+            listName,
+            setLoading,
+          };
+        })
+        .catch((e) => e);
+    } else {
+      return Promise.resolve({
         isOK: true,
         formData: params,
         formLink,
-        applicationNo: _no,
         wfFlowName,
         listName,
         setLoading,
-      };
-    });
+      });
+    }
   };
 
   const [buOptions, setBUOptions] = useState<any>([]);
@@ -83,6 +96,7 @@ const index = () => {
     useState(null);
   const [UseMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   const [userList, setUserList] = useState<any>([]);
+  const [processInfo, setProcessInfo] = useState<any>();
   useEffect(() => {
     _getOps();
 
@@ -496,6 +510,68 @@ const index = () => {
       return Promise.resolve();
     }
   };
+  const uploadFileMethods = (fieldName: string, id: string | number) => {
+    let _listFile = form.getFieldValue(fieldName);
+    if (!_listFile) {
+      return Promise.resolve();
+    }
+    let res: any;
+    let aryPromise: Promise<any>[] = [];
+    _listFile.forEach((element: { name: string; originFileObj: File }) => {
+      aryPromise.push(
+        formService.uploadFile(element.name, element.originFileObj),
+      );
+    });
+    if (!aryPromise.length) {
+      return;
+    }
+    return Promise.all(aryPromise)
+      .then((resultArr) => {
+        let filesPromise: Promise<any>[] = [];
+        resultArr.forEach((result1) => {
+          //  上传文件，并添加id
+          res = result1;
+          filesPromise.push(
+            formService.getFile(res.d.ListItemAllFields.__deferred.uri),
+          );
+        });
+        return Promise.all(filesPromise)
+          .then((resultMiddleArr) => {
+            let resultMiddlePromise: Promise<any>[] = [];
+            resultMiddleArr.forEach((resultMiddle) => {
+              //  上传文件，并添加id
+              resultMiddlePromise.push(
+                formService.updateFileItem(resultMiddle, {
+                  ProcName: listName,
+                  ProcId: id,
+                  FieldName: fieldName,
+                  FileUrl: res.d.ServerRelativeUrl,
+                }),
+              );
+            });
+
+            return Promise.all(resultMiddlePromise)
+              .then(() => {
+                return true;
+              })
+              .catch((e) => {
+                message.error(e);
+                setLoading(false);
+                return e;
+              });
+          })
+          .catch((e) => {
+            message.error(e);
+            setLoading(false);
+            return e;
+          });
+      })
+      .catch((e) => {
+        message.error(e);
+        setLoading(false);
+        return e;
+      });
+  };
 
   return (
     <>
@@ -897,7 +973,13 @@ const index = () => {
                   <>
                     Please describe why the subcontractor is needed{' '}
                     <span className="dot_required">*</span>{' '}
-                    {getLevel(neededReason != 'Others' ? 'Low' : '')}{' '}
+                    {getLevel(
+                      neededReason == 'Others'
+                        ? 'High'
+                        : neededReason
+                        ? 'Low'
+                        : '',
+                    )}{' '}
                   </>
                 }
                 rules={[{ required: true, message: 'Please select' }]}
@@ -938,9 +1020,9 @@ const index = () => {
                     Did a BV customer or government official request the
                     service?<span className="dot_required">*</span>
                     {getLevel(
-                      requestService === 0
+                      requestService === 1
                         ? 'High'
-                        : requestService === 1
+                        : requestService === 0
                         ? 'Low'
                         : '',
                     )}
@@ -958,7 +1040,7 @@ const index = () => {
                 </Radio.Group>
               </Form.Item>
             </Col>
-            {requestService === 0 ? (
+            {requestService === 1 ? (
               <Col span={24}>
                 <Form.Item
                   name="Background"
@@ -1101,7 +1183,11 @@ const index = () => {
                 }
                 rules={[{ required: true, message: 'Please select' }]}
               >
-                <Radio.Group>
+                <Radio.Group
+                  onChange={(val) => {
+                    setProcessInfo(val.target.value);
+                  }}
+                >
                   <Radio value={1}>Yes</Radio>
                   <Radio value={0}>No</Radio>
                 </Radio.Group>
@@ -1243,17 +1329,25 @@ const index = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item name="DataSecurity" label="Data Security">
-                <Select placeholder="Please select" allowClear>
-                  {userList.map((item: any, index: number) => (
-                    <Select.Option value={item?.WorkEmail} key={index}>
-                      {item?.WorkEmail}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
+            {processInfo ? (
+              <Col span={12}>
+                <Form.Item
+                  name="DataSecurity"
+                  label="Data Security"
+                  rules={[{ required: true, message: 'Please select' }]}
+                >
+                  <Select placeholder="Please select" allowClear>
+                    {userList.map((item: any, index: number) => (
+                      <Select.Option value={item?.WorkEmail} key={index}>
+                        {item?.WorkEmail}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            ) : (
+              ''
+            )}
             <Col span={12}>
               <Form.Item
                 name="Legal"
@@ -1333,59 +1427,21 @@ const index = () => {
           callBack={(result: any) => {
             if (!result) {
               setLoading(false);
+
               return;
             }
-            let _listFile = form.getFieldValue('file');
-            let res: any;
-            let aryPromise: Promise<any>[] = [];
-            _listFile.forEach(
-              (element: { name: string; originFileObj: File }) => {
-                aryPromise.push(
-                  formService.uploadFile(element.name, element.originFileObj),
-                );
-              },
-            );
-            Promise.all(aryPromise).then((resultArr) => {
-              let filesPromise: Promise<any>[] = [];
-              resultArr.forEach((result1) => {
-                //  上传文件，并添加id
-                res = result1;
-                filesPromise.push(
-                  formService.getFile(res.d.ListItemAllFields.__deferred.uri),
-                );
+
+            uploadFileMethods('file', result.ID)
+              ?.then(() => {
+                setLoading(false);
+                message.success('Operate Success!');
+                window.location.href =
+                  'https://serviceme.sharepoint.com/sites/DPA_DEV_Community/SitePages/DPA.aspx#/dashboard';
+              })
+              .catch((e) => {
+                console.error(e);
+                setLoading(false);
               });
-              Promise.all(filesPromise)
-                .then((resultMiddleArr) => {
-                  let resultMiddlePromise: Promise<any>[] = [];
-                  resultMiddleArr.forEach((resultMiddle) => {
-                    //  上传文件，并添加id
-
-                    resultMiddlePromise.push(
-                      formService.updateFileItem(resultMiddle, {
-                        ProcName: listName,
-                        ProcId: result.ID,
-                        FieldName: 'file',
-                        FileUrl: res.d.ServerRelativeUrl,
-                      }),
-                    );
-                  });
-
-                  Promise.all(resultMiddlePromise).then(() => {
-                    setLoading(false);
-                    message.success('Operate Success!');
-                    window.location.href =
-                      'https://serviceme.sharepoint.com/sites/DPA_DEV_Community/SitePages/DPA.aspx#/dashboard';
-                  });
-                })
-                .catch((e) => {
-                  message.error(e);
-                  setLoading(false);
-                })
-                .catch((e) => {
-                  message.error(e);
-                  setLoading(false);
-                });
-            });
 
             // formService.uploadFile()
           }}

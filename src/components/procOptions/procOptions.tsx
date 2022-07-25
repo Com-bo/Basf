@@ -1,6 +1,7 @@
 import TextArea from 'antd/lib/input/TextArea';
 import React, { useState, useEffect } from 'react';
 import SpService from '@/services/sharepoint.service';
+import { parseQueryStringArgs } from '@/tools/utils';
 import {
   Button,
   Card,
@@ -35,7 +36,8 @@ const index = (props: IProps) => {
   const [form] = Form.useForm();
   const [comments, setComments] = useState('');
   const [buttons, setButtons] = useState(Array<string>());
-
+  const [showApproveBtn, setShowApproveBtn] = useState(false);
+  const [showRejectBtn, setShowRejectBtn] = useState(false);
   //获取按钮类型
   useEffect(() => {
     if (props.applicationNo) {
@@ -59,12 +61,22 @@ const index = (props: IProps) => {
       setButtons(['Submit', 'Save']);
     }
   }, [props]);
+  useEffect(() => {
+    let params = parseQueryStringArgs(window.location.search);
+    if (params.Btn) {
+      let btnArr = params.Btn.split('');
+      // 是否有approve
+      btnArr[0] && setShowApproveBtn(btnArr[0] === '1');
+      // 是否有reject
+      btnArr[1] && setShowRejectBtn(btnArr[1] === '1');
+    }
+  }, []);
 
   //#region   按钮事件
 
   //表单提交
   const onSubmit = async () => {
-    let res: IBForm = await props.formValidataion().catch((e: any) => {
+    let res: IBForm = await props.formValidataion(true).catch((e: any) => {
       console.error(e);
     });
     if (res?.isOK) {
@@ -75,9 +87,9 @@ const index = (props: IProps) => {
         // 需要生成applicarionno
         Modal.confirm({
           title: 'Tips',
-          content: '是否确认发起流程？',
-          okText: '确认发起',
-          cancelText: '取消',
+          content: 'Confirm the initiation process?',
+          okText: 'Confirm',
+          cancelText: 'Cancel',
           onOk: async () => {
             props?.setLoading(true);
             try {
@@ -131,9 +143,9 @@ const index = (props: IProps) => {
       if (res.isOK) {
         Modal.confirm({
           title: 'Tips',
-          content: '是否确认保存流程？',
-          okText: '确认保存',
-          cancelText: '取消',
+          content: 'Are you sure to save the process?',
+          okText: 'Confirm',
+          cancelText: 'Cancel',
           onOk: async () => {
             var spRes = await spService.submitBizForm(
               res.listName,
@@ -180,7 +192,7 @@ const index = (props: IProps) => {
           </Button>
           {/* 同意 */}
           <Button
-            hidden={buttons.indexOf('Approve') < 0}
+            hidden={buttons.indexOf('Approve') < 0 || !showApproveBtn}
             type="primary"
             onClick={() => {
               flowSubmit('Approve');
@@ -190,7 +202,7 @@ const index = (props: IProps) => {
           </Button>
           {/* 拒绝 */}
           <Button
-            hidden={buttons.indexOf('Reject') < 0}
+            hidden={buttons.indexOf('Reject') < 0 || !showRejectBtn}
             type="default"
             onClick={() => {
               flowSubmit('Reject');

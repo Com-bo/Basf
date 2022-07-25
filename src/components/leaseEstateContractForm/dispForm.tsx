@@ -33,13 +33,17 @@ const index = (props: any) => {
 
   //#endregion
 
-  const onSubmit = () => {
+  const onSubmit = (validation?: boolean) => {
     return form.validateFields().then((res) => {
       // 获取审批人
       const params = {
         ...form.getFieldsValue(),
+        id: props.location.query?.ID,
       };
       delete params.file;
+      delete params.lessorFile;
+      delete params.certificateFile;
+      delete params.agreementFile;
       return {
         isOK: true,
         formData: params,

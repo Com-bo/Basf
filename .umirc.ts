@@ -11,4 +11,20 @@ export default defineConfig({
     '@border-color-base': '#ebe8e5',
   },
   fastRefresh: {},
+  routes: [
+    {
+      path: '/sites/DPA_DEV_Community/SitePages/Form.aspx/',
+      component: '@/layouts/index',
+      routes: [
+        {
+          path: '/sites/DPA_DEV_Community/SitePages/Form.aspx/leaseEstateContract',
+          component: '@/pages/leaseEstateContract',
+        },
+        {
+          path: '/sites/DPA_DEV_Community/SitePages/Form.aspx/subcontractContract',
+          component: '@/pages/subcontractContract',
+        },
+      ],
+    },
+  ],
 });

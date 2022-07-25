@@ -37,26 +37,42 @@ const index = () => {
 
   //#endregion
 
-  const onSubmit = () => {
-    return form.validateFields().then((res) => {
-      const params = {
-        ...form.getFieldsValue(),
-      };
-      let _no = getSerialNum('LC');
-      params.Title = _no;
-      delete params.file;
-      delete params.lessorFile;
-      delete params.certificateFile;
-      delete params.agreementFile;
-      return {
+  const onSubmit = (validation?: boolean) => {
+    const params = {
+      ...form.getFieldsValue(),
+    };
+    let _no = getSerialNum('LC');
+    params.Title = _no;
+    // 审批人封装
+    delete params.file;
+    delete params.lessorFile;
+    delete params.certificateFile;
+    delete params.agreementFile;
+    if (validation) {
+      return form
+        .validateFields()
+        .then((res) => {
+          return {
+            isOK: true,
+            formData: params,
+            formLink,
+            applicationNo: _no,
+            wfFlowName,
+            listName,
+            setLoading,
+          };
+        })
+        .catch((e) => e);
+    } else {
+      return Promise.resolve({
         isOK: true,
         formData: params,
         formLink,
-        applicationNo: _no,
         wfFlowName,
         listName,
-      };
-    });
+        setLoading,
+      });
+    }
   };
   const [buOptions, setBUOptions] = useState<any>([]);
   const [sbuOptions, setSBUOptions] = useState<any>([]);
@@ -80,7 +96,7 @@ const index = () => {
   const [useMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   const [leaseType, setLeaseType] = useState<any>();
   const [userList, setUserList] = useState<any>([]);
-
+  const [leaseOrRenewal, setLeaseOrRenewal] = useState<any>();
   useEffect(() => {
     _getOps();
 
@@ -749,7 +765,11 @@ const index = () => {
                     label="New lease or renewal"
                     rules={[{ required: true, message: 'Please select' }]}
                   >
-                    <Radio.Group>
+                    <Radio.Group
+                      onChange={(val) => {
+                        setLeaseOrRenewal(val.target.value);
+                      }}
+                    >
                       <Radio value={0}>New Lease</Radio>
                       <Radio value={1}>Renewal</Radio>
                     </Radio.Group>
@@ -767,6 +787,7 @@ const index = () => {
                 <Col span={24}>
                   <div className="fileWrapper">
                     <Form.Item
+                      required={leaseOrRenewal === 1}
                       name="agreementFile"
                       valuePropName="fileList"
                       getValueFromEvent={(e: any) => {

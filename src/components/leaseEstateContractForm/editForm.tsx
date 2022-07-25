@@ -17,7 +17,6 @@ import {
 } from 'antd';
 import FormService from '@/services/form.service';
 import moment from 'moment';
-import spService from '@/services/sharepoint.service';
 import ApprovalActions from '@/components/procOptions/procOptions';
 import Loading from '@/components/loading/Loading';
 import { CloudUploadOutlined, BellOutlined } from '@ant-design/icons';
@@ -36,25 +35,39 @@ const index = (props: any) => {
   const formService = new FormService();
 
   //#endregion
-  const onSubmit = () => {
-    return form.validateFields().then((res) => {
-      const params = {
-        ...form.getFieldsValue(),
-      };
-      delete params.file;
-      delete params.lessorFile;
-      delete params.certificateFile;
-      delete params.agreementFile;
-      return {
+  const onSubmit = (validation?: boolean) => {
+    const params = {
+      ...form.getFieldsValue(),
+    };
+    delete params.file;
+    delete params.lessorFile;
+    delete params.certificateFile;
+    delete params.agreementFile;
+    if (validation) {
+      return form
+        .validateFields()
+        .then((res) => {
+          return {
+            isOK: true,
+            formData: params,
+            formLink,
+            applicationNo,
+            wfFlowName,
+            listName,
+            setLoading,
+          };
+        })
+        .catch((e) => e);
+    } else {
+      return Promise.resolve({
         isOK: true,
         formData: params,
         formLink,
-        applicationNo,
         wfFlowName,
         listName,
         setLoading,
-      };
-    });
+      });
+    }
   };
   const [buOptions, setBUOptions] = useState<any>([]);
   const [sbuOptions, setSBUOptions] = useState<any>([]);
@@ -78,6 +91,7 @@ const index = (props: any) => {
   const [useMandatoryTemplate, setUseMandatoryTemplate] = useState<any>();
   const [leaseType, setLeaseType] = useState<any>();
   const [userList, setUserList] = useState<any>([]);
+  const [leaseOrRenewal, setLeaseOrRenewal] = useState<any>();
   const uploadFileMethods = (fieldName: string, id: string | number) => {
     let _listFile = form.getFieldValue(fieldName);
     if (!_listFile) {
@@ -689,91 +703,31 @@ const index = (props: any) => {
                       placeholder="-----select--------"
                       onChange={(val) => {
                         if (val) {
-                          setLoading(true);
                           let _data: any = proOptions.find(
                             (item: any) => item.ProductLine == val,
                           );
                           let approvers = [
-                            'CFOStringId',
-                            'DataSecurityStringId',
-                            'CountryManagerGMStringId',
-                            'LegalStringId',
-                            'ProcurementStringId',
-                            'RegionalVPStringId',
-                            'FinanceControllerStringId',
-                            'SiteGMStringId',
-                            'HSEStringId',
-                            'HRStringId',
+                            'CFO',
+                            'DataSecurity',
+                            'CountryManagerGM',
+                            'Legal',
+                            'Procurement',
+                            'RegionalVP',
+                            'FinanceController',
+                            'SiteGM',
+                            'HSE',
+                            'HR',
+                            'Quality',
                           ];
-                          let aryPromise: Promise<any>[] = [];
-                          let approveDic: any = {};
+                          let newData: any = {};
                           approvers.forEach((element: any) => {
                             if (_data[element]) {
-                              let _key = element.replace('StringId', '');
-                              approveDic[_key] = aryPromise.length;
-                              aryPromise.push(
-                                formService.getUserById(_data[element]),
-                              );
+                              newData[element] = _data[element];
                             }
                           });
-                          Promise.all(aryPromise)
-                            .then((resLst) => {
-                              setLoading(false);
-                              form.setFieldsValue({
-                                CFOId:
-                                  approveDic['CFO'] || approveDic['CFO'] === 0
-                                    ? resLst[approveDic['CFO']][0]?.Id
-                                    : null,
-                                DataSecurityId:
-                                  approveDic['DataSecurity'] ||
-                                  approveDic['DataSecurity'] === 0
-                                    ? resLst[approveDic['DataSecurity']][0]?.Id
-                                    : null,
-                                LegalId:
-                                  approveDic['Legal'] ||
-                                  approveDic['Legal'] === 0
-                                    ? resLst[approveDic['Legal']][0]?.Id
-                                    : null,
-                                ProcurementId:
-                                  approveDic['Procurement'] ||
-                                  approveDic['Procurement'] === 0
-                                    ? resLst[approveDic['Procurement']][0]?.Id
-                                    : null,
-                                RegionalVPId:
-                                  approveDic['RegionalVP'] ||
-                                  approveDic['RegionalVP'] === 0
-                                    ? resLst[approveDic['RegionalVP']][0]?.Id
-                                    : null,
-                                FinanceControllerId:
-                                  approveDic['FinanceController'] ||
-                                  approveDic['FinanceController'] === 0
-                                    ? resLst[approveDic['FinanceController']][0]
-                                        ?.Id
-                                    : null,
-                                SiteGMId:
-                                  approveDic['SiteGM'] ||
-                                  approveDic['SiteGM'] === 0
-                                    ? resLst[approveDic['SiteGM']][0]?.Id
-                                    : null,
-                                CountryManagerGMId:
-                                  approveDic['CountryManagerGM'] ||
-                                  approveDic['CountryManagerGM'] === 0
-                                    ? resLst[approveDic['CountryManagerGM']][0]
-                                        ?.Id
-                                    : null,
-                                HSEId:
-                                  approveDic['HSE'] || approveDic['HSE'] === 0
-                                    ? resLst[approveDic['HSE']][0]?.Id
-                                    : null,
-                                HRId:
-                                  approveDic['HR'] || approveDic['HR'] === 0
-                                    ? resLst[approveDic['HR']][0]?.Id
-                                    : null,
-                              });
-                            })
-                            .catch((e) => {
-                              setLoading(false);
-                            });
+                          form.setFieldsValue({
+                            ...newData,
+                          });
                         } else {
                           form.setFieldsValue({
                             Procurement: '',
@@ -783,7 +737,9 @@ const index = (props: any) => {
                             SiteGM: '',
                             CountryManagerGM: '',
                             RegionalVP: '',
-                            CFO: '',
+                            HR: '',
+                            HSE: '',
+                            Quality: '',
                           });
                         }
                       }}
@@ -862,7 +818,11 @@ const index = (props: any) => {
                     label="New lease or renewal"
                     rules={[{ required: true, message: 'Please select' }]}
                   >
-                    <Radio.Group>
+                    <Radio.Group
+                      onChange={(val) => {
+                        setLeaseOrRenewal(val.target.value);
+                      }}
+                    >
                       <Radio value={0}>New Lease</Radio>
                       <Radio value={1}>Renewal</Radio>
                     </Radio.Group>
@@ -881,6 +841,7 @@ const index = (props: any) => {
                   <div className="fileWrapper">
                     <Form.Item
                       name="agreementFile"
+                      required={leaseOrRenewal === 1}
                       valuePropName="fileList"
                       getValueFromEvent={(e: any) => {
                         if (Array.isArray(e)) {
