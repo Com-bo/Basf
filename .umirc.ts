@@ -13,18 +13,18 @@ export default defineConfig({
   fastRefresh: {},
   routes: [
     {
-      path: '/sites/DPA_DEV_Community/SitePages/Form.aspx/',
-      component: '@/layouts/index',
-      routes: [
-        {
-          path: '/sites/DPA_DEV_Community/SitePages/Form.aspx/leaseEstateContract',
-          component: '@/pages/leaseEstateContract',
-        },
-        {
-          path: '/sites/DPA_DEV_Community/SitePages/Form.aspx/subcontractContract',
-          component: '@/pages/subcontractContract',
-        },
-      ],
+      exact: true,
+      path: '/',
+      redirect: '/home/index',
+    },
+    {
+      // path: '/generalPurchase',
+      path: '/home',
+      component: '@/pages/home',
+    },
+    {
+      path: '/home/index',
+      component: '@/pages/home/index',
     },
   ],
 });

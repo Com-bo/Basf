@@ -3,9 +3,9 @@ import styles from './index.less';
 import { Form, Input, Button } from 'antd';
 import SpService from '@/services/sharepoint.service';
 import moment from 'moment';
-import NewForm from '@/components/purchaseEquipment/newForm';
-import EditForm from '@/components/purchaseEquipment/editForm';
-import DispForm from '@/components/purchaseEquipment/dispForm';
+import NewForm from '@/components/generalPurchaseForm/newForm';
+import EditForm from '@/components/generalPurchaseForm/editForm';
+import DispForm from '@/components/generalPurchaseForm/dispForm';
 
 const index = (props: any) => {
   const getContent = () => {
@@ -22,7 +22,8 @@ const index = (props: any) => {
 
   useEffect(() => {}, []);
 
-  return <>{getContent()}</>;
+  // return <>{getContent()}</>;
+  return <div>111</div>;
 };
 
 export default index;
