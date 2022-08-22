@@ -459,6 +459,92 @@ export default class SharepointService {
         });
     }
   }
+  getTableDataAllNews(
+    listName: string,
+    filter: IFilter[],
+    expand: any[],
+    token: any,
+  ) {
+    let table = this.formatTable(listName);
+    if (table.expand) {
+      expand = expand.concat(table.expand).reduce((p: string[], c: string) => {
+        if (p.findIndex((e) => e === c) < 0) {
+          p.push(c);
+        }
+        return p;
+      }, []);
+    }
+    if (filter[0] && !filter[0].format) {
+      var queryPayload = {
+        query: {
+          // '__metadata': { 'type': 'SP.CamlQuery' },
+          ViewXml:
+            `<View Scope='RecursiveAll'>` +
+            `${filter ? this.formatFilterNew(filter, listName) : ''}` +
+            `</View>`,
+          // "ListItemCollectionPosition": {
+          //     "PagingInfo": "Paged=TRUE&p_ID=" + 1
+          // }
+        },
+      };
+      let url = `${process.env.host}${process.env.relativePath}/_api/web/lists/getbytitle('${table.name}')/getitems`;
+
+      return this._http
+        .post(url, {
+          headers: {
+            Accept: 'application/json;odata=verbose',
+            Authorization: `Bearer ${token}`,
+            'X-RequestDigest': this.formDigestValue,
+          },
+          data: queryPayload,
+        })
+        .then((response: any) => {
+          let res = response.data;
+          return res.d.results.map((e: any) => this.formatValue(e, listName));
+        });
+    } else {
+      let url =
+        `${process.env.host}${process.env.relativePath}/_api/web/lists/getbytitle('${table.name}')/items?` +
+        `$skiptoken=Paged=TRUE&p_ID=1&$top=${this.pageSize}` +
+        `&$select=*` +
+        `${expand ? this.formatExpand(expand, listName) : ''}` +
+        `${filter ? this.formatFilter(filter, listName) : ''}`;
+
+      return this._http
+        .get(url, {
+          headers: {
+            Accept: 'application/json;odata=verbose',
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(async (response: any) => {
+          let res = response.data;
+          let next = res.d.__next;
+          let list = res.d.results.map((e: any) =>
+            this.formatValue(e, listName),
+          );
+
+          while (next) {
+            let data = await this.getUrlNext(next, token).then((res: any) => {
+              let next = res.d.__next;
+              let list = res.d.results.map((e: any) =>
+                this.formatValue(e, listName),
+              );
+              return { list, next };
+            });
+            // .catch((error: any) => {
+            //     const { LogAction } = store.actions
+            //     LogAction.logError(error)
+            //     return Promise.reject(error);
+            // })
+            // console.log('data', data)
+            list = list.concat(data.list);
+            next = data.next;
+          }
+          return list;
+        });
+    }
+  }
 
   getTableDataFilter(
     listName: string,

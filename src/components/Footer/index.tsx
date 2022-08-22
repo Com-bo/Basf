@@ -7,8 +7,7 @@ import NewForm from '@/components/generalPurchaseForm/newForm';
 import EditForm from '@/components/generalPurchaseForm/editForm';
 import DispForm from '@/components/generalPurchaseForm/dispForm';
 
-import BasfHeader from '@/components/Header';
-
+import './style.less';
 import avatar from '@/assets/images/avatar.png';
 import { DownOutlined, RightOutlined, MinusOutlined } from '@ant-design/icons';
 import { getFileInfo } from 'prettier';
@@ -33,18 +32,45 @@ const index = (props: any) => {
 
   return (
     <>
-      <BasfHeader></BasfHeader>
-      <div className="headerArticle">
-        <img src={require('@/assets/images/header.png')} alt="" />
-        <div className="headerArticleWrap">
-          <div className="headerArticleText">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever.
+      <div className="header">
+        <div className="headerTitle">
+          <ul>
+            <li className="active">
+              <a>Home</a>
+            </li>
+            <li>
+              <a>Read IT</a>
+            </li>
+            <li>
+              <a>Event Calendar</a>
+            </li>
+            <li>
+              <a>Digital Academy</a>
+            </li>
+            <li>
+              <a>Solution Gallery</a>
+            </li>
+          </ul>
+          <div className="headerInfo">
+            <div className="headerAvatar">
+              <img src={avatar} alt="" />
+            </div>
+            <div className="headerName">Joe Zhou</div>
+            <DownOutlined style={{ color: '#ffffff' }} />
           </div>
-          <div className="headerArticleMore">
-            more
-            <RightOutlined />
+        </div>
+        <div className="headerArticle">
+          <img src={require('@/assets/images/header.png')} alt="" />
+          <div className="headerArticleWrap">
+            <div className="headerArticleText">
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever.
+            </div>
+            <div className="headerArticleMore">
+              more
+              <RightOutlined />
+            </div>
           </div>
         </div>
       </div>
@@ -121,13 +147,7 @@ const index = (props: any) => {
         </div>
         <div className="part">
           <div className="partLeft">
-            <div className="partTitle">
-              <div className="partTitleHeadLine">Event Calendar</div>
-              <div className="partTitleMore">
-                More
-                <RightOutlined />
-              </div>
-            </div>
+            <div className="partTitle">Event Calendar</div>
             <div className="partbox part2">
               <div className="partProWrap">
                 <div className="partProWrapItem">
@@ -310,12 +330,6 @@ const index = (props: any) => {
                 <div className="conversationInfo">
                   Hi,I am your G2D assistance,ask me something.
                 </div>
-              </div>
-            </div>
-            <div className="conversationEnter">
-              <textarea placeholder="Please Enter"></textarea>
-              <div>
-                <img src={require('@/assets/images/send.png')} alt="" />
               </div>
             </div>
           </div>

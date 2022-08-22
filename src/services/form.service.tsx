@@ -78,10 +78,10 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
-  getTableDataAll(listName: string) {
+  getTableDataAll(listName: string, filter: IFilter[]) {
     let token = this._getToken();
     return this._spService
-      .getTableDataAll(listName, [], [], token)
+      .getTableDataAllNews(listName, filter, [], token)
       .catch((error: any) => {
         // this._logService.logError(error)
         console.error(error);

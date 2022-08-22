@@ -1,6 +1,62 @@
 import Util from '@/common/util';
 
 export const TableTypeMap: any = {
+  // new
+  News: {
+    SPList: 'News',
+    CDSTable: 'News',
+    Fields: [
+      {
+        Key: 'Title',
+        SPList: 'Title',
+        CDSTable: 'Title',
+        Type: 'Text',
+      },
+      {
+        Key: 'Tag',
+        SPList: 'Tag',
+        CDSTable: 'Tag',
+        Type: 'Text',
+      },
+      {
+        Key: 'PublishDate',
+        SPList: 'PublishDate',
+        CDSTable: 'PublishDate',
+        Type: 'Text',
+      },
+      {
+        Key: 'OnTop',
+        SPList: 'OnTop',
+        CDSTable: 'OnTop',
+        Type: 'Text',
+      },
+      {
+        Key: 'DisplayImage',
+        SPList: 'DisplayImage',
+        CDSTable: 'DisplayImage',
+        Type: 'Text',
+      },
+      {
+        Key: 'Content',
+        SPList: 'Content',
+        CDSTable: 'Content',
+        Type: 'Text',
+      },
+    ],
+  },
+  Tag: {
+    SPList: 'Tag',
+    CDSTable: 'Tag',
+    Fields: [
+      {
+        Key: 'Title',
+        SPList: 'Title',
+        CDSTable: 'Title',
+        Type: 'Text',
+      },
+    ],
+  },
+  //
   ProcAttachList: {
     SPList: 'ProcAttachList',
     CDSTable: 'ProcAttachList',
@@ -2620,7 +2676,7 @@ export const TableTypeMap: any = {
         Type: 'User',
         expandProperties: {
           SPList: ['Title'],
-          CDSTable: ['fullname', 'internalemailaddress'],
+          CDSTable: ['fullname'],
         },
       },
       {

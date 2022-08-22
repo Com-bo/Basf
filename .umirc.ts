@@ -5,7 +5,7 @@ export default defineConfig({
     type: 'none',
   },
   theme: {
-    '@primary-color': '#bd1738',
+    '@primary-color': '#65ac1e',
     '@link-color': '#231f20',
     '@border-radius-base': '5px',
     '@border-color-base': '#ebe8e5',
@@ -18,13 +18,24 @@ export default defineConfig({
       redirect: '/home/index',
     },
     {
-      // path: '/generalPurchase',
-      path: '/home',
-      component: '@/pages/home',
-    },
-    {
       path: '/home/index',
       component: '@/pages/home/index',
+    },
+    {
+      path: '/readIT/index',
+      component: '@/pages/readIT/index',
+    },
+    {
+      path: '/EventCalendar/index',
+      component: '@/pages/EventCalendar/index',
+    },
+    {
+      path: '/DigitalAcademy/index',
+      component: '@/pages/DigitalAcademy/index',
+    },
+    {
+      path: '/SolutionGallery/index',
+      component: '@/pages/SolutionGallery/index',
     },
   ],
 });
