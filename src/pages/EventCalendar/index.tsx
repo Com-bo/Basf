@@ -29,23 +29,70 @@ import avatar from '@/assets/images/avatar.png';
 import type { MenuProps, DatePickerProps } from 'antd';
 import { DownOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
 import { getFileInfo } from 'prettier';
+import FormService from '@/services/form.service';
 const index = (props: any) => {
-  useEffect(() => {}, []);
+  const formService = new FormService();
+  const [newData, setNewData] = useState<any>([]);
+  const [showNews, setShowNews] = useState<any>([]);
+
   const onYearChange: DatePickerProps['onChange'] = (date, dateString) => {
     console.log(date, dateString);
     setYearData(moment(dateString, yearFormat));
   };
+
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };
+
   const onChange = (value: number) => {
     console.log('changed', value);
   };
+
   const [monthData, setMonthData] = useState([
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
   ]);
+
   const yearFormat = 'YYYY';
   const [yearData, setYearData] = useState(moment('2015', yearFormat));
+
+  const getWeek = (date: any) => {
+    let week = moment(date).day();
+    console.log(week);
+    switch (week) {
+      case 1:
+        return 'Sun';
+      case 2:
+        return 'Mon';
+      case 3:
+        return 'Tue';
+      case 4:
+        return 'Wed';
+      case 5:
+        return 'Thur';
+      case 6:
+        return 'Fri';
+      case 0:
+        return 'Sat';
+    }
+  };
+
+  //获取数据
+  const queryEventData = () => {
+    formService.getTableDataAll('Event', []).then((res) => {
+      console.log(res);
+      // const EventData=JSON.parse(JSON.stringify(res))
+      // EventData.map((item:any,index:any)=>{
+      //   item.StartTime=getWeek(item.StartTime)
+      // })
+      // console.log(EventData)
+      setNewData(res);
+      setShowNews(res);
+    });
+  };
+
+  useEffect(() => {
+    queryEventData();
+  }, []);
   return (
     <>
       <BasfHeader></BasfHeader>
@@ -64,7 +111,11 @@ const index = (props: any) => {
           />
           <Select style={{ width: 120 }} onChange={handleChange}>
             {monthData.map((item, index) => {
-              return <Option value={item}>{item}</Option>;
+              return (
+                <Option value={item} key={index}>
+                  {item}
+                </Option>
+              );
             })}
           </Select>
           {/* <InputNumber min={1} max={10} defaultValue={3} onChange={onChange} />
@@ -72,126 +123,20 @@ const index = (props: any) => {
         </div>
         <div className="part">
           <div className="partProWrap">
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
-            <div className="partProWrapItem">
-              <div className="partProWrapItemLeft">
-                <div>8</div>
-                <div>jun</div>
-              </div>
-              <div className="partProWrapItemRight">
-                <div>PAD SAP Scripts and Beginning</div>
-                <div>Tue, Jun 8, 09:30</div>
-              </div>
-            </div>
+            {showNews?.map((item: any, index: any) => {
+              return (
+                <div className="partProWrapItem" key={index}>
+                  <div className="partProWrapItemLeft">
+                    <div>8</div>
+                    <div>jun</div>
+                  </div>
+                  <div className="partProWrapItemRight">
+                    <div>{item.Title}</div>
+                    <div>Tue, Jun 8, 09:30 {getWeek(item.StartTime)}</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

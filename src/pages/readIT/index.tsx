@@ -19,19 +19,12 @@ const index = (props: any) => {
   const [showNews, setShowNews] = useState<any>([]);
   const [tagData, setTagData] = useState<any>([]);
   const [showTags, setShowTags] = useState(Array<any>());
-  const [searchTagData, setSearchTagData] = useState<any>([]);
-  const [newDataTagInput, setNewDataTagInput] = useState<String>('');
+  const [checkedTagValues, setCheckedTagValues] = useState<any>([]);
   const [seachTagStr, setSearchTagStr] = useState('');
-
-  // const _getTags = async () => {
-  //   try {
-  //     const TagOnline = await formService.getTableDataAll('Tag', []);
-  //     setTagData(TagOnline)
-  //     queryNewData();
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // };
+  const [seachTitleStr, setSeachTitleStr] = useState('');
+  const [seachTitleStrList, setSeachTitleStrList] = useState<any>(
+    JSON.parse(window.localStorage.getItem('seachTitleStrList') || '[]'),
+  );
 
   //获取tag
   const queryTags = () => {
@@ -49,29 +42,87 @@ const index = (props: any) => {
     });
   };
 
+  // 搜索标签
   const onTagSearch = () => {
-    setShowTags(tagData.filter((x: any) => x.Title.indexOf(seachTagStr) >= 0));
+    setShowTags(
+      tagData.filter(
+        (x: any) =>
+          x.Title.toLowerCase().indexOf(seachTagStr.toLowerCase()) >= 0,
+      ),
+    );
   };
 
-  const getTableDataAllPromise = (item: any) => {
-    return new Promise((resolve, reject) => {
-      formService
-        .getTableDataAll('News', [
-          {
-            type: 'filter eq',
-            value: item,
-            properties: ['Tag'],
-          },
-        ])
-        .then((res) => {
-          resolve(res);
-        });
-    });
+  // 标签搜索新闻
+  const onTagChange = (checkedValues: CheckboxValueType[]) => {
+    setCheckedTagValues(checkedValues);
   };
 
-  const tagSearch = async () => {};
-  const newDataTagInputClick = (e: any) => {
-    setNewDataTagInput(e.target.value);
+  // 标签和标题检索
+  const onTagTitleSearch = () => {
+    if (seachTitleStr) {
+      const newList = seachTitleStrList;
+      console.log(newList);
+      newList.unshift(seachTitleStr);
+
+      const newListded = [];
+      for (let i = 0; i < newList.length; i++) {
+        if (newListded.indexOf(newList[i]) == -1) {
+          newListded.push(newList[i]);
+        }
+      }
+
+      window.localStorage.setItem(
+        'seachTitleStrList',
+        JSON.stringify(newListded),
+      );
+      setSeachTitleStrList(newListded);
+    }
+
+    onTagTitleSearchChild();
+  };
+
+  // 检索函数
+  const onTagTitleSearchChild = () => {
+    if (checkedTagValues.length) {
+      if (seachTitleStr) {
+        setShowNews(
+          newData
+            .filter((x: any) => checkedTagValues.indexOf(x.Tag) >= 0)
+            .filter(
+              (y: any) =>
+                y.Title.toLowerCase().indexOf(seachTitleStr.toLowerCase()) >= 0,
+            ),
+        );
+      } else {
+        setShowNews(
+          newData.filter((x: any) => checkedTagValues.indexOf(x.Tag) >= 0),
+        );
+      }
+    } else {
+      if (seachTitleStr) {
+        setShowNews(
+          newData.filter(
+            (y: any) =>
+              y.Title.toLowerCase().indexOf(seachTitleStr.toLowerCase()) >= 0,
+          ),
+        );
+      } else {
+        setShowNews(newData);
+      }
+    }
+  };
+
+  // 搜索记录
+  const delSearchTitle = (e: any, index: any) => {
+    e.stopPropagation();
+    const newList = seachTitleStrList;
+    newList.splice(index, 1);
+    window.localStorage.setItem('seachTitleStrList', JSON.stringify(newList));
+    setSeachTitleStrList([...newList]);
+  };
+
+  const onSearchTitle = (item: any) => {
+    setSeachTitleStr(item);
   };
 
   useEffect(() => {
@@ -82,19 +133,16 @@ const index = (props: any) => {
   useEffect(() => {
     if (seachTagStr == '') {
       setShowTags(tagData);
-    } else {
-      setShowTags(
-        tagData.filter((x: any) => x.Title.indexOf(seachTagStr) >= 0),
-      );
     }
   }, [seachTagStr]);
 
-  const onChange = (checkedValues: CheckboxValueType[]) => {
-    setShowNews(newData.filter((x: any) => checkedValues.indexOf(x.Tag) >= 0));
-    if (!checkedValues.length) {
-      setShowNews(newData);
-    }
-  };
+  useEffect(() => {
+    onTagTitleSearch();
+  }, [checkedTagValues]);
+
+  useEffect(() => {
+    onTagTitleSearchChild();
+  }, [seachTitleStr]);
 
   return (
     <>
@@ -120,7 +168,10 @@ const index = (props: any) => {
             </div>
             <div className="partbox">
               <div className="part1">
-                <Checkbox.Group style={{ width: '100%' }} onChange={onChange}>
+                <Checkbox.Group
+                  style={{ width: '100%' }}
+                  onChange={onTagChange}
+                >
                   <Row>
                     {showTags?.map((item: any, index: any) => {
                       return (
@@ -136,22 +187,36 @@ const index = (props: any) => {
           </div>
           <div className="partRight">
             <div className="search">
-              <input type="text" placeholder="Search" />
-              <img src={require('@/assets/images/search.png')} alt="" />
+              <Input
+                value={seachTitleStr}
+                placeholder="Search"
+                onChange={(e) => setSeachTitleStr(e.target.value)}
+              ></Input>
+              <img
+                onClick={onTagTitleSearch}
+                src={require('@/assets/images/search.png')}
+                alt=""
+              />
             </div>
             <div className="searchList">
-              <span className="item">
-                AAAAAAA <CloseOutlined />
-              </span>
-              <span className="item">
-                AAAAAAA <CloseOutlined />
-              </span>
-              <span className="item">
-                AAAAAAA <CloseOutlined />
-              </span>
-              <span className="item">
-                AAAAAAA <CloseOutlined />
-              </span>
+              {seachTitleStrList?.map((item: any, index: any) => {
+                return (
+                  <span
+                    className="item"
+                    key={index}
+                    onClick={() => {
+                      onSearchTitle(item);
+                    }}
+                  >
+                    {item}{' '}
+                    <CloseOutlined
+                      onClick={(e) => {
+                        delSearchTitle(e, index);
+                      }}
+                    />
+                  </span>
+                );
+              })}
             </div>
             <div className="partbox part1">
               <div className="partProWrap">

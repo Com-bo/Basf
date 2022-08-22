@@ -44,6 +44,60 @@ export const TableTypeMap: any = {
       },
     ],
   },
+  Event: {
+    SPList: 'Event',
+    CDSTable: 'Event',
+    Fields: [
+      {
+        Key: 'Title',
+        SPList: 'Title',
+        CDSTable: 'Title',
+        Type: 'Text',
+      },
+      {
+        Key: 'StartTime',
+        SPList: 'StartTime',
+        CDSTable: 'StartTime',
+        Type: 'Text',
+      },
+      {
+        Key: 'EndTime',
+        SPList: 'EndTime',
+        CDSTable: 'EndTime',
+        Type: 'Text',
+      },
+      {
+        Key: 'AllDataEvent',
+        SPList: 'AllDataEvent',
+        CDSTable: 'AllDataEvent',
+        Type: 'Text',
+      },
+      {
+        Key: 'Location',
+        SPList: 'Location',
+        CDSTable: 'Location',
+        Type: 'Text',
+      },
+      {
+        Key: 'Link',
+        SPList: 'Link',
+        CDSTable: 'Link',
+        Type: 'Text',
+      },
+      {
+        Key: 'Description',
+        SPList: 'Description',
+        CDSTable: 'Description',
+        Type: 'Text',
+      },
+      {
+        Key: 'Hot',
+        SPList: 'Hot',
+        CDSTable: 'Hot',
+        Type: 'Text',
+      },
+    ],
+  },
   Tag: {
     SPList: 'Tag',
     CDSTable: 'Tag',
