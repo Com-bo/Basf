@@ -10,26 +10,108 @@ import DispForm from '@/components/generalPurchaseForm/dispForm';
 import BasfHeader from '@/components/Header';
 
 import avatar from '@/assets/images/avatar.png';
+import FormService from '@/services/form.service';
 import { DownOutlined, RightOutlined, MinusOutlined } from '@ant-design/icons';
 import { getFileInfo } from 'prettier';
 const index = (props: any) => {
+  const formService = new FormService();
   const [robotMark, setRobotMark] = useState(true);
-  const getContent = () => {
-    console.log(props);
-    switch (props?.location?.query?.Action) {
-      case 'New':
-        return <NewForm />;
-      case 'Edit':
-        return <EditForm />;
-      case 'View':
-        return <DispForm {...props} />;
+  const [newData, setNewData] = useState<any>([]);
+  const [showNews, setShowNews] = useState<any>([]);
+  const [tagData, setTagData] = useState<any>([]);
+  const [showTags, setShowTags] = useState(Array<any>());
+  const [eventData, setEventData] = useState<any>([]);
+  const [showEvent, setShowEvent] = useState(Array<any>());
+  //获取tag
+  const queryTags = () => {
+    formService.getTableDataAll('Tag', []).then((res) => {
+      setTagData(res);
+      setShowTags(res);
+    });
+  };
+
+  //获取新闻信息
+  const queryNewData = () => {
+    formService.getTableDataAll('News', []).then((res) => {
+      setNewData(res);
+      setShowNews(res.slice(0, 4));
+    });
+  };
+
+  //获取活动数据
+  const queryEventData = () => {
+    formService.getTableDataAll('Event', []).then((res) => {
+      setEventData(res);
+      setShowEvent(res.slice(0, 4));
+    });
+  };
+  const getWeek = (date: any) => {
+    let week = moment(date).day();
+    switch (week) {
+      case 0:
+        return 'Sun';
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thur';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
     }
   };
+
+  const getMonth = (date: any) => {
+    let month = moment(date).format('MM');
+    switch (month) {
+      case '01':
+        return 'Jan';
+      case '02':
+        return 'Feb';
+      case '03':
+        return 'Mar';
+      case '04':
+        return 'Apr';
+      case '05':
+        return 'May';
+      case '06':
+        return 'Jun';
+      case '07':
+        return 'Jul';
+      case '08':
+        return 'Aug';
+      case '09':
+        return 'Sept';
+      case '10':
+        return 'Oct';
+      case '11':
+        return 'Nov';
+      case '12':
+        return 'Dec';
+    }
+  };
+
+  const getDate = (date: any) => {
+    return moment(date).format('DD');
+  };
+
+  const getTime = (date: any) => {
+    return moment(date).format('HH:mm');
+  };
+
   const getInfo = () => {
     var Flag = !robotMark;
     setRobotMark(Flag);
   };
-  useEffect(() => {}, []);
+  useEffect(() => {
+    queryTags();
+    queryNewData();
+    queryEventData();
+  }, []);
 
   return (
     <>
@@ -54,43 +136,22 @@ const index = (props: any) => {
             <div className="partTitle">Read IT</div>
             <div className="partbox part1">
               <div className="partProWrap">
-                <div className="partProWrapItem">
-                  <img src={require('@/assets/images/pro1.png')} alt="" />
-                  <div className="partProWrapItemWrap">
-                    <div className="partProWrapItemTitle">
-                      BASF researchers receive R&D award
+                {showNews?.map((item: any, index: any) => {
+                  return (
+                    <div className="partProWrapItem">
+                      <img src={require('@/assets/images/pro1.png')} alt="" />
+                      <div className="partProWrapItemWrap">
+                        <div className="partProWrapItemTitle">{item.Title}</div>
+                        <div className="partProWrapItemTitleDate">
+                          {item.PublishDate &&
+                          moment(item.PublishDate).isValid()
+                            ? moment(item.PublishDate).format('YYYY-MM-DD')
+                            : item.PublishDate}
+                        </div>
+                      </div>
                     </div>
-                    <div className="partProWrapItemTitleDate">2022-07-02</div>
-                  </div>
-                </div>
-                <div className="partProWrapItem">
-                  <img src={require('@/assets/images/pro1.png')} alt="" />
-                  <div className="partProWrapItemWrap">
-                    <div className="partProWrapItemTitle">
-                      BASF researchers receive R&D award BASF researchers
-                      receive R&D award
-                    </div>
-                    <div className="partProWrapItemTitleDate">2022-07-02</div>
-                  </div>
-                </div>
-                <div className="partProWrapItem">
-                  <img src={require('@/assets/images/pro1.png')} alt="" />
-                  <div className="partProWrapItemWrap">
-                    <div className="partProWrapItemTitle">
-                      BASF researchers receive R&D award
-                    </div>
-                    <div className="partProWrapItemTitleDate">2022-07-02</div>
-                  </div>
-                </div>
-                <div className="partProWrapItem">
-                  <img src={require('@/assets/images/pro1.png')} alt="" />
-                  <div className="partProWrapItemWrap">
-                    <div className="partProWrapItemTitle">
-                      BASF researchers receive R&D award
-                    </div>
-                    <div className="partProWrapItemTitleDate">2022-07-02</div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -98,23 +159,13 @@ const index = (props: any) => {
             <div className="partTitle">Read IT Tags</div>
             <div className="partbox">
               <div className="part1">
-                <div className="partpro">Power BI</div>
-                <div className="partpro">SAP</div>
-
-                <div className="partpro">SAP</div>
-
-                <div className="partpro">Power BI</div>
-
-                <div className="partpro">Power BI</div>
-                <div className="partpro">SAP</div>
-
-                <div className="partpro">SAP</div>
-                <div className="partpro">Power BI</div>
-                <div className="partpro">Power BI</div>
-                <div className="partpro">SAP</div>
-                <div className="partpro">SAP</div>
-                <div className="partpro">Power BI</div>
-                <div className="partpro">Power BI</div>
+                {showTags?.map((item: any, index: any) => {
+                  return (
+                    <div className="partpro" key={index}>
+                      {item.Title}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -130,48 +181,29 @@ const index = (props: any) => {
             </div>
             <div className="partbox part2">
               <div className="partProWrap">
-                <div className="partProWrapItem">
-                  <div className="partProWrapItemLeft">
-                    <div>8</div>
-                    <div>jun</div>
-                  </div>
-                  <div className="partProWrapItemRight">
-                    <div>PAD SAP Scripts and Beginning</div>
-                    <div>Tue, Jun 8, 09:30</div>
-                  </div>
-                </div>
-                <div className="partProWrapItem">
-                  <div className="partProWrapItemLeft">
-                    <div>8</div>
-                    <div>jun</div>
-                  </div>
-                  <div className="partProWrapItemRight">
-                    <div>PAD SAP Scripts and Beginning</div>
-                    <div>Tue, Jun 8, 09:30</div>
-                  </div>
-                </div>
-                <div className="partProWrapItem">
-                  <div className="partProWrapItemLeft">
-                    <div>8</div>
-                    <div>jun</div>
-                  </div>
-                  <div className="partProWrapItemRight">
-                    <div>PAD SAP Scripts and Beginning</div>
-                    <div>Tue, Jun 8, 09:30</div>
-                  </div>
-                </div>
-                <div className="partProWrapItem">
-                  <div className="partProWrapItemLeft">
-                    <div>8</div>
-                    <div>jun</div>
-                  </div>
-                  <div className="partProWrapItemRight">
-                    <div>PAD SAP Scripts and Beginning</div>
-                    <div>Tue, Jun 8, 09:30</div>
-                  </div>
-                </div>
+                {showEvent?.map((item: any, index: any) => {
+                  return (
+                    <div className="partProWrapItem" key={index}>
+                      {item.Hot ? (
+                        <img src={require('@/assets/images/Hot.png')} alt="" />
+                      ) : (
+                        ''
+                      )}
+                      <div className="partProWrapItemLeft">
+                        <div>{getDate(item.StartTime)}</div>
+                        <div>{getMonth(item.StartTime)}</div>
+                      </div>
+                      <div className="partProWrapItemRight">
+                        <div>{item.Title}</div>
+                        <div>
+                          {getWeek(item.StartTime)},{getMonth(item.StartTime)}{' '}
+                          {getDate(item.StartTime)},{getTime(item.StartTime)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
               <div className="partOperate">
                 <div className="partOperateItem">
                   <img
@@ -181,8 +213,10 @@ const index = (props: any) => {
                   />
                   <div className="partOperateTitle">
                     <div className="partOperateTit">Solution Gallery</div>
+                    <a href="">
+                      Click To View <RightOutlined />{' '}
+                    </a>
                     <div className="search">
-                      <input type="text" />
                       <img src={require('@/assets/images/serach.png')} alt="" />
                     </div>
                   </div>
@@ -194,80 +228,39 @@ const index = (props: any) => {
                     alt=""
                   />
                   <div className="partOperateTitle">
-                    <div className="partOperateText">
-                      <div className="partOperateTextItem">
-                        <img
-                          src={require('@/assets/images/icon2.png')}
-                          alt=""
-                        />
-                        <div>Trainer Pool</div>
-                      </div>
-                      <div className="partOperateTextItem">
-                        <img
-                          src={require('@/assets/images/icon1.png')}
-                          alt=""
-                        />
-                        <div>Course Management</div>
-                      </div>
-                    </div>
+                    <img src={require('@/assets/images/logo.png')} alt="" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
           <div className="partRight">
-            <div className="partTitle">Yammer</div>
+            <div className="partTitle">Chatbot</div>
             <div className="partbox">
               <div className="part2">
-                <textarea name=""></textarea>
-                <div className="buttonWrap">
-                  <Space>
-                    Add:
-                    <img src={require('@/assets/images/aite.png')} alt="" />
-                    <img src={require('@/assets/images/lianjie.png')} alt="" />
-                    <img src={require('@/assets/images/tupian.png')} alt="" />
-                  </Space>
-                  <div className="updateButton">Update</div>
-                </div>
-                <div className="commentBox">
-                  <div className="comment mainComment">
-                    <div className="commentLeft">
-                      <img src={avatar} alt="" />
-                    </div>
-                    <div className="commentRight">
-                      <div className="commentName">Jasmine Sokko:</div>
-                      <div className="commentTitle">
-                        How to set the font of the email body?
+                <div className="qaInfoArticle">
+                  <img
+                    className="robotName"
+                    src={require('@/assets/images/robot1.png')}
+                    alt=""
+                  />
+                  <div className="qaInfoTime">3:18</div>
+                  <div className="conversationList">
+                    <div className="conversation conversationYou">
+                      <div className="conversationInfo">
+                        Hi,I am your G2D ,ask me something.
                       </div>
-                      <div className="commentInfo">
-                        <div className="datewrap">
-                          <div className="date">8 hours ago</div>
-                          <div className="Reply">Reply</div>
-                        </div>
-                        <div>
-                          <img
-                            src={require('@/assets/images/share.png')}
-                            alt=""
-                          />
-                        </div>
+                    </div>
+                    <div className="conversation conversationMe">
+                      <div className="conversationInfo">
+                        Hi,I am your G2D ,ask me something.
                       </div>
                     </div>
                   </div>
-                  <div className="comment defaultComment">
-                    <div className="commentLeft">
-                      <img src={avatar} alt="" />
-                    </div>
-                    <div className="commentRight">
-                      <div className="commentName">Jasmine Sokko:</div>
-                      <div className="commentTitle">
-                        How to set the font of the email body?
-                      </div>
-                      <div className="commentInfo">
-                        <div className="datewrap">
-                          <div className="date">8 hours ago</div>
-                          <div className="Reply">Reply</div>
-                        </div>
-                      </div>
+                  <div className="conversationEnter">
+                    <textarea placeholder="Please Enter"></textarea>
+                    <div>
+                      <img src={require('@/assets/images/send.png')} alt="" />
                     </div>
                   </div>
                 </div>
@@ -276,15 +269,15 @@ const index = (props: any) => {
           </div>
         </div>
       </div>
-      {robotMark ? (
+      {/* {robotMark ? (
         <div className="robotDiv" onClick={getInfo}>
           <img src={require('@/assets/images/robot.png')} alt="" />
         </div>
       ) : (
         ''
-      )}
+      )} */}
 
-      {robotMark ? (
+      {/* {robotMark ? (
         ''
       ) : (
         <div className="qaInfo">
@@ -320,7 +313,7 @@ const index = (props: any) => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 };

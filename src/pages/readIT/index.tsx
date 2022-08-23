@@ -22,9 +22,6 @@ const index = (props: any) => {
   const [checkedTagValues, setCheckedTagValues] = useState<any>([]);
   const [seachTagStr, setSearchTagStr] = useState('');
   const [seachTitleStr, setSeachTitleStr] = useState('');
-  const [seachTitleStrList, setSeachTitleStrList] = useState<any>(
-    JSON.parse(window.localStorage.getItem('seachTitleStrList') || '[]'),
-  );
 
   //获取tag
   const queryTags = () => {
@@ -58,30 +55,6 @@ const index = (props: any) => {
   };
 
   // 标签和标题检索
-  const onTagTitleSearch = () => {
-    if (seachTitleStr) {
-      const newList = seachTitleStrList;
-      console.log(newList);
-      newList.unshift(seachTitleStr);
-
-      const newListded = [];
-      for (let i = 0; i < newList.length; i++) {
-        if (newListded.indexOf(newList[i]) == -1) {
-          newListded.push(newList[i]);
-        }
-      }
-
-      window.localStorage.setItem(
-        'seachTitleStrList',
-        JSON.stringify(newListded),
-      );
-      setSeachTitleStrList(newListded);
-    }
-
-    onTagTitleSearchChild();
-  };
-
-  // 检索函数
   const onTagTitleSearchChild = () => {
     if (checkedTagValues.length) {
       if (seachTitleStr) {
@@ -115,10 +88,9 @@ const index = (props: any) => {
   // 搜索记录
   const delSearchTitle = (e: any, index: any) => {
     e.stopPropagation();
-    const newList = seachTitleStrList;
+    const newList = checkedTagValues;
     newList.splice(index, 1);
-    window.localStorage.setItem('seachTitleStrList', JSON.stringify(newList));
-    setSeachTitleStrList([...newList]);
+    setCheckedTagValues([...newList]);
   };
 
   const onSearchTitle = (item: any) => {
@@ -134,11 +106,8 @@ const index = (props: any) => {
     if (seachTagStr == '') {
       setShowTags(tagData);
     }
+    onTagSearch();
   }, [seachTagStr]);
-
-  useEffect(() => {
-    onTagTitleSearch();
-  }, [checkedTagValues]);
 
   useEffect(() => {
     onTagTitleSearchChild();
@@ -158,7 +127,9 @@ const index = (props: any) => {
               <Input
                 value={seachTagStr}
                 placeholder="Search"
-                onChange={(e) => setSearchTagStr(e.target.value)}
+                onChange={(e) => {
+                  setSearchTagStr(e.target.value);
+                }}
               ></Input>
               <img
                 onClick={onTagSearch}
@@ -193,13 +164,13 @@ const index = (props: any) => {
                 onChange={(e) => setSeachTitleStr(e.target.value)}
               ></Input>
               <img
-                onClick={onTagTitleSearch}
+                onClick={onTagTitleSearchChild}
                 src={require('@/assets/images/search.png')}
                 alt=""
               />
             </div>
             <div className="searchList">
-              {seachTitleStrList?.map((item: any, index: any) => {
+              {checkedTagValues?.map((item: any, index: any) => {
                 return (
                   <span
                     className="item"

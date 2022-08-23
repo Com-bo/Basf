@@ -15,6 +15,7 @@ import {
   Col,
   Row,
 } from 'antd';
+const { RangePicker } = DatePicker;
 const { Option } = Select;
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 import SpService from '@/services/sharepoint.service';
@@ -34,65 +35,140 @@ const index = (props: any) => {
   const formService = new FormService();
   const [newData, setNewData] = useState<any>([]);
   const [showNews, setShowNews] = useState<any>([]);
-
-  const onYearChange: DatePickerProps['onChange'] = (date, dateString) => {
-    console.log(date, dateString);
-    setYearData(moment(dateString, yearFormat));
-  };
-
-  const handleChange = (value: string) => {
-    console.log(`selected ${value}`);
-  };
-
-  const onChange = (value: number) => {
-    console.log('changed', value);
-  };
-
-  const [monthData, setMonthData] = useState([
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-  ]);
-
   const yearFormat = 'YYYY';
-  const [yearData, setYearData] = useState(moment('2015', yearFormat));
+  const [monthData, setMonthData] = useState([
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
+    '08',
+    '09',
+    '10',
+    '11',
+    '12',
+  ]);
+  const [yearDataCurrent, setYearDataCurrent] = useState(
+    moment(`${moment().year()}`, yearFormat),
+  );
+  const [monthDataCurrent, setMonthDataCurrent] = useState(monthData[0]);
+  const [dateDataCurrent, setDateDataCurrent] = useState();
+  const [dateDataCurrent1, setDateDataCurrent1] = useState();
+
+  const onYearChange: DatePickerProps['onChange'] = (
+    date: any,
+    dateString: any,
+  ) => {
+    setYearDataCurrent(date);
+  };
+
+  const onMonthChange = (value: any) => {
+    setMonthDataCurrent(value);
+  };
+
+  const onDateChange = (value: any, date: any) => {
+    setDateDataCurrent(value);
+    setDateDataCurrent1(date);
+  };
 
   const getWeek = (date: any) => {
     let week = moment(date).day();
-    console.log(week);
     switch (week) {
-      case 1:
-        return 'Sun';
-      case 2:
-        return 'Mon';
-      case 3:
-        return 'Tue';
-      case 4:
-        return 'Wed';
-      case 5:
-        return 'Thur';
-      case 6:
-        return 'Fri';
       case 0:
+        return 'Sun';
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thur';
+      case 5:
+        return 'Fri';
+      case 6:
         return 'Sat';
     }
+  };
+
+  const getMonth = (date: any) => {
+    let month = moment(date).format('MM');
+    switch (month) {
+      case '01':
+        return 'Jan';
+      case '02':
+        return 'Feb';
+      case '03':
+        return 'Mar';
+      case '04':
+        return 'Apr';
+      case '05':
+        return 'May';
+      case '06':
+        return 'Jun';
+      case '07':
+        return 'Jul';
+      case '08':
+        return 'Aug';
+      case '09':
+        return 'Sept';
+      case '10':
+        return 'Oct';
+      case '11':
+        return 'Nov';
+      case '12':
+        return 'Dec';
+    }
+  };
+
+  const getDate = (date: any) => {
+    return moment(date).format('DD');
+  };
+
+  const getTime = (date: any) => {
+    return moment(date).format('HH:mm');
   };
 
   //获取数据
   const queryEventData = () => {
     formService.getTableDataAll('Event', []).then((res) => {
-      console.log(res);
-      // const EventData=JSON.parse(JSON.stringify(res))
-      // EventData.map((item:any,index:any)=>{
-      //   item.StartTime=getWeek(item.StartTime)
-      // })
-      // console.log(EventData)
       setNewData(res);
       setShowNews(res);
     });
   };
 
+  const onQueryFilter = (year: any, month: any, date: any) => {
+    console.log(year, month, date);
+    if (date) {
+      setShowNews(
+        newData
+          .filter((x: any) => moment(x.StartTime).year() == year)
+          .filter((x: any) => moment(x.StartTime).format('MM') == month)
+          .filter((x: any) => Number(getDate(x.StartTime)) >= Number(date[0]))
+          .filter((x: any) => Number(getDate(x.StartTime)) <= Number(date[1])),
+      );
+    } else {
+      setShowNews(
+        newData
+          .filter((x: any) => moment(x.StartTime).year() == year)
+          .filter((x: any) => moment(x.StartTime).format('MM') == month),
+      );
+    }
+  };
   useEffect(() => {
     queryEventData();
   }, []);
+
+  useEffect(() => {
+    onQueryFilter(
+      moment(yearDataCurrent).year(),
+      monthDataCurrent,
+      dateDataCurrent1,
+    );
+  }, [yearDataCurrent, monthDataCurrent, dateDataCurrent1]);
+
   return (
     <>
       <BasfHeader></BasfHeader>
@@ -103,13 +179,17 @@ const index = (props: any) => {
       <div className="eventCalendar">
         <div className="dataPick">
           <DatePicker
-            value={yearData}
+            value={yearDataCurrent}
             onChange={onYearChange}
             picker="year"
             clearIcon=""
             suffixIcon={<DownOutlined />}
           />
-          <Select style={{ width: 120 }} onChange={handleChange}>
+          <Select
+            style={{ width: 120 }}
+            onChange={onMonthChange}
+            value={monthDataCurrent}
+          >
             {monthData.map((item, index) => {
               return (
                 <Option value={item} key={index}>
@@ -118,8 +198,12 @@ const index = (props: any) => {
               );
             })}
           </Select>
-          {/* <InputNumber min={1} max={10} defaultValue={3} onChange={onChange} />
-          <InputNumber min={1} max={10} defaultValue={3} onChange={onChange} /> */}
+          <RangePicker
+            format="DD"
+            clearIcon=""
+            value={dateDataCurrent}
+            onChange={onDateChange}
+          ></RangePicker>
         </div>
         <div className="part">
           <div className="partProWrap">
@@ -127,12 +211,15 @@ const index = (props: any) => {
               return (
                 <div className="partProWrapItem" key={index}>
                   <div className="partProWrapItemLeft">
-                    <div>8</div>
-                    <div>jun</div>
+                    <div>{getDate(item.StartTime)}</div>
+                    <div>{getMonth(item.StartTime)}</div>
                   </div>
                   <div className="partProWrapItemRight">
                     <div>{item.Title}</div>
-                    <div>Tue, Jun 8, 09:30 {getWeek(item.StartTime)}</div>
+                    <div>
+                      {getWeek(item.StartTime)},{getMonth(item.StartTime)}{' '}
+                      {getDate(item.StartTime)},{getTime(item.StartTime)}
+                    </div>
                   </div>
                 </div>
               );
