@@ -22,6 +22,10 @@ const index = (props: any) => {
   const [showTags, setShowTags] = useState(Array<any>());
   const [eventData, setEventData] = useState<any>([]);
   const [showEvent, setShowEvent] = useState(Array<any>());
+  const [SolutionLink, setSolutionLink] = useState<any>([
+    'https://apps.powerapps.com/play/e/b240154e-fa0f-45e9-b470-5d6d1c29d82d/a/194ab89b-0179-4800-b341-5b7b7de03a76?tenantId=ecaa386b-c8df-4ce0-ad01-740cbdb5ba55&source=portal',
+    'https://basf.sharepoint.com/sites/learn-together   ',
+  ]);
   //获取tag
   const queryTags = () => {
     formService.getTableDataAll('Tag', []).then((res) => {
@@ -33,6 +37,14 @@ const index = (props: any) => {
   //获取新闻信息
   const queryNewData = () => {
     formService.getTableDataAll('News', []).then((res) => {
+      res.sort(function (a: any, b: any) {
+        return a.PublishDate < b.PublishDate ? 1 : -1;
+      });
+      res.map((item: any, index: any) => {
+        res[index].BacImg = `${JSON.parse(item.DisplayImage).serverUrl}${
+          JSON.parse(item.DisplayImage).serverRelativeUrl
+        }`;
+      });
       setNewData(res);
       setShowNews(res.slice(0, 4));
     });
@@ -41,6 +53,9 @@ const index = (props: any) => {
   //获取活动数据
   const queryEventData = () => {
     formService.getTableDataAll('Event', []).then((res) => {
+      res.sort(function (a: any, b: any) {
+        return a.StartTime < b.StartTime ? 1 : -1;
+      });
       setEventData(res);
       setShowEvent(res.slice(0, 4));
     });
@@ -138,8 +153,8 @@ const index = (props: any) => {
               <div className="partProWrap">
                 {showNews?.map((item: any, index: any) => {
                   return (
-                    <div className="partProWrapItem">
-                      <img src={require('@/assets/images/pro1.png')} alt="" />
+                    <div className="partProWrapItem" key={index}>
+                      <img src={item.BacImg} alt="" />
                       <div className="partProWrapItemWrap">
                         <div className="partProWrapItemTitle">{item.Title}</div>
                         <div className="partProWrapItemTitleDate">
@@ -175,7 +190,7 @@ const index = (props: any) => {
             <div className="partTitle">
               <div className="partTitleHeadLine">Event Calendar</div>
               <div className="partTitleMore">
-                More
+                <a href="/EventCalendar/index">More</a>
                 <RightOutlined />
               </div>
             </div>
@@ -185,7 +200,7 @@ const index = (props: any) => {
                   return (
                     <div className="partProWrapItem" key={index}>
                       {item.Hot ? (
-                        <img src={require('@/assets/images/Hot.png')} alt="" />
+                        <img src={require('@/assets/images/hot.png')} alt="" />
                       ) : (
                         ''
                       )}
@@ -213,15 +228,12 @@ const index = (props: any) => {
                   />
                   <div className="partOperateTitle">
                     <div className="partOperateTit">Solution Gallery</div>
-                    <a href="">
+                    <a href={SolutionLink[0]}>
                       Click To View <RightOutlined />{' '}
                     </a>
-                    <div className="search">
-                      <img src={require('@/assets/images/serach.png')} alt="" />
-                    </div>
                   </div>
                 </div>
-                <div className="partOperateItem">
+                <a className="partOperateItem" href={SolutionLink[1]}>
                   <img
                     className="bgimg"
                     src={require('@/assets/images/tit1.png')}
@@ -230,7 +242,7 @@ const index = (props: any) => {
                   <div className="partOperateTitle">
                     <img src={require('@/assets/images/logo.png')} alt="" />
                   </div>
-                </div>
+                </a>
               </div>
             </div>
           </div>

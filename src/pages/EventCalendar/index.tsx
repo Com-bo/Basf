@@ -6,6 +6,7 @@ import {
   InputNumber,
   Select,
   DatePicker,
+  Spin,
   message,
   Menu,
   Dropdown,
@@ -32,6 +33,7 @@ import { DownOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
 import { getFileInfo } from 'prettier';
 import FormService from '@/services/form.service';
 const index = (props: any) => {
+  const [loading, setLoading] = useState(false);
   const formService = new FormService();
   const [newData, setNewData] = useState<any>([]);
   const [showNews, setShowNews] = useState<any>([]);
@@ -53,7 +55,9 @@ const index = (props: any) => {
   const [yearDataCurrent, setYearDataCurrent] = useState(
     moment(`${moment().year()}`, yearFormat),
   );
-  const [monthDataCurrent, setMonthDataCurrent] = useState(monthData[0]);
+  const [monthDataCurrent, setMonthDataCurrent] = useState(
+    `${moment().format('MM')}`,
+  );
   const [dateDataCurrent, setDateDataCurrent] = useState();
   const [dateDataCurrent1, setDateDataCurrent1] = useState();
 
@@ -135,13 +139,26 @@ const index = (props: any) => {
   const queryEventData = () => {
     formService.getTableDataAll('Event', []).then((res) => {
       setNewData(res);
-      setShowNews(res);
+      res.sort(function (a: any, b: any) {
+        return a.StartTime < b.StartTime ? 1 : -1;
+      });
+      setShowNews(
+        res
+          .filter(
+            (x: any) =>
+              moment(x.StartTime).year() == moment(yearDataCurrent).year(),
+          )
+          .filter(
+            (x: any) => moment(x.StartTime).format('MM') == monthDataCurrent,
+          ),
+      );
     });
   };
 
   const onQueryFilter = (year: any, month: any, date: any) => {
-    console.log(year, month, date);
-    if (date) {
+    console.log(year, month, date, showNews);
+    setLoading(true);
+    if (date && date[0] && date[1]) {
       setShowNews(
         newData
           .filter((x: any) => moment(x.StartTime).year() == year)
@@ -160,6 +177,11 @@ const index = (props: any) => {
   useEffect(() => {
     queryEventData();
   }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  }, [showNews]);
 
   useEffect(() => {
     onQueryFilter(
@@ -171,6 +193,13 @@ const index = (props: any) => {
 
   return (
     <>
+      {loading ? (
+        <div className="spinGroup">
+          <Spin></Spin>
+        </div>
+      ) : (
+        ''
+      )}
       <BasfHeader></BasfHeader>
       <div className="headerArticle">
         <img src={require('@/assets/images/event.png')} alt="" />
@@ -199,8 +228,8 @@ const index = (props: any) => {
             })}
           </Select>
           <RangePicker
+            placeholder={['', '']}
             format="DD"
-            clearIcon=""
             value={dateDataCurrent}
             onChange={onDateChange}
           ></RangePicker>

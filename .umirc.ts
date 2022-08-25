@@ -10,6 +10,7 @@ export default defineConfig({
     '@border-radius-base': '5px',
     '@border-color-base': '#ebe8e5',
   },
+  // publicPath:"https://serviceme.sharepoint.com/sites/DPA_DEV_Community/LevelRequest/SitePages/",
   fastRefresh: {},
   routes: [
     {
@@ -38,4 +39,31 @@ export default defineConfig({
       component: '@/pages/SolutionGallery/index',
     },
   ],
+  // routes: [
+  //   {
+  //     exact: true,
+  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/',
+  //     redirect: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/home/index',
+  //   },
+  //   {
+  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/home/index',
+  //     component: '@/pages/home/index',
+  //   },
+  //   {
+  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/readIT/index',
+  //     component: '@/pages/readIT/index',
+  //   },
+  //   {
+  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/EventCalendar/index',
+  //     component: '@/pages/EventCalendar/index',
+  //   },
+  //   {
+  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/DigitalAcademy/index',
+  //     component: '@/pages/DigitalAcademy/index',
+  //   },
+  //   {
+  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/SolutionGallery/index',
+  //     component: '@/pages/SolutionGallery/index',
+  //   },
+  // ]
 });

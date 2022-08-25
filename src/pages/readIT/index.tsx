@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useReducer, useState, useEffect } from 'react';
 import styles from './index.less';
 import { Form, Input, Button, Space, Checkbox, Col, Row } from 'antd';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
@@ -23,6 +23,8 @@ const index = (props: any) => {
   const [seachTagStr, setSearchTagStr] = useState('');
   const [seachTitleStr, setSeachTitleStr] = useState('');
 
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
+
   //获取tag
   const queryTags = () => {
     formService.getTableDataAll('Tag', []).then((res) => {
@@ -34,6 +36,14 @@ const index = (props: any) => {
   //获取新闻信息
   const queryNewData = () => {
     formService.getTableDataAll('News', []).then((res) => {
+      res.sort(function (a: any, b: any) {
+        return a.PublishDate < b.PublishDate ? 1 : -1;
+      });
+      res.map((item: any, index: any) => {
+        res[index].BacImg = `${JSON.parse(item.DisplayImage).serverUrl}${
+          JSON.parse(item.DisplayImage).serverRelativeUrl
+        }`;
+      });
       setNewData(res);
       setShowNews(res);
     });
@@ -85,16 +95,12 @@ const index = (props: any) => {
     }
   };
 
-  // 搜索记录
+  // 记录
   const delSearchTitle = (e: any, index: any) => {
     e.stopPropagation();
-    const newList = checkedTagValues;
+    const newList = JSON.parse(JSON.stringify(checkedTagValues));
     newList.splice(index, 1);
     setCheckedTagValues([...newList]);
-  };
-
-  const onSearchTitle = (item: any) => {
-    setSeachTitleStr(item);
   };
 
   useEffect(() => {
@@ -111,7 +117,11 @@ const index = (props: any) => {
 
   useEffect(() => {
     onTagTitleSearchChild();
-  }, [seachTitleStr]);
+  }, [seachTitleStr, checkedTagValues]);
+
+  useEffect(() => {
+    // onTagChange();
+  }, [checkedTagValues]);
 
   return (
     <>
@@ -131,17 +141,14 @@ const index = (props: any) => {
                   setSearchTagStr(e.target.value);
                 }}
               ></Input>
-              <img
-                onClick={onTagSearch}
-                src={require('@/assets/images/search.png')}
-                alt=""
-              />
+              <img src={require('@/assets/images/search.png')} alt="" />
             </div>
             <div className="partbox">
               <div className="part1">
                 <Checkbox.Group
                   style={{ width: '100%' }}
                   onChange={onTagChange}
+                  value={checkedTagValues}
                 >
                   <Row>
                     {showTags?.map((item: any, index: any) => {
@@ -163,22 +170,12 @@ const index = (props: any) => {
                 placeholder="Search"
                 onChange={(e) => setSeachTitleStr(e.target.value)}
               ></Input>
-              <img
-                onClick={onTagTitleSearchChild}
-                src={require('@/assets/images/search.png')}
-                alt=""
-              />
+              <img src={require('@/assets/images/search.png')} alt="" />
             </div>
             <div className="searchList">
               {checkedTagValues?.map((item: any, index: any) => {
                 return (
-                  <span
-                    className="item"
-                    key={index}
-                    onClick={() => {
-                      onSearchTitle(item);
-                    }}
-                  >
+                  <span className="item" key={index}>
                     {item}{' '}
                     <CloseOutlined
                       onClick={(e) => {
@@ -193,7 +190,7 @@ const index = (props: any) => {
               <div className="partProWrap">
                 {showNews?.map((item: any, index: any) => (
                   <div className="partProWrapItem" key={index}>
-                    <img src={require('@/assets/images/pro1.png')} alt="" />
+                    <img src={item.BacImg} alt="" />
                     <div className="partProWrapItemWrap">
                       <div className="partProWrapItemTitleDate">
                         {item.PublishDate && moment(item.PublishDate).isValid()
