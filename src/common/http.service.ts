@@ -45,7 +45,9 @@ export default class HttpService {
     // this.requestUrl = requestUrl
     // this.requestConfiguration = requestConfig ? requestConfig : {}
     // return this._http.get(this.requestUrl, this.requestConfiguration)
-
+    if (process.env.type == 'test') {
+      delete requestConfig?.headers?.Authorization;
+    }
     return axios({
       method: 'get',
       url: requestUrl,
@@ -60,7 +62,9 @@ export default class HttpService {
     // this.requestUrl = requestUrl
     // this.requestConfiguration = requestConfig ? requestConfig : {}
     // return this._http.post(this.requestUrl, this.requestConfiguration.data, this.requestConfiguration.headers)
-
+    if (process.env.type == 'test') {
+      delete requestConfig?.headers?.Authorization;
+    }
     return axios({
       method: 'post',
       url: requestUrl,
@@ -75,7 +79,9 @@ export default class HttpService {
     // this.requestUrl = requestUrl
     // this.requestConfiguration = requestConfig ? requestConfig : {}
     // return this._http.post(this.requestUrl, this.requestConfiguration.data, this.requestConfiguration.headers)
-
+    if (process.env.type == 'test') {
+      delete requestConfig?.headers?.Authorization;
+    }
     return axios({
       method: 'patch',
       url: requestUrl,
@@ -89,7 +95,9 @@ export default class HttpService {
     // this.requestUrl = requestUrl
     // this.requestConfiguration = requestConfig ? requestConfig : {}
     // return this._http.post(this.requestUrl, this.requestConfiguration.data, this.requestConfiguration.headers)
-
+    if (process.env.type == 'test') {
+      delete requestConfig?.headers?.Authorization;
+    }
     return axios({
       method: 'delete',
       url: requestUrl,

@@ -236,23 +236,35 @@ const index = (props: any) => {
         </div>
         <div className="part">
           <div className="partProWrap">
-            {showNews?.map((item: any, index: any) => {
-              return (
-                <div className="partProWrapItem" key={index}>
-                  <div className="partProWrapItemLeft">
-                    <div>{getDate(item.StartTime)}</div>
-                    <div>{getMonth(item.StartTime)}</div>
-                  </div>
-                  <div className="partProWrapItemRight">
-                    <div>{item.Title}</div>
-                    <div>
-                      {getWeek(item.StartTime)},{getMonth(item.StartTime)}{' '}
-                      {getDate(item.StartTime)},{getTime(item.StartTime)}
+            {showNews.length ? (
+              showNews?.map((item: any, index: any) => {
+                return (
+                  <div className="partProWrapItem" key={index}>
+                    {item.Hot ? (
+                      <img src={require('@/assets/images/hot.png')} alt="" />
+                    ) : (
+                      ''
+                    )}
+                    <div className="partProWrapItemLeft">
+                      <div>{getDate(item.StartTime)}</div>
+                      <div>{getMonth(item.StartTime)}</div>
+                    </div>
+                    <div className="partProWrapItemRight">
+                      <div>{item.Title}</div>
+                      <div>
+                        {getWeek(item.StartTime)},{getMonth(item.StartTime)}{' '}
+                        {getDate(item.StartTime)},{getTime(item.StartTime)}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="Nodata">
+                {/* <img src={require('@/assets/images/nodata.png')} alt="" /> */}
+                No Result !
+              </div>
+            )}
           </div>
         </div>
       </div>

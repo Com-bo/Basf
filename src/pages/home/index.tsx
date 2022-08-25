@@ -11,7 +11,12 @@ import BasfHeader from '@/components/Header';
 
 import avatar from '@/assets/images/avatar.png';
 import FormService from '@/services/form.service';
-import { DownOutlined, RightOutlined, MinusOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  RightOutlined,
+  LeftOutlined,
+  MinusOutlined,
+} from '@ant-design/icons';
 import { getFileInfo } from 'prettier';
 const index = (props: any) => {
   const formService = new FormService();
@@ -26,6 +31,7 @@ const index = (props: any) => {
     'https://apps.powerapps.com/play/e/b240154e-fa0f-45e9-b470-5d6d1c29d82d/a/194ab89b-0179-4800-b341-5b7b7de03a76?tenantId=ecaa386b-c8df-4ce0-ad01-740cbdb5ba55&source=portal',
     'https://basf.sharepoint.com/sites/learn-together   ',
   ]);
+  const [newIndex, setNewIndex] = useState(0);
   //获取tag
   const queryTags = () => {
     formService.getTableDataAll('Tag', []).then((res) => {
@@ -128,6 +134,19 @@ const index = (props: any) => {
     queryEventData();
   }, []);
 
+  // const pagFun=()=>{
+  //   setShowNews(newData.slice((newIndex+1)*4, 4));
+  // }
+
+  // const pagination=(index:any)=>{
+  //   if(index){
+  //   }else{
+  //     console.log(newIndex)
+  //     setShowNews(newData.slice((newIndex+1)*4, 4));
+  //     setNewIndex(newIndex+1)
+  //   }
+  // }
+
   return (
     <>
       <BasfHeader></BasfHeader>
@@ -148,7 +167,21 @@ const index = (props: any) => {
       <div className="bodypart">
         <div className="part">
           <div className="partLeft">
-            <div className="partTitle">Read IT</div>
+            <div className="partTitle">
+              <div className="partTitleHeadLine">Read IT</div>
+              <div className="partTitleMore">
+                {/* <span className='turn'>
+                <LeftOutlined 
+                onClick={()=>{pagination(true)}}
+                />
+                </span>
+                <span className='turn'>
+                <RightOutlined 
+                onClick={()=>{pagination(false)}}
+                />
+                </span> */}
+              </div>
+            </div>
             <div className="partbox part1">
               <div className="partProWrap">
                 {showNews?.map((item: any, index: any) => {
@@ -176,7 +209,13 @@ const index = (props: any) => {
               <div className="part1">
                 {showTags?.map((item: any, index: any) => {
                   return (
-                    <div className="partpro" key={index}>
+                    <div
+                      className="partpro"
+                      key={index}
+                      onClick={() => {
+                        window.location.href = `/readIT/index?Tag=${index}`;
+                      }}
+                    >
                       {item.Title}
                     </div>
                   );

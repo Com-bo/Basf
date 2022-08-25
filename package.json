@@ -3,10 +3,10 @@
   "scripts": {
     "start": "cross-env PORT=8001 UMI_ENV=dev umi dev",
     "dev": "cross-env UMI_ENV=dev umi build",
+    "test": "cross-env UMI_ENV=test umi build",
     "build": "umi build",
     "postinstall": "umi generate tmp",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
-    "test": "umi-test",
     "test:coverage": "umi-test --coverage"
   },
   "gitHooks": {

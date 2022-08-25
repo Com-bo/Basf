@@ -28,6 +28,11 @@ const index = (props: any) => {
   //获取tag
   const queryTags = () => {
     formService.getTableDataAll('Tag', []).then((res) => {
+      if (window.location.search.split('=')[1]) {
+        setCheckedTagValues([
+          res[Number(window.location.search.split('=')[1])].Title,
+        ]);
+      }
       setTagData(res);
       setShowTags(res);
     });
@@ -62,6 +67,7 @@ const index = (props: any) => {
   // 标签搜索新闻
   const onTagChange = (checkedValues: CheckboxValueType[]) => {
     setCheckedTagValues(checkedValues);
+    console.log(checkedValues);
   };
 
   // 标签和标题检索
@@ -177,6 +183,9 @@ const index = (props: any) => {
                 return (
                   <span className="item" key={index}>
                     {item}{' '}
+                    {/* <div>
+
+                    </div> */}
                     <CloseOutlined
                       onClick={(e) => {
                         delSearchTitle(e, index);
@@ -188,20 +197,28 @@ const index = (props: any) => {
             </div>
             <div className="partbox part1">
               <div className="partProWrap">
-                {showNews?.map((item: any, index: any) => (
-                  <div className="partProWrapItem" key={index}>
-                    <img src={item.BacImg} alt="" />
-                    <div className="partProWrapItemWrap">
-                      <div className="partProWrapItemTitleDate">
-                        {item.PublishDate && moment(item.PublishDate).isValid()
-                          ? moment(item.PublishDate).format('YYYY-MM-DD')
-                          : item.PublishDate}
+                {showNews.length ? (
+                  showNews?.map((item: any, index: any) => (
+                    <div className="partProWrapItem" key={index}>
+                      <img src={item.BacImg} alt="" />
+                      <div className="partProWrapItemWrap">
+                        <div className="partProWrapItemTitleDate">
+                          {item.PublishDate &&
+                          moment(item.PublishDate).isValid()
+                            ? moment(item.PublishDate).format('YYYY-MM-DD')
+                            : item.PublishDate}
+                        </div>
+                        <div className="partProWrapItemTitle">{item.Title}</div>
+                        <div className="ProTag">{item.Tag}</div>
                       </div>
-                      <div className="partProWrapItemTitle">{item.Title}</div>
-                      <div className="ProTag">{item.Tag}</div>
                     </div>
+                  ))
+                ) : (
+                  <div className="Nodata">
+                    {/* <img src={require('@/assets/images/nodata.png')} alt="" /> */}
+                    No Result !
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>

@@ -34,39 +34,48 @@ const index = (props: any) => {
     <>
       <div className="header">
         <div className="headerTitle">
-          <ul>
-            <li className={urlMark == '/home/index' ? 'active' : ''}>
-              <a href="/">Home</a>
-            </li>
-            <li className={urlMark == '/readIT/index' ? 'active' : ''}>
-              <a href="/readIT/index">Read IT</a>
-            </li>
-            <li className={urlMark == '/EventCalendar/index' ? 'active' : ''}>
-              <a href="/EventCalendar/index">Event Calendar</a>
-            </li>
-            <li className={urlMark == '/DigitalAcademy/index' ? 'active' : ''}>
-              <a href="/DigitalAcademy/index">Digital Academy</a>
-            </li>
-            <li className={urlMark == '/SolutionGallery/index' ? 'active' : ''}>
-              <a href="/SolutionGallery/index">Solution Gallery</a>
-            </li>
+          <div className="headerLogo">
+            <div className="logoName">
+              <img src={require('@/assets/images/mylogo.png')} alt="" />
+            </div>
+            <ul>
+              <li className={urlMark == '/home/index' ? 'active' : ''}>
+                <a href="/">Home</a>
+              </li>
+              <li className={urlMark == '/readIT/index' ? 'active' : ''}>
+                <a href="/readIT/index">Read IT</a>
+              </li>
+              <li className={urlMark == '/EventCalendar/index' ? 'active' : ''}>
+                <a href="/EventCalendar/index">Event Calendar</a>
+              </li>
+              <li
+                className={urlMark == '/DigitalAcademy/index' ? 'active' : ''}
+              >
+                <a href="/DigitalAcademy/index">Digital Academy</a>
+              </li>
+              <li
+                className={urlMark == '/SolutionGallery/index' ? 'active' : ''}
+              >
+                <a href="/SolutionGallery/index">Solution Gallery</a>
+              </li>
 
-            {/* <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/home/index' ? 'active' : ''}>
-              <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/home/index">Home</a>
-            </li>
-            <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/readIT/index' ? 'active' : ''}>
-              <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/readIT/index">Read IT</a>
-            </li>
-            <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/EventCalendar/index' ? 'active' : ''}>
-              <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/EventCalendar/index">Event Calendar</a>
-            </li>
-            <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/DigitalAcademy/index' ? 'active' : ''}>
-              <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/DigitalAcademy/index">Digital Academy</a>
-            </li>
-            <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/SolutionGallery/index' ? 'active' : ''}>
-              <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/SolutionGallery/index">Solution Gallery</a>
-            </li> */}
-          </ul>
+              {/* <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/home/index' ? 'active' : ''}>
+                <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/home/index">Home</a>
+              </li>
+              <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/readIT/index' ? 'active' : ''}>
+                <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/readIT/index">Read IT</a>
+              </li>
+              <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/EventCalendar/index' ? 'active' : ''}>
+                <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/EventCalendar/index">Event Calendar</a>
+              </li>
+              <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/DigitalAcademy/index' ? 'active' : ''}>
+                <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/DigitalAcademy/index">Digital Academy</a>
+              </li>
+              <li className={urlMark == '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/SolutionGallery/index' ? 'active' : ''}>
+                <a href="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/SolutionGallery/index">Solution Gallery</a>
+              </li> */}
+            </ul>
+          </div>
           <div className="headerInfo">
             <div className="headerAvatar">
               <img src={avatar} alt="" />
