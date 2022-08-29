@@ -261,8 +261,8 @@ const index = (props: any) => {
               })
             ) : (
               <div className="Nodata">
-                {/* <img src={require('@/assets/images/nodata.png')} alt="" /> */}
-                No Result !
+                <img src={require('@/assets/images/NoResult.png')} alt="" />
+                {/* No Result ! */}
               </div>
             )}
           </div>

@@ -1,5 +1,8 @@
 import { defineConfig } from 'umi';
 
+const pagePath = '';
+// const pagePath="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx"
+
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -10,60 +13,32 @@ export default defineConfig({
     '@border-radius-base': '5px',
     '@border-color-base': '#ebe8e5',
   },
-  // publicPath:"https://serviceme.sharepoint.com/sites/DPA_DEV_Community/LevelRequest/SitePages/",
   fastRefresh: {},
   routes: [
     {
       exact: true,
-      path: '/',
-      redirect: '/home/index',
+      path: `${pagePath}/`,
+      redirect: `${pagePath}/home/index`,
     },
     {
-      path: '/home/index',
+      path: `${pagePath}/home/index`,
       component: '@/pages/home/index',
     },
     {
-      path: '/readIT/index',
+      path: `${pagePath}/readIT/index`,
       component: '@/pages/readIT/index',
     },
     {
-      path: '/EventCalendar/index',
+      path: `${pagePath}/EventCalendar/index`,
       component: '@/pages/EventCalendar/index',
     },
     {
-      path: '/DigitalAcademy/index',
+      path: `${pagePath}/DigitalAcademy/index`,
       component: '@/pages/DigitalAcademy/index',
     },
     {
-      path: '/SolutionGallery/index',
+      path: `${pagePath}/SolutionGallery/index`,
       component: '@/pages/SolutionGallery/index',
     },
   ],
-  // routes: [
-  //   {
-  //     exact: true,
-  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/',
-  //     redirect: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/home/index',
-  //   },
-  //   {
-  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/home/index',
-  //     component: '@/pages/home/index',
-  //   },
-  //   {
-  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/readIT/index',
-  //     component: '@/pages/readIT/index',
-  //   },
-  //   {
-  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/EventCalendar/index',
-  //     component: '@/pages/EventCalendar/index',
-  //   },
-  //   {
-  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/DigitalAcademy/index',
-  //     component: '@/pages/DigitalAcademy/index',
-  //   },
-  //   {
-  //     path: '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx/SolutionGallery/index',
-  //     component: '@/pages/SolutionGallery/index',
-  //   },
-  // ]
 });

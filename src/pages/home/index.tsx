@@ -153,14 +153,16 @@ const index = (props: any) => {
       <div className="headerArticle">
         <img src={require('@/assets/images/header.png')} alt="" />
         <div className="headerArticleWrap">
-          <div className="headerArticleText">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever.
-          </div>
-          <div className="headerArticleMore">
-            more
-            <RightOutlined />
+          <div className="headerArticleWrapOut">
+            <div className="headerArticleText">
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever.
+            </div>
+            <div className="headerArticleMore">
+              more
+              <RightOutlined />
+            </div>
           </div>
         </div>
       </div>
@@ -213,7 +215,7 @@ const index = (props: any) => {
                       className="partpro"
                       key={index}
                       onClick={() => {
-                        window.location.href = `/readIT/index?Tag=${index}`;
+                        window.location.href = `${process.env.pagePath}/readIT/index?Tag=${index}`;
                       }}
                     >
                       {item.Title}
@@ -229,7 +231,7 @@ const index = (props: any) => {
             <div className="partTitle">
               <div className="partTitleHeadLine">Event Calendar</div>
               <div className="partTitleMore">
-                <a href="/EventCalendar/index">More</a>
+                <a href={`${process.env.pagePath}/EventCalendar/index`}>More</a>
                 <RightOutlined />
               </div>
             </div>
@@ -279,7 +281,7 @@ const index = (props: any) => {
                     alt=""
                   />
                   <div className="partOperateTitle">
-                    <img src={require('@/assets/images/logo.png')} alt="" />
+                    <div className="partOperateTit1">Digital Academy</div>
                   </div>
                 </a>
               </div>

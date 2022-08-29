@@ -56,18 +56,12 @@ const index = (props: any) => {
 
   // 搜索标签
   const onTagSearch = () => {
-    setShowTags(
-      tagData.filter(
-        (x: any) =>
-          x.Title.toLowerCase().indexOf(seachTagStr.toLowerCase()) >= 0,
-      ),
-    );
+    setShowTags(tagData.filter((x: any) => x.Title.indexOf(seachTagStr) >= 0));
   };
 
   // 标签搜索新闻
   const onTagChange = (checkedValues: CheckboxValueType[]) => {
     setCheckedTagValues(checkedValues);
-    console.log(checkedValues);
   };
 
   // 标签和标题检索
@@ -77,10 +71,7 @@ const index = (props: any) => {
         setShowNews(
           newData
             .filter((x: any) => checkedTagValues.indexOf(x.Tag) >= 0)
-            .filter(
-              (y: any) =>
-                y.Title.toLowerCase().indexOf(seachTitleStr.toLowerCase()) >= 0,
-            ),
+            .filter((y: any) => y.Title.indexOf(seachTitleStr) >= 0),
         );
       } else {
         setShowNews(
@@ -90,10 +81,7 @@ const index = (props: any) => {
     } else {
       if (seachTitleStr) {
         setShowNews(
-          newData.filter(
-            (y: any) =>
-              y.Title.toLowerCase().indexOf(seachTitleStr.toLowerCase()) >= 0,
-          ),
+          newData.filter((y: any) => y.Title.indexOf(seachTitleStr) >= 0),
         );
       } else {
         setShowNews(newData);
@@ -125,10 +113,6 @@ const index = (props: any) => {
     onTagTitleSearchChild();
   }, [seachTitleStr, checkedTagValues]);
 
-  useEffect(() => {
-    // onTagChange();
-  }, [checkedTagValues]);
-
   return (
     <>
       <BasfHeader></BasfHeader>
@@ -159,7 +143,7 @@ const index = (props: any) => {
                   <Row>
                     {showTags?.map((item: any, index: any) => {
                       return (
-                        <Col span={24} key={index}>
+                        <Col span={24} key={item.Title}>
                           <Checkbox value={item.Title}>{item.Title}</Checkbox>
                         </Col>
                       );
@@ -181,7 +165,7 @@ const index = (props: any) => {
             <div className="searchList">
               {checkedTagValues?.map((item: any, index: any) => {
                 return (
-                  <span className="item" key={index}>
+                  <span className="item" key={item}>
                     {item}{' '}
                     {/* <div>
 
@@ -215,8 +199,8 @@ const index = (props: any) => {
                   ))
                 ) : (
                   <div className="Nodata">
-                    {/* <img src={require('@/assets/images/nodata.png')} alt="" /> */}
-                    No Result !
+                    <img src={require('@/assets/images/NoResult.png')} alt="" />
+                    {/* No Result ! */}
                   </div>
                 )}
               </div>
