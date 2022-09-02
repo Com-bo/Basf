@@ -42,6 +42,12 @@ export const TableTypeMap: any = {
         CDSTable: 'Content',
         Type: 'Text',
       },
+      {
+        Key: 'Writer',
+        SPList: 'Writer',
+        CDSTable: 'Writer',
+        Type: 'Text',
+      },
     ],
   },
   Event: {

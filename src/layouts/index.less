@@ -799,19 +799,6 @@ body {
   }
 }
 
-.ant-picker-separator {
-  color: #ffffff !important;
-}
-.ant-picker-range-wrapper {
-  .ant-picker-panels {
-    .ant-picker-header {
-      display: none;
-    }
-    .ant-picker-panel:last-child {
-      display: none !important;
-    }
-  }
-}
 // eventCalendar
 .eventCalendar {
   max-width: 1500px;
@@ -1573,6 +1560,70 @@ body {
           padding: 0 15px;
         }
       }
+    }
+  }
+}
+
+.actions {
+  a {
+    padding-right: 10px;
+    &.publish {
+      color: rgba(255, 149, 0, 1);
+    }
+  }
+}
+.maintain {
+  background-color: RGBA(239, 239, 239, 1);
+  padding-top: 20px;
+  display: flex;
+  .partTitle {
+    margin-bottom: 0;
+  }
+  .maintain_title {
+    // width: 230px;
+    .maintain_title_bg {
+      height: calc(100vh - 90px);
+    }
+  }
+  .maintain_content {
+    margin: 0 20px;
+    padding: 40px 30px;
+    background-color: #ffffff;
+    flex: 1;
+    .maintain_table_action {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      button {
+        width: 90px;
+        height: 32px;
+        background: #65ac1e;
+        font-size: 14px;
+        font-family: Alibaba PuHuiTi;
+        font-weight: 400;
+        color: #ffffff;
+        border-radius: 0;
+      }
+      .ant-input-affix-wrapper {
+        width: 301px;
+        height: 33px;
+        background: #ffffff;
+        border: 1px solid #dcdcdc;
+      }
+    }
+    button.btn {
+      width: 90px;
+      height: 32px;
+      font-size: 14px;
+      font-family: Alibaba PuHuiTi;
+      font-weight: 400;
+      border-radius: 0;
+    }
+
+    .ant-pagination {
+      text-align: center;
+      margin-top: 20px;
     }
   }
 }

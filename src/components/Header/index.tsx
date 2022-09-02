@@ -12,20 +12,41 @@ import avatar from '@/assets/images/avatar.png';
 import { DownOutlined, RightOutlined, MinusOutlined } from '@ant-design/icons';
 const index = (props: any) => {
   const [urlMark, setUrlMark] = useState('');
+  const [SolutionLink, setSolutionLink] = useState<any>([
+    'https://apps.powerapps.com/play/e/b240154e-fa0f-45e9-b470-5d6d1c29d82d/a/194ab89b-0179-4800-b341-5b7b7de03a76?tenantId=ecaa386b-c8df-4ce0-ad01-740cbdb5ba55&source=portal',
+    'https://basf.sharepoint.com/sites/learn-together   ',
+  ]);
+  const shift = () => {
+    window.location.href = `${process.env.pagePath}/newsManagement/index`;
+  };
+
   const menu = (
     <Menu
       items={[
         {
           key: '1',
           label: (
-            <a target="_blank" rel="noopener noreferrer" href="">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://serviceme.sharepoint.com/sites/Gate2Digital/Lists/Event/AllItems.aspx"
+            >
               Settings
+            </a>
+          ),
+        },
+        {
+          key: '2',
+          label: (
+            <a target="_blank" rel="noopener noreferrer" onClick={shift}>
+              Maintain
             </a>
           ),
         },
       ]}
     />
   );
+
   useEffect(() => {
     console.log(window.location.pathname);
     setUrlMark(window.location.pathname);
@@ -55,7 +76,7 @@ const index = (props: any) => {
                     : ''
                 }
               >
-                <a href={`${process.env.pagePath}/readIT/index`}>Read IT</a>
+                <a href={`${process.env.pagePath}/readIT/index`}>News</a>
               </li>
               <li
                 className={
@@ -75,9 +96,10 @@ const index = (props: any) => {
                     : ''
                 }
               >
-                <a href={`${process.env.pagePath}/DigitalAcademy/index`}>
+                {/* <a href={`${process.env.pagePath}/DigitalAcademy/index`}>
                   Digital Academy
-                </a>
+                </a> */}
+                <a href={SolutionLink[0]}>Digital Academy</a>
               </li>
               <li
                 className={
@@ -86,9 +108,10 @@ const index = (props: any) => {
                     : ''
                 }
               >
-                <a href={`${process.env.pagePath}/SolutionGallery/index`}>
+                {/* <a href={`${process.env.pagePath}/SolutionGallery/index`}>
                   Solution Gallery
-                </a>
+                </a> */}
+                <a href={SolutionLink[1]}>Solution Gallery</a>
               </li>
             </ul>
           </div>
@@ -98,7 +121,7 @@ const index = (props: any) => {
             </div>
             <div className="headerName">Joe Zhou</div>
             <Dropdown overlay={menu} placement="bottom" arrow>
-              <DownOutlined style={{ color: '#ffffff' }} />
+              <DownOutlined style={{ color: '#ffffff', cursor: 'pointer' }} />
             </Dropdown>
           </div>
         </div>

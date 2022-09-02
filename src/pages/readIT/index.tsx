@@ -40,23 +40,41 @@ const index = (props: any) => {
 
   //获取新闻信息
   const queryNewData = () => {
-    formService.getTableDataAll('News', []).then((res) => {
-      res.sort(function (a: any, b: any) {
-        return a.PublishDate < b.PublishDate ? 1 : -1;
+    formService
+      .getTableDataAll(
+        'News',
+        [],
+        // [
+        //   {
+        //     type: 'filter eq',
+        //     value: "SAP",
+        //     properties: ['Tag'],
+        //   }
+        // ],
+      )
+      .then((res) => {
+        res.sort(function (a: any, b: any) {
+          return a.PublishDate < b.PublishDate ? 1 : -1;
+        });
+        res.map((item: any, index: any) => {
+          res[index].BacImg = `${JSON.parse(item.DisplayImage).serverUrl}${
+            JSON.parse(item.DisplayImage).serverRelativeUrl
+          }`;
+        });
+        setNewData(res);
+        setShowNews(res);
       });
-      res.map((item: any, index: any) => {
-        res[index].BacImg = `${JSON.parse(item.DisplayImage).serverUrl}${
-          JSON.parse(item.DisplayImage).serverRelativeUrl
-        }`;
-      });
-      setNewData(res);
-      setShowNews(res);
-    });
   };
 
   // 搜索标签
   const onTagSearch = () => {
-    setShowTags(tagData.filter((x: any) => x.Title.indexOf(seachTagStr) >= 0));
+    const reg = new RegExp(`^${seachTagStr}`, 'gi');
+    setShowTags(
+      tagData.filter((x: any) =>
+        // x.Title.toLowerCase().indexOf(seachTagStr.toLowerCase()) >= 0
+        x.Title.match(reg),
+      ),
+    );
   };
 
   // 标签搜索新闻
@@ -122,7 +140,7 @@ const index = (props: any) => {
       <div className="readItPart">
         <div className="part">
           <div className="partLeft">
-            <div className="partTitle">Read IT Tags</div>
+            <div className="partTitle">News Tags</div>
             <div className="search">
               <Input
                 value={seachTagStr}

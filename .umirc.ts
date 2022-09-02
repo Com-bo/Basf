@@ -1,7 +1,7 @@
 import { defineConfig } from 'umi';
 
-const pagePath = '';
-// const pagePath="/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx"
+// const pagePath = '';
+const pagePath = '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx';
 
 export default defineConfig({
   nodeModulesTransform: {
@@ -33,12 +33,24 @@ export default defineConfig({
       component: '@/pages/EventCalendar/index',
     },
     {
-      path: `${pagePath}/DigitalAcademy/index`,
-      component: '@/pages/DigitalAcademy/index',
+      path: `${pagePath}/newsManagement/index`,
+      component: '@/pages/newsManagement/index',
     },
     {
-      path: `${pagePath}/SolutionGallery/index`,
-      component: '@/pages/SolutionGallery/index',
+      path: `${pagePath}/tagsManagement/index`,
+      component: '@/pages/tagsManagement/index',
     },
+    {
+      path: `${pagePath}/EventManagement/index`,
+      component: '@/pages/EventManagement/index',
+    },
+    // {
+    //   path: `${pagePath}/DigitalAcademy/index`,
+    //   component: '@/pages/DigitalAcademy/index',
+    // },
+    // {
+    //   path: `${pagePath}/SolutionGallery/index`,
+    //   component: '@/pages/SolutionGallery/index',
+    // },
   ],
 });

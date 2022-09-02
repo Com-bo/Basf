@@ -1,6 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import styles from './index.less';
-import { Form, Input, Button, Space } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Space,
+  Table,
+  Pagination,
+  Row,
+  Col,
+  Select,
+  Radio,
+  DatePicker,
+  Upload,
+  Modal,
+} from 'antd';
+import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
+import ImgCrop from 'antd-img-crop';
+import 'antd/es/modal/style';
+
+import BraftEditor from 'braft-editor';
+import 'braft-editor/dist/index.css';
+
+import type { PaginationProps } from 'antd';
 import SpService from '@/services/sharepoint.service';
 import moment from 'moment';
 import NewForm from '@/components/generalPurchaseForm/newForm';
@@ -16,8 +38,9 @@ import {
   RightOutlined,
   LeftOutlined,
   MinusOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
-import { getFileInfo } from 'prettier';
+
 const index = (props: any) => {
   const formService = new FormService();
   const [robotMark, setRobotMark] = useState(true);
@@ -31,7 +54,7 @@ const index = (props: any) => {
     'https://apps.powerapps.com/play/e/b240154e-fa0f-45e9-b470-5d6d1c29d82d/a/194ab89b-0179-4800-b341-5b7b7de03a76?tenantId=ecaa386b-c8df-4ce0-ad01-740cbdb5ba55&source=portal',
     'https://basf.sharepoint.com/sites/learn-together   ',
   ]);
-  const [newIndex, setNewIndex] = useState(0);
+
   //获取tag
   const queryTags = () => {
     formService.getTableDataAll('Tag', []).then((res) => {
@@ -124,32 +147,16 @@ const index = (props: any) => {
     return moment(date).format('HH:mm');
   };
 
-  const getInfo = () => {
-    var Flag = !robotMark;
-    setRobotMark(Flag);
-  };
   useEffect(() => {
     queryTags();
     queryNewData();
     queryEventData();
   }, []);
 
-  // const pagFun=()=>{
-  //   setShowNews(newData.slice((newIndex+1)*4, 4));
-  // }
-
-  // const pagination=(index:any)=>{
-  //   if(index){
-  //   }else{
-  //     console.log(newIndex)
-  //     setShowNews(newData.slice((newIndex+1)*4, 4));
-  //     setNewIndex(newIndex+1)
-  //   }
-  // }
-
   return (
     <>
       <BasfHeader></BasfHeader>
+
       <div className="headerArticle">
         <img src={require('@/assets/images/header.png')} alt="" />
         <div className="headerArticleWrap">
@@ -170,18 +177,18 @@ const index = (props: any) => {
         <div className="part">
           <div className="partLeft">
             <div className="partTitle">
-              <div className="partTitleHeadLine">Read IT</div>
+              <div className="partTitleHeadLine">News</div>
               <div className="partTitleMore">
                 {/* <span className='turn'>
-                <LeftOutlined 
-                onClick={()=>{pagination(true)}}
-                />
-                </span>
-                <span className='turn'>
-                <RightOutlined 
-                onClick={()=>{pagination(false)}}
-                />
-                </span> */}
+              <LeftOutlined 
+              onClick={()=>{pagination(true)}}
+              />
+              </span>
+              <span className='turn'>
+              <RightOutlined 
+              onClick={()=>{pagination(false)}}
+              />
+              </span> */}
               </div>
             </div>
             <div className="partbox part1">
@@ -206,7 +213,7 @@ const index = (props: any) => {
             </div>
           </div>
           <div className="partRight">
-            <div className="partTitle">Read IT Tags</div>
+            <div className="partTitle">News Tags</div>
             <div className="partbox">
               <div className="part1">
                 {showTags?.map((item: any, index: any) => {
@@ -306,7 +313,7 @@ const index = (props: any) => {
                     </div>
                     <div className="conversation conversationMe">
                       <div className="conversationInfo">
-                        Hi,I am your G2D ,ask me something.
+                        Hi,I am your G2D ,ask me something
                       </div>
                     </div>
                   </div>
@@ -322,6 +329,7 @@ const index = (props: any) => {
           </div>
         </div>
       </div>
+
       {/* {robotMark ? (
         <div className="robotDiv" onClick={getInfo}>
           <img src={require('@/assets/images/robot.png')} alt="" />
