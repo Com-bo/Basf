@@ -1,7 +1,7 @@
 import { defineConfig } from 'umi';
 
-// const pagePath = '';
-const pagePath = '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx';
+const pagePath = '';
+// const pagePath = '/sites/DPA_DEV_Community/LevelRequest/SitePages/Portal.aspx';
 
 export default defineConfig({
   nodeModulesTransform: {

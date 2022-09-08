@@ -14,7 +14,11 @@ import {
   Upload,
   Modal,
   Menu,
+  Popconfirm,
+  message,
+  Spin,
 } from 'antd';
+const { Search } = Input;
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import ImgCrop from 'antd-img-crop';
 import 'antd/es/modal/style';
@@ -44,25 +48,19 @@ import {
 
 const index = (props: any) => {
   const formService = new FormService();
-  const [robotMark, setRobotMark] = useState(true);
+  const [rawData, setRawData] = useState<any>([]);
   const [newData, setNewData] = useState<any>([]);
-  const [showNews, setShowNews] = useState<any>([]);
+
   const [tagData, setTagData] = useState<any>([]);
-  const [showTags, setShowTags] = useState(Array<any>());
-  const [eventData, setEventData] = useState<any>([]);
-  const [showEvent, setShowEvent] = useState(Array<any>());
-  const [SolutionLink, setSolutionLink] = useState<any>([
-    'https://apps.powerapps.com/play/e/b240154e-fa0f-45e9-b470-5d6d1c29d82d/a/194ab89b-0179-4800-b341-5b7b7de03a76?tenantId=ecaa386b-c8df-4ce0-ad01-740cbdb5ba55&source=portal',
-    'https://basf.sharepoint.com/sites/learn-together   ',
-  ]);
+  const [loading, setLoading] = useState(false);
 
   // 维护界面
-  const [ismaintain, setIsmaintain] = useState(true);
   const [isAdd, setIsAdd] = useState(false);
+  const [editListMark, setEditListMark] = useState(false);
   const [componentDisabled, setComponentDisabled] = useState(true);
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totals, setTotals] = useState();
+  const [totals, setTotals] = useState(0);
   const [showIsmainTainNews, setShowIsmainTainNews] = useState<any>([]);
   const [form] = Form.useForm();
   const imgprops = {
@@ -74,16 +72,9 @@ const index = (props: any) => {
     modalWidth: 600, //弹窗宽度
   };
 
-  //获取tag
-  const queryTags = () => {
-    formService.getTableDataAll('Tag', []).then((res) => {
-      setTagData(res);
-      setShowTags(res);
-    });
-  };
-
   //获取新闻信息
   const queryNewData = () => {
+    setLoading(true);
     formService.getTableDataAll('News', []).then((res) => {
       res.sort(function (a: any, b: any) {
         return a.PublishDate < b.PublishDate ? 1 : -1;
@@ -94,10 +85,20 @@ const index = (props: any) => {
         }`;
       });
       setNewData(res);
-      console.log(res, res.length);
+      setRawData(res);
       setTotals(res.length);
-      setShowNews(res.slice(0, 4));
       queryMainTain(res);
+      console.log(res);
+      setLoading(false);
+    });
+  };
+
+  //获取tag
+  const queryTags = () => {
+    formService.getTableDataAll('Tag', []).then((res) => {
+      var resTagData = res.reverse();
+      console.log(resTagData);
+      setTagData(resTagData);
     });
   };
 
@@ -110,18 +111,7 @@ const index = (props: any) => {
 
   useEffect(() => {
     queryMainTain(newData);
-  }, [current]);
-
-  //获取活动数据
-  const queryEventData = () => {
-    formService.getTableDataAll('Event', []).then((res) => {
-      res.sort(function (a: any, b: any) {
-        return a.StartTime < b.StartTime ? 1 : -1;
-      });
-      setEventData(res);
-      setShowEvent(res.slice(0, 4));
-    });
-  };
+  }, [current, newData]);
 
   const columns = [
     {
@@ -157,13 +147,45 @@ const index = (props: any) => {
       dataIndex: 'action',
       key: 'action',
       width: '20%',
-      render: () => {
+      render: (text: any, record: any, index: any) => {
         return (
           <>
             <Space className="actions">
-              <a className="publish">Publish</a>
-              <a>Edit</a>
-              <a>Delete</a>
+              {/* <a className="publish">Publish</a> */}
+              <a
+                onClick={() => {
+                  openModal();
+                  form.setFieldsValue({
+                    ...record,
+                    PublishDate:
+                      record.PublishDate && moment(record.PublishDate).isValid()
+                        ? moment(record.PublishDate)
+                        : null,
+                  });
+                }}
+              >
+                Edit
+              </a>
+              <Popconfirm
+                title="Are you sure?"
+                onConfirm={(event: any) => {
+                  event.stopPropagation();
+                  formService.removeItem('News', record.key).then(() => {
+                    Successfuloperation();
+                  });
+                }}
+                okText="Yes"
+                cancelText="Cancel"
+              >
+                <Button
+                  type="text"
+                  key="2"
+                  onClick={(event) => event.stopPropagation()}
+                  icon={<i className="gbs gbs-delete"></i>}
+                >
+                  Delete
+                </Button>
+              </Popconfirm>
             </Space>
           </>
         );
@@ -175,22 +197,15 @@ const index = (props: any) => {
     current: any,
     pageSize: any,
   ) => {
-    console.log(current, pageSize);
     setCurrent(current);
   };
 
-  const [fileList, setFileList] = useState<UploadFile[]>([
-    {
-      uid: '-1',
-      name: 'image.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-  ]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   const onChangeDisplayImage: UploadProps['onChange'] = ({
     fileList: newFileList,
   }) => {
+    console.log(newFileList);
     setFileList(newFileList);
   };
 
@@ -218,13 +233,158 @@ const index = (props: any) => {
   };
 
   useEffect(() => {
-    queryTags();
     queryNewData();
-    queryEventData();
+    queryTags();
   }, []);
+
+  const onTitleSearch = (value: string) => {
+    const reg = new RegExp(`${value}`, 'gi');
+    var newdataTitle = rawData.filter((x: any) => x.Title.match(reg));
+    var newdataTag = rawData.filter((x: any) => x.Tag.match(reg));
+    var newdataWriter = rawData.filter((x: any) => x.Writer.match(reg));
+    var newdata = newdataTitle.concat(newdataTag).concat(newdataWriter);
+    var newIndexData: any[] = [];
+    newdata.forEach(function (n: any) {
+      if (newIndexData.indexOf(n) == -1) {
+        newIndexData.push(n);
+      }
+    });
+    setNewData(newIndexData);
+    setTotals(newIndexData.length);
+    setCurrent(1);
+  };
+
+  const Successfuloperation = () => {
+    message.success('Successful operation.');
+    // closeModal()
+    queryNewData();
+  };
+  const closeModal = () => {
+    setEditListMark(false);
+    form.resetFields();
+  };
+  const openModal = () => {
+    setEditListMark(true);
+    setComponentDisabled(false);
+  };
 
   return (
     <>
+      {/* 编辑*/}
+      <Modal
+        maskClosable={false}
+        width="1500px"
+        visible={editListMark}
+        footer={null}
+        onCancel={closeModal}
+      >
+        <div className="maintain_table_action">
+          <div className="partTitle">
+            <div className="partTitleHeadLine">Add News</div>
+          </div>
+        </div>
+        <Form form={form} labelCol={{ flex: '150px' }}>
+          <Row gutter={20}>
+            <Col span={12}>
+              <Form.Item name="Title" label="Title">
+                <Input disabled={componentDisabled} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="Tag" label="Tag" rules={[{ required: true }]}>
+                <Select
+                  placeholder="-----select--------"
+                  disabled={componentDisabled}
+                >
+                  {tagData.map((item: any, index: any) => (
+                    <Select.Option key={index} value={item.Title}>
+                      {item.Title}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Time"
+                name="PublishDate"
+                rules={[{ required: true }]}
+              >
+                <DatePicker
+                  disabled={componentDisabled}
+                  picker="month"
+                  format="YYYY-MM-DD"
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="OnTop"
+                label="On Top"
+                valuePropName="value"
+                rules={[{ required: true }]}
+              >
+                <Radio.Group disabled={componentDisabled}>
+                  <Radio value={true}>Yes</Radio>
+                  <Radio value={false}>No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="Writer" label="Writer">
+                <Input disabled={componentDisabled} />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item name="DisplayImage" label="Display Image">
+                <div style={{ minHeight: '122px' }}>
+                  <ImgCrop {...imgprops}>
+                    <Upload
+                      listType="picture-card"
+                      fileList={fileList}
+                      onChange={onChangeDisplayImage}
+                      onPreview={onPreviewDisplayImage}
+                    >
+                      {fileList.length < 1 && '+ Upload'}
+                    </Upload>
+                  </ImgCrop>
+                </div>
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item name="Content" label="Content">
+                <BraftEditor
+                  onChange={handleChangeBraftEditor}
+                  contentStyle={{ height: 200 }}
+                  style={{
+                    border: '1px solid #d9d9d9',
+                    marginBottom: '20px',
+                  }}
+                  //  placeholder={placeholder}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="Attachment" label="Attachment">
+                <Button type="primary" className="btn">
+                  Upload
+                </Button>
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item style={{ textAlign: 'center' }}>
+                <Space>
+                  <Button className="btn">Preview</Button>
+                  <Button className="btn" type="primary" onClick={saveData}>
+                    Save
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
       <BasfHeader></BasfHeader>
 
       <div className="maintain">
@@ -232,199 +392,50 @@ const index = (props: any) => {
           <Basfmeau></Basfmeau>
         </div>
 
-        {!isAdd ? (
-          <div className="maintain_content">
-            <div className="maintain_table_action">
-              <div className="partTitle">
-                <div className="partTitleHeadLine">News Management</div>
-              </div>
-              <Space>
-                <Input
-                  placeholder="Title、Tag、Writer"
-                  prefix={<SearchOutlined />}
-                />
-                <Button>Search</Button>
-                <Button
-                  onClick={() => {
-                    setIsAdd(true);
-                    setComponentDisabled(false);
-                  }}
-                >
-                  Add
-                </Button>
-              </Space>
+        <div className="maintain_content">
+          <div className="maintain_table_action">
+            <div className="partTitle">
+              <div className="partTitleHeadLine">News Management</div>
             </div>
-
-            <Table
-              dataSource={showIsmainTainNews}
-              columns={columns}
-              pagination={false}
-              scroll={{ y: 'calc(100vh - 330px)' }}
-            />
-
-            <Pagination
-              current={current}
-              total={totals}
-              pageSize={pageSize}
-              onChange={onShowSizeChange}
-            />
+            <Space>
+              <Search
+                placeholder="Title、Tag、Writer、"
+                onSearch={onTitleSearch}
+                style={{ width: 200 }}
+              />
+              <Button
+                className="def"
+                onClick={() => {
+                  openModal();
+                }}
+              >
+                Add
+              </Button>
+            </Space>
           </div>
-        ) : (
-          <div className="maintain_content">
-            <div className="maintain_table_action">
-              <div className="partTitle">
-                <div className="partTitleHeadLine">Add News</div>
-              </div>
-            </div>
 
-            <Form form={form} labelCol={{ flex: '150px' }}>
-              <Row gutter={20}>
-                <Col span={12}>
-                  <Form.Item name="Title" label="Title">
-                    <Input disabled={componentDisabled} />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="Tag"
-                    label="Tag"
-                    rules={[{ required: true }]}
-                  >
-                    <Select
-                      placeholder="-----select--------"
-                      disabled={componentDisabled}
-                    >
-                      {/* <Option></Option> */}
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Time"
-                    name="Time"
-                    rules={[{ required: true }]}
-                  >
-                    <DatePicker
-                      disabled={componentDisabled}
-                      picker="month"
-                      format="YYYYMM"
-                      style={{ width: '100%' }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="OnTop"
-                    label="On Top"
-                    rules={[{ required: true }]}
-                  >
-                    <Radio.Group disabled={componentDisabled}>
-                      <Radio value={1}>A</Radio>
-                      <Radio value={2}>B</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="Writer" label="Writer">
-                    <Input disabled={componentDisabled} />
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item name="DisplayImage" label="Display Image">
-                    <ImgCrop {...imgprops}>
-                      <Upload
-                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                        listType="picture-card"
-                        fileList={fileList}
-                        onChange={onChangeDisplayImage}
-                        onPreview={onPreviewDisplayImage}
-                      >
-                        {fileList.length < 5 && '+ Upload'}
-                      </Upload>
-                    </ImgCrop>
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item name="Content" label="Content">
-                    <BraftEditor
-                      onChange={handleChangeBraftEditor}
-                      contentStyle={{ height: 200 }}
-                      style={{
-                        border: '1px solid #d9d9d9',
-                        marginBottom: '20px',
-                      }}
-                      //  placeholder={placeholder}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item name="Attachment" label="Attachment">
-                    <Button type="primary" className="btn">
-                      Upload
-                    </Button>
-                  </Form.Item>
-                </Col>
-                <Col span={24}>
-                  <Form.Item style={{ textAlign: 'center' }}>
-                    <Space>
-                      <Button className="btn">Preview</Button>
-                      <Button className="btn" type="primary" onClick={saveData}>
-                        Save
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form>
-          </div>
-        )}
+          <Table
+            dataSource={showIsmainTainNews}
+            columns={columns}
+            pagination={false}
+            scroll={{ y: 'calc(100vh - 330px)' }}
+          />
+
+          <Pagination
+            current={current}
+            total={totals}
+            pageSize={pageSize}
+            onChange={onShowSizeChange}
+          />
+        </div>
       </div>
-
-      {/* {robotMark ? (
-        <div className="robotDiv" onClick={getInfo}>
-          <img src={require('@/assets/images/robot.png')} alt="" />
+      {loading ? (
+        <div className="spinGroup">
+          <Spin></Spin>
         </div>
       ) : (
         ''
-      )} */}
-
-      {/* {robotMark ? (
-        ''
-      ) : (
-        <div className="qaInfo">
-          <div className="qaInfoTitle">
-            <div className="qaInfoTit">little Assistant</div>
-            <MinusOutlined onClick={getInfo} />
-          </div>
-          <div className="qaInfoArticle">
-            <div className="qaInfoTime">3:18</div>
-            <div className="conversationList">
-              <div className="conversation conversationYou">
-                <div className="conversationAvatar">
-                  <img src={require('@/assets/images/robothead.png')} alt="" />
-                </div>
-                <div className="conversationInfo">
-                  Hi,I am your G2D assistance,ask me something.
-                </div>
-              </div>
-              <div className="conversation conversationMe">
-                <div className="conversationAvatar">
-                  <img src={require('@/assets/images/user.png')} alt="" />
-                </div>
-                <div className="conversationInfo">
-                  Hi,I am your G2D assistance,ask me something.
-                </div>
-              </div>
-            </div>
-            <div className="conversationEnter">
-              <textarea placeholder="Please Enter"></textarea>
-              <div>
-                <img src={require('@/assets/images/send.png')} alt="" />
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
+      )}
     </>
   );
 };

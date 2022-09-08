@@ -13,7 +13,11 @@ import {
   DatePicker,
   Upload,
   Modal,
+  Popconfirm,
+  Tooltip,
   Menu,
+  Spin,
+  message,
 } from 'antd';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import ImgCrop from 'antd-img-crop';
@@ -21,7 +25,7 @@ import 'antd/es/modal/style';
 
 import BraftEditor from 'braft-editor';
 import 'braft-editor/dist/index.css';
-
+import Loading from '@/components/loading/Loading';
 import type { MenuProps, MenuTheme, PaginationProps } from 'antd';
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -44,21 +48,9 @@ import {
 
 const index = (props: any) => {
   const formService = new FormService();
-  const [robotMark, setRobotMark] = useState(true);
-  const [newData, setNewData] = useState<any>([]);
-  const [showNews, setShowNews] = useState<any>([]);
   const [tagData, setTagData] = useState<any>([]);
-  const [showTags, setShowTags] = useState(Array<any>());
-  const [eventData, setEventData] = useState<any>([]);
-  const [showEvent, setShowEvent] = useState(Array<any>());
-  const [SolutionLink, setSolutionLink] = useState<any>([
-    'https://apps.powerapps.com/play/e/b240154e-fa0f-45e9-b470-5d6d1c29d82d/a/194ab89b-0179-4800-b341-5b7b7de03a76?tenantId=ecaa386b-c8df-4ce0-ad01-740cbdb5ba55&source=portal',
-    'https://basf.sharepoint.com/sites/learn-together   ',
-  ]);
 
   // 维护界面
-  const [ismaintain, setIsmaintain] = useState(true);
-  const [isAdd, setIsAdd] = useState(false);
   const [componentDisabled, setComponentDisabled] = useState(true);
   const [editListMark, setEditListMark] = useState(false);
   const [current, setCurrent] = useState(1);
@@ -66,15 +58,21 @@ const index = (props: any) => {
   const [totals, setTotals] = useState();
   const [showIsmainTainNews, setShowIsmainTainNews] = useState<any>([]);
   const [form] = Form.useForm();
-  const [formDataEdit] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   //获取tag
   const queryTags = () => {
+    setLoading(true);
     formService.getTableDataAll('Tag', []).then((res) => {
-      setTagData(res);
+      var resTagData = res.reverse();
+      resTagData.map((item: any, index: any) => {
+        resTagData[index]['NoIndex'] = index + 1;
+      });
+      console.log(resTagData);
+      setTagData(resTagData);
+      queryMainTain(resTagData);
       setTotals(res.length);
-      queryMainTain(res);
-      console.log(res);
+      setLoading(false);
     });
   };
 
@@ -92,8 +90,8 @@ const index = (props: any) => {
   const columns = [
     {
       title: 'No.',
-      dataIndex: 'No',
-      key: 'No',
+      dataIndex: 'NoIndex',
+      key: 'NoIndex',
       width: '20%',
     },
     {
@@ -107,12 +105,41 @@ const index = (props: any) => {
       dataIndex: 'action',
       key: 'action',
       width: '20%',
-      render: () => {
+      render: (text: any, record: any, index: any) => {
         return (
           <>
             <Space className="actions">
-              <a>Edit</a>
-              <a>Delete</a>
+              <a
+                onClick={() => {
+                  form.setFieldsValue({
+                    ...record,
+                  });
+                  openModal();
+                }}
+              >
+                Edit
+              </a>
+
+              <Popconfirm
+                title="Are you sure?"
+                onConfirm={(event: any) => {
+                  event.stopPropagation();
+                  formService.removeItem('Tag', record.key).then(() => {
+                    Successfuloperation();
+                  });
+                }}
+                okText="Yes"
+                cancelText="Cancel"
+              >
+                <Button
+                  type="text"
+                  key="2"
+                  onClick={(event) => event.stopPropagation()}
+                  icon={<i className="gbs gbs-delete"></i>}
+                >
+                  Delete
+                </Button>
+              </Popconfirm>
             </Space>
           </>
         );
@@ -124,17 +151,47 @@ const index = (props: any) => {
     current: any,
     pageSize: any,
   ) => {
-    console.log(current, pageSize);
     setCurrent(current);
   };
 
   const saveData = () => {
-    console.log(form.getFieldsValue());
+    form.validateFields().then(() => {
+      if (form.getFieldValue('key')) {
+        formService
+          .updateItem('Tag', form.getFieldValue('key'), {
+            Title: form.getFieldValue('Title'),
+          })
+          .then((res) => {
+            Successfuloperation();
+          });
+      } else {
+        formService
+          .addItem('Tag', { Title: form.getFieldValue('Title') })
+          .then((res) => {
+            Successfuloperation();
+          });
+      }
+    });
   };
 
   useEffect(() => {
     queryTags();
   }, []);
+
+  const openModal = () => {
+    setEditListMark(true);
+    setComponentDisabled(false);
+  };
+
+  const closeModal = () => {
+    setEditListMark(false);
+    form.resetFields();
+  };
+  const Successfuloperation = () => {
+    message.success('Successful operation.');
+    closeModal();
+    queryTags();
+  };
 
   return (
     <>
@@ -145,10 +202,7 @@ const index = (props: any) => {
         width="500px"
         visible={editListMark}
         footer={null}
-        onCancel={() => {
-          setEditListMark(false);
-          formDataEdit.resetFields();
-        }}
+        onCancel={closeModal}
       >
         <div className="maintain_table_action">
           <div className="partTitle">
@@ -158,19 +212,18 @@ const index = (props: any) => {
         <Form form={form} labelCol={{ flex: '100px' }}>
           <Row gutter={20}>
             <Col span={24}>
-              <Form.Item name="Title" label="Tag Name">
+              <Form.Item
+                name="Title"
+                label="Tag Name"
+                rules={[{ required: true }]}
+              >
                 <Input disabled={componentDisabled} />
               </Form.Item>
             </Col>
             <Col span={24}>
               <Form.Item style={{ textAlign: 'center' }}>
                 <Space>
-                  <Button
-                    className="btn"
-                    onClick={() => {
-                      setEditListMark(false);
-                    }}
-                  >
+                  <Button className="btn" onClick={closeModal}>
                     Cancel
                   </Button>
                   <Button className="btn" type="primary" onClick={saveData}>
@@ -194,12 +247,7 @@ const index = (props: any) => {
               <div className="partTitleHeadLine">Tags Management</div>
             </div>
             <Space>
-              <Button
-                onClick={() => {
-                  setEditListMark(true);
-                  setComponentDisabled(false);
-                }}
-              >
+              <Button className="def" onClick={openModal}>
                 Add
               </Button>
             </Space>
@@ -209,6 +257,7 @@ const index = (props: any) => {
             dataSource={showIsmainTainNews}
             columns={columns}
             pagination={false}
+            rowKey={(record) => record.key}
             scroll={{ y: 'calc(100vh - 330px)' }}
           />
 
@@ -220,6 +269,13 @@ const index = (props: any) => {
           />
         </div>
       </div>
+      {loading ? (
+        <div className="spinGroup">
+          <Spin></Spin>
+        </div>
+      ) : (
+        ''
+      )}
     </>
   );
 };

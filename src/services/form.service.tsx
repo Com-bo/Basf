@@ -44,6 +44,24 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
+
+  // 添加一条数据
+  addItem(listName: string, item: any) {
+    let token = this._getToken();
+    return this._spService
+      .addItem(listName, item, token)
+      .catch((error: any) => {
+        console.error(error);
+        return Promise.reject(error);
+      });
+  }
+
+  // 编辑一条数据
+  updateItem(listName: string, id: number, item: any) {
+    let token = this._getToken();
+    return this._spService.updateItem(listName, id, item, token);
+  }
+
   submitBizForm(
     listName: string,
     item: any,
@@ -59,10 +77,7 @@ export default class FormService {
         return Promise.reject(error);
       });
   }
-  updateItem(listName: string, id: number, item: any) {
-    let token = this._getToken();
-    return this._spService.updateItem(listName, id, item, token);
-  }
+
   // 更新文件的属性
   /**
    *@param file 文件的信息 url，type

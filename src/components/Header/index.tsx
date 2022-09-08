@@ -50,6 +50,11 @@ const index = (props: any) => {
   useEffect(() => {
     console.log(window.location.pathname);
     setUrlMark(window.location.pathname);
+    if (
+      window.location.pathname == `${process.env.pagePath}/EventCalendar/index`
+    ) {
+      document.getElementsByTagName('body')[0].className = 'Event';
+    }
   }, []);
   return (
     <>

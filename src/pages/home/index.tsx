@@ -55,6 +55,10 @@ const index = (props: any) => {
     'https://basf.sharepoint.com/sites/learn-together   ',
   ]);
 
+  const [current, setCurrent] = useState(0);
+  const [page, setPage] = useState(4);
+  const [total, setTotal] = useState(0);
+
   //获取tag
   const queryTags = () => {
     formService.getTableDataAll('Tag', []).then((res) => {
@@ -75,7 +79,8 @@ const index = (props: any) => {
         }`;
       });
       setNewData(res);
-      setShowNews(res.slice(0, 4));
+      setCurrent(1);
+      setTotal(Math.ceil(res.length / page));
     });
   };
 
@@ -153,6 +158,26 @@ const index = (props: any) => {
     queryEventData();
   }, []);
 
+  const newsOnPage = () => {
+    setShowNews(newData.slice((current - 1) * page, current * page));
+  };
+
+  useEffect(() => {
+    newsOnPage();
+  }, [current]);
+
+  const pagination = (flag: any) => {
+    if (flag) {
+      if (current > 1) {
+        setCurrent(current - 1);
+      }
+    } else {
+      if (current < total) {
+        setCurrent(current + 1);
+      }
+    }
+  };
+
   return (
     <>
       <BasfHeader></BasfHeader>
@@ -179,16 +204,20 @@ const index = (props: any) => {
             <div className="partTitle">
               <div className="partTitleHeadLine">News</div>
               <div className="partTitleMore">
-                {/* <span className='turn'>
-              <LeftOutlined 
-              onClick={()=>{pagination(true)}}
-              />
-              </span>
-              <span className='turn'>
-              <RightOutlined 
-              onClick={()=>{pagination(false)}}
-              />
-              </span> */}
+                <span className="turn">
+                  <LeftOutlined
+                    onClick={() => {
+                      pagination(true);
+                    }}
+                  />
+                </span>
+                <span className="turn">
+                  <RightOutlined
+                    onClick={() => {
+                      pagination(false);
+                    }}
+                  />
+                </span>
               </div>
             </div>
             <div className="partbox part1">
