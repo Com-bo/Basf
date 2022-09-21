@@ -60,7 +60,8 @@ const index = (props: any) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [rawData, setRawData] = useState<any>([]);
   const [newData, setNewData] = useState<any>([]);
-  const listName = 'NewsData';
+  const listName = 'News';
+  const listFilesName = 'NewsFiles';
   const [tagData, setTagData] = useState<any>([]);
   const [loading, setLoading] = useState(false);
 
@@ -102,7 +103,7 @@ const index = (props: any) => {
   //获取新闻信息
   const queryNewData = () => {
     setLoading(true);
-    formService.getTableDataAll('NewsData', []).then((res) => {
+    formService.getTableDataAll('News', []).then((res) => {
       console.log(res);
       res.sort(function (a: any, b: any) {
         return a.PublishDate < b.PublishDate ? 1 : -1;
@@ -145,8 +146,8 @@ const index = (props: any) => {
   const columns = [
     {
       title: 'Title',
-      dataIndex: 'TitleName',
-      key: 'TitleName',
+      dataIndex: 'Title',
+      key: 'Title',
       width: '20%',
     },
     {
@@ -192,6 +193,7 @@ const index = (props: any) => {
                         ? moment(record.PublishDate)
                         : null,
                     Content: BraftEditor.createEditorState(record.Content),
+                    Tag: record.Tag.split(','),
                   });
                 }}
               >
@@ -259,44 +261,61 @@ const index = (props: any) => {
       var fileName = '';
       var expandItems = ['FileLeafRef'];
       if (key) {
-        var FileItems = await formService.getFileItemsById(listName, key);
-        fileName = FileItems.File.Name;
-        // 设定【保存数据】
-        var saveData = {
-          ...form.getFieldsValue(),
-          Content: form.getFieldValue('Content').toHTML(),
-          FileName: fileName,
-        };
-        console.log(saveData);
-        // 执行【数据更新】
-        try {
-          formService
-            .updateLibItem(listName, key, saveData, expandItems)
-            .then(() => {});
-        } catch (e) {}
-      } else {
-        uploadFileFun(
-          file.name,
-          listName,
-          file,
-          process.env.taskRelativePath,
-        ).then((res) => {
-          var innerName = res.innerName;
-          console.log(res);
-          getonFileByUrl(res.d.ListItemAllFields.__deferred.uri).then((res) => {
-            console.log(res);
-            updateFileItem(res, {
-              Writer: form.getFieldValue('Writer'),
-              Tag: form.getFieldValue('Tag'),
-              PublishDate: moment(form.getFieldValue('PublishDate')).format(
-                'YYYY-MM-DD',
-              ),
-              Content: form.getFieldValue('Content')?.toHTML(),
-            }).then((res) => {
-              console.log(res);
+        formService
+          .updateItem(listName, key, {
+            Title: form.getFieldValue('Title'),
+            PublishDate: form.getFieldValue('PublishDate'),
+            OnTop: form.getFieldValue('OnTop'),
+            Writer: form.getFieldValue('Writer'),
+            Content: form.getFieldValue('Content').toHTML(),
+            Tag: form.getFieldValue('Tag').join(','),
+          })
+          .then((res) => {
+            let NewsId = key;
+            uploadFileFun(
+              file.name,
+              listFilesName,
+              file,
+              process.env.taskRelativePath,
+            ).then((res) => {
+              getonFileByUrl(res.d.ListItemAllFields.__deferred.uri).then(
+                (res) => {
+                  updateFileItem(res, {
+                    NewsId: NewsId,
+                  }).then((res) => {});
+                },
+              );
             });
+            Successfuloperation();
           });
-        });
+      } else {
+        formService
+          .addItem(listName, {
+            Title: form.getFieldValue('Title'),
+            PublishDate: form.getFieldValue('PublishDate'),
+            OnTop: form.getFieldValue('OnTop'),
+            Writer: form.getFieldValue('Writer'),
+            Content: form.getFieldValue('Content').toHTML(),
+            Tag: form.getFieldValue('Tag').join(','),
+          })
+          .then((res) => {
+            let NewsId = res.ID;
+            uploadFileFun(
+              file.name,
+              listFilesName,
+              file,
+              process.env.taskRelativePath,
+            ).then((res) => {
+              getonFileByUrl(res.d.ListItemAllFields.__deferred.uri).then(
+                (res) => {
+                  updateFileItem(res, {
+                    NewsId: NewsId,
+                  }).then((res) => {});
+                },
+              );
+            });
+            Successfuloperation();
+          });
       }
     });
   };
@@ -329,6 +348,7 @@ const index = (props: any) => {
     message.success('Successful operation.');
     closeModal();
     queryNewData();
+    setCanUpload(true);
   };
   const closeModal = () => {
     setEditListMark(false);
@@ -359,7 +379,11 @@ const index = (props: any) => {
         <Form form={form} labelCol={{ flex: '150px' }}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="TitleName" label="Title">
+              <Form.Item
+                name="Title"
+                label="Title"
+                rules={[{ required: true }]}
+              >
                 <Input disabled={componentDisabled} />
               </Form.Item>
             </Col>
@@ -407,7 +431,11 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="Writer" label="Writer">
+              <Form.Item
+                name="Writer"
+                label="Writer"
+                rules={[{ required: true }]}
+              >
                 <Input disabled={componentDisabled} />
               </Form.Item>
             </Col>
@@ -428,7 +456,11 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item name="Content" label="Content">
+              <Form.Item
+                name="Content"
+                label="Content"
+                rules={[{ required: true }]}
+              >
                 <BraftEditor
                   onChange={handleChangeBraftEditor}
                   contentStyle={{ height: 200 }}

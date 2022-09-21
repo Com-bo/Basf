@@ -51,9 +51,11 @@ const index = (props: any) => {
           return a.PublishDate < b.PublishDate ? 1 : -1;
         });
         res.map((item: any, index: any) => {
-          res[index].BacImg = `${JSON.parse(item.DisplayImage).serverUrl}${
-            JSON.parse(item.DisplayImage).serverRelativeUrl
-          }`;
+          res[index].BacImg = item.DisplayImage
+            ? `${JSON.parse(item.DisplayImage).serverUrl}${
+                JSON.parse(item.DisplayImage).serverRelativeUrl
+              }`
+            : '';
         });
         setNewData(res);
         setShowNews(res);
