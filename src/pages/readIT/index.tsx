@@ -140,7 +140,7 @@ const index = (props: any) => {
       <div className="readItPart">
         <div className="part">
           <div className="partLeft">
-            <div className="partTitle">News Tags</div>
+            <div className="partTitle">Read IT Tags</div>
             <div className="search">
               <Input
                 value={seachTagStr}
@@ -201,7 +201,13 @@ const index = (props: any) => {
               <div className="partProWrap">
                 {showNews.length ? (
                   showNews?.map((item: any, index: any) => (
-                    <div className="partProWrapItem" key={index}>
+                    <div
+                      className="partProWrapItem"
+                      key={index}
+                      onClick={() => {
+                        window.location.href = `${process.env.pagePath}/newsDetail/index?news=${index}`;
+                      }}
+                    >
                       <img src={item.BacImg} alt="" />
                       <div className="partProWrapItemWrap">
                         <div className="partProWrapItemTitleDate">

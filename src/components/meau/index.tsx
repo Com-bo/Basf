@@ -59,7 +59,7 @@ const index = (props: any) => {
     <>
       <Menu
         onClick={onClickMeau}
-        style={{ width: 256 }}
+        style={{ width: 256, fontWeight: 'bold' }}
         mode="inline"
         items={items}
       />

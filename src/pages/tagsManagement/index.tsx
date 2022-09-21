@@ -49,7 +49,7 @@ import {
 const index = (props: any) => {
   const formService = new FormService();
   const [tagData, setTagData] = useState<any>([]);
-
+  const [dataStatus, setDataStatus] = useState(false);
   // 维护界面
   const [componentDisabled, setComponentDisabled] = useState(true);
   const [editListMark, setEditListMark] = useState(false);
@@ -111,6 +111,7 @@ const index = (props: any) => {
             <Space className="actions">
               <a
                 onClick={() => {
+                  setDataStatus(false);
                   form.setFieldsValue({
                     ...record,
                   });
@@ -206,7 +207,9 @@ const index = (props: any) => {
       >
         <div className="maintain_table_action">
           <div className="partTitle">
-            <div className="partTitleHeadLine">New Tags</div>
+            <div className="partTitleHeadLine">
+              {dataStatus ? 'Add' : 'Edit'} Tags
+            </div>
           </div>
         </div>
         <Form form={form} labelCol={{ flex: '100px' }}>
@@ -247,7 +250,13 @@ const index = (props: any) => {
               <div className="partTitleHeadLine">Tags Management</div>
             </div>
             <Space>
-              <Button className="def" onClick={openModal}>
+              <Button
+                className="def"
+                onClick={() => {
+                  setDataStatus(true);
+                  openModal();
+                }}
+              >
                 Add
               </Button>
             </Space>

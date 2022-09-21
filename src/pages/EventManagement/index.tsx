@@ -49,6 +49,7 @@ const index = (props: any) => {
   const formService = new FormService();
   const [rawData, setRawData] = useState<any>([]);
   const [eventData, setEventData] = useState<any>([]);
+  const [dataStatus, setDataStatus] = useState(false);
 
   // 维护界面
   const [componentDisabled, setComponentDisabled] = useState(true);
@@ -130,6 +131,7 @@ const index = (props: any) => {
             <Space className="actions">
               <a
                 onClick={() => {
+                  setDataStatus(false);
                   form.setFieldsValue({
                     ...record,
                     EndTime:
@@ -257,7 +259,9 @@ const index = (props: any) => {
       >
         <div className="maintain_table_action">
           <div className="partTitle">
-            <div className="partTitleHeadLine">Events</div>
+            <div className="partTitleHeadLine">
+              {dataStatus ? 'Add' : 'Edit'} Events
+            </div>
           </div>
         </div>
         <Form form={form} labelCol={{ flex: '100px' }}>
@@ -304,7 +308,7 @@ const index = (props: any) => {
             </Col>
             <Col span={6}>
               <Form.Item valuePropName="checked" name="AllDataEvent">
-                <Checkbox>All data Event</Checkbox>
+                <Checkbox>All day Event</Checkbox>
               </Form.Item>
             </Col>
             <Col span={24}>
@@ -321,11 +325,7 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item
-                name="Location"
-                label="Location"
-                rules={[{ required: true }]}
-              >
+              <Form.Item name="Location" label="Location">
                 <Input disabled={componentDisabled} />
               </Form.Item>
             </Col>
@@ -335,11 +335,7 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item
-                name="Description"
-                label="Description"
-                rules={[{ required: true }]}
-              >
+              <Form.Item name="Description" label="Description">
                 <Input disabled={componentDisabled} />
               </Form.Item>
             </Col>
@@ -385,6 +381,7 @@ const index = (props: any) => {
                 onClick={() => {
                   setEditListMark(true);
                   setComponentDisabled(false);
+                  setDataStatus(true);
                 }}
               >
                 Add

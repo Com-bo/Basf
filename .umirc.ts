@@ -29,6 +29,10 @@ export default defineConfig({
       component: '@/pages/readIT/index',
     },
     {
+      path: `${pagePath}/newsDetail/index`,
+      component: '@/pages/newsDetail/index',
+    },
+    {
       path: `${pagePath}/EventCalendar/index`,
       component: '@/pages/EventCalendar/index',
     },

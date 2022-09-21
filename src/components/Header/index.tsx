@@ -13,8 +13,8 @@ import { DownOutlined, RightOutlined, MinusOutlined } from '@ant-design/icons';
 const index = (props: any) => {
   const [urlMark, setUrlMark] = useState('');
   const [SolutionLink, setSolutionLink] = useState<any>([
-    'https://apps.powerapps.com/play/e/b240154e-fa0f-45e9-b470-5d6d1c29d82d/a/194ab89b-0179-4800-b341-5b7b7de03a76?tenantId=ecaa386b-c8df-4ce0-ad01-740cbdb5ba55&source=portal',
     'https://basf.sharepoint.com/sites/learn-together   ',
+    'https://apps.powerapps.com/play/e/b240154e-fa0f-45e9-b470-5d6d1c29d82d/a/194ab89b-0179-4800-b341-5b7b7de03a76?tenantId=ecaa386b-c8df-4ce0-ad01-740cbdb5ba55&source=portal',
   ]);
   const shift = () => {
     window.location.href = `${process.env.pagePath}/newsManagement/index`;
@@ -55,6 +55,10 @@ const index = (props: any) => {
     ) {
       document.getElementsByTagName('body')[0].className = 'Event';
     }
+
+    // var result = await AjaxApi.externalGet({
+    //   path: process.env.pagePath + '/_api/web/CurrentUser',
+    // });
   }, []);
   return (
     <>
@@ -81,7 +85,7 @@ const index = (props: any) => {
                     : ''
                 }
               >
-                <a href={`${process.env.pagePath}/readIT/index`}>News</a>
+                <a href={`${process.env.pagePath}/readIT/index`}>Read IT</a>
               </li>
               <li
                 className={

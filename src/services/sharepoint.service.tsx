@@ -15,7 +15,7 @@ import Item from 'antd/lib/list/Item';
 
 export default class SharepointService {
   private _http: HttpService;
-  private formDigestValue: string;
+  private formDigestValue: string | undefined;
   private pageSize = 500;
 
   private config = {
@@ -25,11 +25,22 @@ export default class SharepointService {
   constructor() {
     this._http = new HttpService();
     let test: any = window['_spPageContextInfo' as any];
-    this.formDigestValue = test
-      ? test.formDigestValue
-        ? test.formDigestValue
-        : ''
-      : '';
+    // this.formDigestValue = test
+    //   ? test.formDigestValue
+    //     ? test.formDigestValue
+    //     : ''
+    //   : '';
+    let url = `${process.env.host}${process.env.taskRelativePath}/_api/contextinfo`;
+    this._http
+      .post(url, {
+        headers: {
+          Authorization: `Bearer ${this.getToken()}`,
+        },
+      })
+      .then((response: any) => {
+        let res = response.data;
+        this.formDigestValue = res.FormDigestValue;
+      });
   }
 
   private formatValue(e: any, listName: string, isFull = false) {
@@ -545,6 +556,92 @@ export default class SharepointService {
         });
     }
   }
+  getTableDataAllOther(
+    listName: string,
+    filter: IFilter[],
+    expand: any[],
+    token: any,
+  ) {
+    let table = this.formatTable(listName);
+    if (table.expand) {
+      expand = expand.concat(table.expand).reduce((p: string[], c: string) => {
+        if (p.findIndex((e) => e === c) < 0) {
+          p.push(c);
+        }
+        return p;
+      }, []);
+    }
+    if (filter[0] && !filter[0].format) {
+      var queryPayload = {
+        query: {
+          // '__metadata': { 'type': 'SP.CamlQuery' },
+          ViewXml:
+            `<View Scope='RecursiveAll'>` +
+            `${filter ? this.formatFilterNew(filter, listName) : ''}` +
+            `</View>`,
+          // "ListItemCollectionPosition": {
+          //     "PagingInfo": "Paged=TRUE&p_ID=" + 1
+          // }
+        },
+      };
+      let url = `${process.env.host}${process.env.relativePath}/_api/web/lists/Events/getitems`;
+      // sites/learn-together/Lists/Events
+      return this._http
+        .post(url, {
+          headers: {
+            Accept: 'application/json;odata=verbose',
+            Authorization: `Bearer ${token}`,
+            'X-RequestDigest': this.formDigestValue,
+          },
+          data: queryPayload,
+        })
+        .then((response: any) => {
+          let res = response.data;
+          return res.d.results.map((e: any) => this.formatValue(e, listName));
+        });
+    } else {
+      let url =
+        `${process.env.host}${process.env.relativePath}/_api/web/lists/Events/items?` +
+        `$skiptoken=Paged=TRUE&p_ID=1&$top=${this.pageSize}` +
+        `&$select=*` +
+        `${expand ? this.formatExpand(expand, listName) : ''}` +
+        `${filter ? this.formatFilter(filter, listName) : ''}`;
+
+      return this._http
+        .get(url, {
+          headers: {
+            Accept: 'application/json;odata=verbose',
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(async (response: any) => {
+          let res = response.data;
+          let next = res.d.__next;
+          let list = res.d.results.map((e: any) =>
+            this.formatValue(e, listName),
+          );
+
+          while (next) {
+            let data = await this.getUrlNext(next, token).then((res: any) => {
+              let next = res.d.__next;
+              let list = res.d.results.map((e: any) =>
+                this.formatValue(e, listName),
+              );
+              return { list, next };
+            });
+            // .catch((error: any) => {
+            //     const { LogAction } = store.actions
+            //     LogAction.logError(error)
+            //     return Promise.reject(error);
+            // })
+            // console.log('data', data)
+            list = list.concat(data.list);
+            next = data.next;
+          }
+          return list;
+        });
+    }
+  }
 
   getTableDataFilter(
     listName: string,
@@ -650,6 +747,69 @@ export default class SharepointService {
         let value = response.data.d;
         // value['key'] = value[formatKey(this.config.Type, listName)]
         return { key: id };
+      });
+  }
+
+  // TODO
+  updateLibItem(
+    listName: string,
+    id: number,
+    item: any,
+    expand: any[],
+    token: any,
+  ) {
+    let table = this.formatTable(listName);
+    let newOb = this.formatUploadData(item, table, listName);
+
+    // 排除更新字段
+    if (expand && expand.length > 0) {
+      expand.forEach((k: string | number) => {
+        delete newOb[k];
+      });
+    }
+
+    newOb['__metadata'] = { type: `SP.Data.${listName}Item` };
+
+    let url = `${process.env.host}${
+      process.env.taskRelativePath
+    }/_api/web/lists/getbytitle('${
+      this.formatTable(listName).name
+    }')/items(${id})`;
+    return this._http
+      .post(url, {
+        headers: {
+          accept: 'application/json;odata=verbose',
+          Authorization: `Bearer ${token}`,
+          'X-RequestDigest': this.formDigestValue,
+          'IF-MATCH': '*',
+          'X-HTTP-Method': 'MERGE',
+          'content-type': 'application/json;odata=verbose',
+        },
+        data: newOb,
+      })
+      .then((response: any) => {
+        let value = response.data.d;
+        // value['key'] = value[formatKey(this.config.Type, listName)]
+        return { key: id };
+      });
+  }
+
+  // TODO
+  async getFileItemsById(listName: string, id: number) {
+    let url =
+      `${process.env.host}${process.env.taskRelativePath}/_api/web/lists/getbytitle('${listName}')/items(${id})?` +
+      `$select=*,UniqueId,FileLeafRef,FileRef,FSObjType,ContentTypeId,Title,HasUniqueRoleAssignments,RoleAssignments` +
+      `&$expand=RoleAssignments,File,File/Properties,Folder`;
+
+    return this._http
+      .get(url, {
+        headers: {
+          Accept: 'application/json;odata=verbose',
+          Authorization: `Bearer ${this.getToken()}`,
+        },
+      })
+      .then((response: any) => {
+        return response.data.d;
       });
   }
 

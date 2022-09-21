@@ -202,7 +202,7 @@ const index = (props: any) => {
         <div className="part">
           <div className="partLeft">
             <div className="partTitle">
-              <div className="partTitleHeadLine">News</div>
+              <div className="partTitleHeadLine">Read IT</div>
               <div className="partTitleMore">
                 <span className="turn">
                   <LeftOutlined
@@ -224,7 +224,13 @@ const index = (props: any) => {
               <div className="partProWrap">
                 {showNews?.map((item: any, index: any) => {
                   return (
-                    <div className="partProWrapItem" key={index}>
+                    <div
+                      className="partProWrapItem"
+                      key={index}
+                      onClick={() => {
+                        window.location.href = `${process.env.pagePath}/newsDetail/index?news=${index}`;
+                      }}
+                    >
                       <img src={item.BacImg} alt="" />
                       <div className="partProWrapItemWrap">
                         <div className="partProWrapItemTitle">{item.Title}</div>
@@ -242,7 +248,7 @@ const index = (props: any) => {
             </div>
           </div>
           <div className="partRight">
-            <div className="partTitle">News Tags</div>
+            <div className="partTitle">Read IT Tags</div>
             <div className="partbox">
               <div className="part1">
                 {showTags?.map((item: any, index: any) => {

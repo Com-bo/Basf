@@ -78,6 +78,25 @@ export default class FormService {
       });
   }
 
+  // TODO
+  updateLibItem(listName: string, id: number, item: any, expand: any[]) {
+    let token = this._getToken();
+    return this._spService.updateLibItem(listName, id, item, expand, token);
+  }
+
+  // TODO
+  async getFileItemsById(listName: string, id: number) {
+    return await this._spService
+      .getFileItemsById(listName, id)
+      .then((res) => {
+        return res;
+      })
+      .catch((error: any) => {
+        console.error(error);
+        return Promise.reject(error);
+      });
+  }
+
   // 更新文件的属性
   /**
    *@param file 文件的信息 url，type
@@ -97,6 +116,16 @@ export default class FormService {
     let token = this._getToken();
     return this._spService
       .getTableDataAllNews(listName, filter, [], token)
+      .catch((error: any) => {
+        // this._logService.logError(error)
+        console.error(error);
+        return Promise.reject(error);
+      });
+  }
+  getTableDataAllOther(listName: string, filter: IFilter[]) {
+    let token = this._getToken();
+    return this._spService
+      .getTableDataAllOther(listName, filter, [], token)
       .catch((error: any) => {
         // this._logService.logError(error)
         console.error(error);

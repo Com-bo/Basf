@@ -28,13 +28,22 @@ import 'braft-editor/dist/index.css';
 
 import type { MenuProps, MenuTheme, PaginationProps } from 'antd';
 type MenuItem = Required<MenuProps>['items'][number];
-
 import SpService from '@/services/sharepoint.service';
 import moment from 'moment';
 import BasfHeader from '@/components/Header';
 import Basfmeau from '@/components/meau';
 import FormService from '@/services/form.service';
-
+import {
+  removeItem,
+  updateItem,
+  addItem,
+  deleteFileItem,
+  uploadFileFun,
+  updateFileItem,
+  updateFile,
+  getFileItemByFileName,
+  getonFileByUrl,
+} from '@/services/sharepointApi';
 import {
   DownOutlined,
   RightOutlined,
@@ -48,11 +57,14 @@ import {
 
 const index = (props: any) => {
   const formService = new FormService();
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [rawData, setRawData] = useState<any>([]);
   const [newData, setNewData] = useState<any>([]);
-
+  const listName = 'NewsData';
   const [tagData, setTagData] = useState<any>([]);
   const [loading, setLoading] = useState(false);
+
+  const [dataStatus, setDataStatus] = useState(false);
 
   // 维护界面
   const [isAdd, setIsAdd] = useState(false);
@@ -72,17 +84,35 @@ const index = (props: any) => {
     modalWidth: 600, //弹窗宽度
   };
 
+  const [file, setFile] = useState<any>();
+  const [isCanUpload, setCanUpload] = useState(true);
+  // 设定【上传控件 - 属性】
+  const uploadProps = {
+    onChange() {
+      let _listFile = form.getFieldValue('UploadFile');
+      // 只能上传一个文件
+      if (!_listFile || _listFile.fileList <= 0) {
+        setCanUpload(true);
+      } else {
+        setCanUpload(false);
+      }
+    },
+  };
+
   //获取新闻信息
   const queryNewData = () => {
     setLoading(true);
-    formService.getTableDataAll('News', []).then((res) => {
+    formService.getTableDataAll('NewsData', []).then((res) => {
+      console.log(res);
       res.sort(function (a: any, b: any) {
         return a.PublishDate < b.PublishDate ? 1 : -1;
       });
       res.map((item: any, index: any) => {
-        res[index].BacImg = `${JSON.parse(item.DisplayImage).serverUrl}${
-          JSON.parse(item.DisplayImage).serverRelativeUrl
-        }`;
+        res[index].BacImg = item.DisplayImage
+          ? `${JSON.parse(item.DisplayImage).serverUrl}${
+              JSON.parse(item.DisplayImage).serverRelativeUrl
+            }`
+          : '';
       });
       setNewData(res);
       setRawData(res);
@@ -97,7 +127,6 @@ const index = (props: any) => {
   const queryTags = () => {
     formService.getTableDataAll('Tag', []).then((res) => {
       var resTagData = res.reverse();
-      console.log(resTagData);
       setTagData(resTagData);
     });
   };
@@ -116,8 +145,8 @@ const index = (props: any) => {
   const columns = [
     {
       title: 'Title',
-      dataIndex: 'Title',
-      key: 'Title',
+      dataIndex: 'TitleName',
+      key: 'TitleName',
       width: '20%',
     },
     {
@@ -154,6 +183,7 @@ const index = (props: any) => {
               {/* <a className="publish">Publish</a> */}
               <a
                 onClick={() => {
+                  setDataStatus(false);
                   openModal();
                   form.setFieldsValue({
                     ...record,
@@ -161,6 +191,7 @@ const index = (props: any) => {
                       record.PublishDate && moment(record.PublishDate).isValid()
                         ? moment(record.PublishDate)
                         : null,
+                    Content: BraftEditor.createEditorState(record.Content),
                   });
                 }}
               >
@@ -200,8 +231,6 @@ const index = (props: any) => {
     setCurrent(current);
   };
 
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-
   const onChangeDisplayImage: UploadProps['onChange'] = ({
     fileList: newFileList,
   }) => {
@@ -225,17 +254,59 @@ const index = (props: any) => {
   };
 
   const saveData = () => {
-    console.log(form.getFieldsValue());
+    form.validateFields().then(async () => {
+      var key = form.getFieldValue('key');
+      var fileName = '';
+      var expandItems = ['FileLeafRef'];
+      if (key) {
+        var FileItems = await formService.getFileItemsById(listName, key);
+        fileName = FileItems.File.Name;
+        // 设定【保存数据】
+        var saveData = {
+          ...form.getFieldsValue(),
+          Content: form.getFieldValue('Content').toHTML(),
+          FileName: fileName,
+        };
+        console.log(saveData);
+        // 执行【数据更新】
+        try {
+          formService
+            .updateLibItem(listName, key, saveData, expandItems)
+            .then(() => {});
+        } catch (e) {}
+      } else {
+        uploadFileFun(
+          file.name,
+          listName,
+          file,
+          process.env.taskRelativePath,
+        ).then((res) => {
+          var innerName = res.innerName;
+          console.log(res);
+          getonFileByUrl(res.d.ListItemAllFields.__deferred.uri).then((res) => {
+            console.log(res);
+            updateFileItem(res, {
+              Writer: form.getFieldValue('Writer'),
+              Tag: form.getFieldValue('Tag'),
+              PublishDate: moment(form.getFieldValue('PublishDate')).format(
+                'YYYY-MM-DD',
+              ),
+              Content: form.getFieldValue('Content')?.toHTML(),
+            }).then((res) => {
+              console.log(res);
+            });
+          });
+        });
+      }
+    });
   };
-  const handleChangeBraftEditor = (val: any) => {
-    // onChange(val);
-    console.log('val: ', val);
-  };
+  const handleChangeBraftEditor = (val: any) => {};
 
   useEffect(() => {
     queryNewData();
     queryTags();
   }, []);
+  // getTablePagingList
 
   const onTitleSearch = (value: string) => {
     const reg = new RegExp(`${value}`, 'gi');
@@ -256,7 +327,7 @@ const index = (props: any) => {
 
   const Successfuloperation = () => {
     message.success('Successful operation.');
-    // closeModal()
+    closeModal();
     queryNewData();
   };
   const closeModal = () => {
@@ -280,13 +351,15 @@ const index = (props: any) => {
       >
         <div className="maintain_table_action">
           <div className="partTitle">
-            <div className="partTitleHeadLine">Add News</div>
+            <div className="partTitleHeadLine">
+              {dataStatus ? 'Add' : 'Edit'} News
+            </div>
           </div>
         </div>
         <Form form={form} labelCol={{ flex: '150px' }}>
           <Row gutter={20}>
             <Col span={12}>
-              <Form.Item name="Title" label="Title">
+              <Form.Item name="TitleName" label="Title">
                 <Input disabled={componentDisabled} />
               </Form.Item>
             </Col>
@@ -295,6 +368,8 @@ const index = (props: any) => {
                 <Select
                   placeholder="-----select--------"
                   disabled={componentDisabled}
+                  mode="multiple"
+                  // size="5"
                 >
                   {tagData.map((item: any, index: any) => (
                     <Select.Option key={index} value={item.Title}>
@@ -337,7 +412,7 @@ const index = (props: any) => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item name="DisplayImage" label="Display Image">
+              <Form.Item name="BacImg" label="Display Image">
                 <div style={{ minHeight: '122px' }}>
                   <ImgCrop {...imgprops}>
                     <Upload
@@ -361,15 +436,19 @@ const index = (props: any) => {
                     border: '1px solid #d9d9d9',
                     marginBottom: '20px',
                   }}
-                  //  placeholder={placeholder}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="Attachment" label="Attachment">
-                <Button type="primary" className="btn">
-                  Upload
-                </Button>
+              <Form.Item name="UploadFile" label="Attachment">
+                <Upload
+                  beforeUpload={(f) => {
+                    setFile(f);
+                  }}
+                  {...uploadProps}
+                >
+                  {isCanUpload ? <Button>Upload</Button> : ''}
+                </Upload>
               </Form.Item>
             </Col>
             <Col span={24}>
@@ -385,6 +464,7 @@ const index = (props: any) => {
           </Row>
         </Form>
       </Modal>
+      {/* <SharePoint:InputFormTextBox id="txt" runat="server" RichTextMode="HtmlAsXml" RichText="True" Rows="5" Width="186px" Height="74px" TextMode="MultiLine"/> */}
       <BasfHeader></BasfHeader>
 
       <div className="maintain">
@@ -407,6 +487,7 @@ const index = (props: any) => {
                 className="def"
                 onClick={() => {
                   openModal();
+                  setDataStatus(true);
                 }}
               >
                 Add

@@ -1,7 +1,61 @@
 import Util from '@/common/util';
 
 export const TableTypeMap: any = {
-  // new
+  //
+  NewsData: {
+    SPList: 'NewsData',
+    CDSTable: 'NewsData',
+    Fields: [
+      {
+        Key: 'TitleName',
+        SPList: 'TitleName',
+        CDSTable: 'TitleName',
+        Type: 'Text',
+      },
+      {
+        Key: 'ServerRedirectedEmbedUri',
+        SPList: 'ServerRedirectedEmbedUri',
+        CDSTable: 'ServerRedirectedEmbedUri',
+        Type: 'Text',
+      },
+      {
+        Key: 'Tag',
+        SPList: 'Tag',
+        CDSTable: 'Tag',
+        Type: 'Text',
+      },
+      {
+        Key: 'PublishDate',
+        SPList: 'PublishDate',
+        CDSTable: 'PublishDate',
+        Type: 'Text',
+      },
+      {
+        Key: 'OnTop',
+        SPList: 'OnTop',
+        CDSTable: 'OnTop',
+        Type: 'Text',
+      },
+      {
+        Key: 'DisplayImage',
+        SPList: 'DisplayImage',
+        CDSTable: 'DisplayImage',
+        Type: 'Text',
+      },
+      {
+        Key: 'Content',
+        SPList: 'Content',
+        CDSTable: 'Content',
+        Type: 'Text',
+      },
+      {
+        Key: 'Writer',
+        SPList: 'Writer',
+        CDSTable: 'Writer',
+        Type: 'Text',
+      },
+    ],
+  },
   News: {
     SPList: 'News',
     CDSTable: 'News',
@@ -112,6 +166,54 @@ export const TableTypeMap: any = {
         Key: 'Title',
         SPList: 'Title',
         CDSTable: 'Title',
+        Type: 'Text',
+      },
+    ],
+  },
+  BVTemplate: {
+    SPList: 'BVTemplate',
+    CDSTable: 'BVTemplate',
+    Fields: [
+      {
+        Key: 'ID',
+        SPList: 'ID',
+        CDSTable: 'ID',
+        Type: 'Int',
+      },
+      {
+        Key: 'ContractApplicationScope',
+        SPList: 'ContractApplicationScope',
+        CDSTable: 'ContractApplicationScope',
+        Type: 'Text',
+      },
+      {
+        Key: 'ContractCategory',
+        SPList: 'ContractCategory',
+        CDSTable: 'ContractCategory',
+        Type: 'Text',
+      },
+      {
+        Key: 'UpdateDate',
+        SPList: 'UpdateDate',
+        CDSTable: 'UpdateDate',
+        Type: 'DateTime',
+      },
+      {
+        Key: 'FileName',
+        SPList: 'FileName',
+        CDSTable: 'FileName',
+        Type: 'Text',
+      },
+      {
+        Key: 'FileLeafRef',
+        SPList: 'FileLeafRef',
+        CDSTable: 'FileLeafRef',
+        Type: 'Text',
+      },
+      {
+        Key: 'ServerRedirectedEmbedUri',
+        SPList: 'ServerRedirectedEmbedUri',
+        CDSTable: 'ServerRedirectedEmbedUri',
         Type: 'Text',
       },
     ],

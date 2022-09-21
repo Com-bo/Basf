@@ -256,13 +256,39 @@ const index = (props: any) => {
                         {getDate(item.StartTime)},{getTime(item.StartTime)}
                       </div>
                     </div>
+
+                    <div className="modal">
+                      <div className="modalitem">
+                        <div>Title:</div>
+                        <div>{item.Title}</div>
+                      </div>
+                      <div className="modalitem">
+                        <div>Time:</div>
+                        <div>{item.Time}</div>
+                      </div>
+                      <div className="modalitem">
+                        <div>Hot:</div>
+                        <div>{item.Hot}</div>
+                      </div>
+                      <div className="modalitem">
+                        <div>Location:</div>
+                        <div>{item.Location}</div>
+                      </div>
+                      <div className="modalitem">
+                        <div>Link:</div>
+                        <div>{item.Link}</div>
+                      </div>
+                      <div className="modalitem">
+                        <div>Description:</div>
+                        <div>{item.Description}</div>
+                      </div>
+                    </div>
                   </div>
                 );
               })
             ) : (
               <div className="Nodata">
-                <img src={require('@/assets/images/NoResult.png')} alt="" />
-                {/* No Result ! */}
+                <img src={require('@/assets/images/NoResult.png')} alt="" />{' '}
               </div>
             )}
           </div>

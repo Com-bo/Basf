@@ -80,7 +80,6 @@ body {
     align-items: center;
     justify-content: space-between;
     background: #333333;
-    box-shadow: 0px 50px 50px 0px rgba(0, 0, 0, 0.5);
     .headerLogo {
       display: flex;
     }
@@ -781,15 +780,15 @@ body {
               }
               .ProTag {
                 display: inline-block;
-                background: rgba(255, 255, 255, 0.25);
                 border-radius: 3px;
-                font-size: 16px;
+                font-style: italic;
+                font-size: 14px;
                 font-family: Alibaba;
                 font-weight: normal;
                 color: #ffffff;
                 opacity: 0.8;
                 line-height: 16px;
-                padding: 6px 20px;
+                padding: 5px;
               }
             }
           }
@@ -877,7 +876,6 @@ body {
         margin-bottom: 12px;
         display: flex;
         align-items: center;
-        overflow: hidden;
         cursor: pointer;
         &:nth-child(3n + 3) {
           margin-right: 0;
@@ -933,6 +931,25 @@ body {
               color: #999999;
             }
           }
+        }
+        &:hover {
+          .modal {
+            z-index: 999;
+            opacity: 1;
+          }
+        }
+        .modal {
+          position: absolute;
+          background-color: #ffffff;
+          width: 300px;
+          height: 300px;
+          z-index: -9999;
+          opacity: 0;
+          right: 0;
+          bottom: 0;
+          transition: all linear 0.5s;
+          box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.5);
+          border-radius: 25px;
         }
       }
     }
@@ -1304,15 +1321,15 @@ body {
                 }
                 .ProTag {
                   display: inline-block;
-                  background: rgba(255, 255, 255, 0.25);
                   border-radius: 3px;
-                  font-size: 16px;
+                  font-style: italic;
+                  font-size: 14px;
                   font-family: Alibaba;
                   font-weight: normal;
                   color: #ffffff;
                   opacity: 0.8;
                   line-height: 16px;
-                  padding: 6px 20px;
+                  padding: 5px;
                 }
               }
             }
@@ -1580,10 +1597,7 @@ body {
     margin-bottom: 0;
   }
   .maintain_title {
-    // width: 230px;
-    .maintain_title_bg {
-      height: calc(100vh - 90px);
-    }
+    color: red !important;
   }
   .maintain_content {
     margin: 0 20px;
@@ -1611,6 +1625,10 @@ body {
         background: #ffffff;
         border: 1px solid #dcdcdc;
       }
+      .partTitleHeadLine {
+        font-weight: bold;
+        font-style: italic;
+      }
     }
     button.btn {
       width: 90px;
@@ -1624,6 +1642,77 @@ body {
     .ant-pagination {
       text-align: center;
       margin-top: 20px;
+    }
+
+    .ant-table-thead {
+      .ant-table-cell {
+        background-color: rgba(102, 102, 102, 0.1);
+      }
+    }
+  }
+}
+
+.newsDetail {
+  .headerArticle {
+  }
+  .newsDetailbody {
+    margin-top: 100px;
+    .content {
+      background-color: #ffffff;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 30px;
+      .title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        font-family: Alibaba PuHuiTi;
+        font-weight: bold;
+        .title_Writer {
+          color: rgba(0, 71, 155, 1);
+        }
+        img {
+          width: 35px;
+          height: 35px;
+          margin-right: 20px;
+        }
+      }
+      .title_text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        & > div {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 12px;
+          font-family: Alibaba PuHuiTi;
+          font-weight: 400;
+          color: #333333;
+          margin-right: 20px;
+          img {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+          }
+        }
+      }
+      .fujian {
+        display: flex;
+        align-items: center;
+        img {
+          width: 150px;
+        }
+        .fujianitem {
+          div {
+            display: inline-block;
+            background-color: rgba(68, 68, 68, 0.06);
+            padding: 10px 15px;
+            margin-left: 20px;
+          }
+        }
+      }
     }
   }
 }
