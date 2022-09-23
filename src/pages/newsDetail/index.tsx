@@ -32,6 +32,7 @@ const index = (props: any) => {
   const formService = new FormService();
   const [newData, setNewData] = useState<any>([]);
   const [showNews, setShowNews] = useState<any>([]);
+  const [Tags, setTags] = useState<any>([]);
   //获取新闻信息
   const queryNewData = () => {
     formService
@@ -58,9 +59,22 @@ const index = (props: any) => {
             : '';
         });
         setNewData(res);
-        setShowNews(res);
+        console.log(res);
+        var newsKey = Number(window.location.search.split('=')[1]);
+        setShowNews(res.filter((y: any) => y.key == newsKey)[0]);
+
+        setTags(res.filter((y: any) => y.key == newsKey)[0].Tag.split(','));
       });
+
+    // formService
+    // .getTableDataAll(
+    //   'NewsFiles',[]).then((res) => {
+    //     console.log(res)
+    //   })
   };
+  useEffect(() => {
+    queryNewData();
+  }, []);
   return (
     <>
       {loading ? (
@@ -73,33 +87,51 @@ const index = (props: any) => {
       <BasfHeader></BasfHeader>
       <div className="newsDetail">
         <div className="headerArticle">
-          {/* <img src={require('@/assets/images/newsDetail.png')} alt="" /> */}
+          {/* <img src={require('@/assets/images/detailbg.png')} alt="" /> */}
         </div>
         <div className="newsDetailbody">
+          {/* <img className='bgimg' src={require('@/assets/images/detailbg.png')} alt="" /> */}
           <div className="part">
             <div className="content">
               <div className="title">
                 <img src={require('@/assets/images/newstitle.png')} alt="" />
-                <div className="title_Writer">Read IT GC -</div>
-                <div className="title_Name">
-                  Instruction and Q&A about MS Teams
-                </div>
+                <div className="title_Name">{showNews.Title}</div>
               </div>
               <div className="title_text">
                 <div>
                   <img src={require('@/assets/images/newstime.png')} alt="" />
-                  <div>2022-08-22 16:20</div>
+                  <div>
+                    {moment(showNews.Created).format('YYYY-MM-DD HH:MM:SS')}
+                  </div>
                 </div>
                 <div>
                   <img src={require('@/assets/images/newswriter.png')} alt="" />
-                  <div>Esther chen</div>
+                  <div>{showNews.Writer}</div>
                 </div>
               </div>
+
+              <div className="tags">
+                {Tags.map((item: any, index: any) => {
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        window.location.href = `${process.env.pagePath}/readIT/index?Tag=${item}`;
+                      }}
+                    >
+                      {item}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div dangerouslySetInnerHTML={{ __html: showNews.Content }}></div>
+
               <div className="fujian">
                 <img src={require('@/assets/images/fujian.png')} alt="" />
-                <div className="fujianitem">
+                {/* <div className="fujianitem">
                   <div>Microsoft Teams user Guide .pdf</div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

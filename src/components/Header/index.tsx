@@ -128,7 +128,7 @@ const index = (props: any) => {
             <div className="headerAvatar">
               <img src={avatar} alt="" />
             </div>
-            <div className="headerName">Joe Zhou</div>
+            <div className="headerName">User</div>
             <Dropdown overlay={menu} placement="bottom" arrow>
               <DownOutlined style={{ color: '#ffffff', cursor: 'pointer' }} />
             </Dropdown>

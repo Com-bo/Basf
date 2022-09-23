@@ -28,13 +28,12 @@ const index = (props: any) => {
   //获取tag
   const queryTags = () => {
     formService.getTableDataAll('Tag', []).then((res) => {
-      if (window.location.search.split('=')[1]) {
-        setCheckedTagValues([
-          res[Number(window.location.search.split('=')[1])].Title,
-        ]);
-      }
       setTagData(res);
       setShowTags(res);
+      if (window.location.search.split('=')[1]) {
+        var TagValue = window.location.search.split('=')[1];
+        setCheckedTagValues([TagValue.replace('%20', ' ')]);
+      }
     });
   };
 
@@ -65,6 +64,7 @@ const index = (props: any) => {
         });
         setNewData(res);
         setShowNews(res);
+        onTagTitleSearchChild();
       });
   };
 
@@ -83,13 +83,26 @@ const index = (props: any) => {
   const onTagChange = (checkedValues: CheckboxValueType[]) => {
     setCheckedTagValues(checkedValues);
   };
+  const isRepeat = (arr: any) => {
+    var hash = {};
+    for (var i in arr) {
+      if (hash[arr[i]]) {
+        return true;
+      }
+      hash[arr[i]] = true;
+    }
+    return false;
+  };
 
   // 标签和标题检索
   const onTagTitleSearchChild = () => {
+    console.log(checkedTagValues);
     if (checkedTagValues.length) {
+      const reg = new RegExp(`^${seachTagStr}`, 'gi');
       if (seachTitleStr) {
         setShowNews(
           newData
+            // .filter((x: any) => checkedTagValues.indexOf(x.Tag) >= 0)
             .filter((x: any) => checkedTagValues.indexOf(x.Tag) >= 0)
             .filter((y: any) => y.Title.indexOf(seachTitleStr) >= 0),
         );
@@ -207,7 +220,7 @@ const index = (props: any) => {
                       className="partProWrapItem"
                       key={index}
                       onClick={() => {
-                        window.location.href = `${process.env.pagePath}/newsDetail/index?news=${index}`;
+                        window.location.href = `${process.env.pagePath}/newsDetail/index?news=${item.key}`;
                       }}
                     >
                       <img src={item.BacImg} alt="" />

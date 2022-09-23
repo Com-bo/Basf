@@ -283,6 +283,7 @@ const index = (props: any) => {
               >
                 <DatePicker
                   showTime
+                  format="YYYY-MM-DD HH:mm"
                   disabled={componentDisabled}
                   style={{ width: '100%' }}
                 />
@@ -301,6 +302,7 @@ const index = (props: any) => {
               >
                 <DatePicker
                   showTime
+                  format="YYYY-MM-DD HH:mm"
                   disabled={componentDisabled}
                   style={{ width: '100%' }}
                 />
@@ -336,7 +338,7 @@ const index = (props: any) => {
             </Col>
             <Col span={24}>
               <Form.Item name="Description" label="Description">
-                <Input disabled={componentDisabled} />
+                <Input.TextArea disabled={componentDisabled} />
               </Form.Item>
             </Col>
             <Col span={24}>

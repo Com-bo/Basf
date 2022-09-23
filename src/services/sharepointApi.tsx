@@ -107,24 +107,34 @@ export const uploadFileFun = async (
     moment().format('yyyyMMDDHHmmss') +
     '.' +
     splits[splits.length - 1];
-
-  let url = `${process.env.host}${path}/_api/web/getfolderbyserverrelativeurl('${path}/${libraryName}/')/files/add(overwrite=true,url='${fileName}')`;
+  let url = `${process.env.host}${process.env.taskRelativePath}/_api/contextinfo`;
   return http
     .post(url, {
       headers: {
         Authorization: `Bearer ${process.env.token}`,
-        'X-RequestDigest': formDigestValue,
-        accept: 'application/json;odata=verbose',
       },
-      data: arrayBuffer,
     })
     .then((response: any) => {
-      let value = response.data;
-      value.innerName = fileName;
-      return value;
-    })
-    .catch((e) => {
-      return e;
+      let res = response.data;
+      var fValue = res.FormDigestValue;
+      url = `${process.env.host}${path}/_api/web/getfolderbyserverrelativeurl('${path}/${libraryName}/')/files/add(overwrite=true,url='${fileName}')`;
+      return http
+        .post(url, {
+          headers: {
+            Authorization: `Bearer ${process.env.token}`,
+            'X-RequestDigest': fValue,
+            accept: 'application/json;odata=verbose',
+          },
+          data: arrayBuffer,
+        })
+        .then((response: any) => {
+          let value = response.data;
+          value.innerName = fileName;
+          return value;
+        })
+        .catch((e) => {
+          return e;
+        });
     });
 };
 
@@ -209,34 +219,36 @@ export const getonFileByUrl = async (url: string) => {
 
 export const updateFileItem = async (file: any, item: any) => {
   var http = new HttpService();
-  // let url2 = `${process.env.host}/_api/contextinfo`;
+  let url2 = `${process.env.host}${process.env.taskRelativePath}/_api/contextinfo`;
 
-  // http.post(url2, {
-  //   headers: {
-  //     Authorization: `Bearer ${process.env.token}`,
-  //   }
-  // })
-  // .then((response: any) => {
-  //   let res = response.data;
-
-  //   formDigestValue= res.FormDigestValue
-  // });
-  var paramsStr = [];
-  for (var field in item) {
-    paramsStr.push(`'${field}':'${item[field]}'`);
-  }
-  let body = `{'__metadata':{'type':'${file.type}'},${paramsStr.join(',')}}`;
-  return await http.post(file.uri, {
-    data: body,
-    headers: {
-      Authorization: `Bearer ${process.env.token}`,
-      'X-RequestDigest': formDigestValue,
-      'content-type': 'application/json;odata=verbose',
-      // 'content-length': body.length,
-      'IF-MATCH': '*',
-      'X-HTTP-Method': 'MERGE',
-    },
-  });
+  http
+    .post(url2, {
+      headers: {
+        Authorization: `Bearer ${process.env.token}`,
+      },
+    })
+    .then((response: any) => {
+      let res = response.data;
+      formDigestValue = res.FormDigestValue;
+      var paramsStr = [];
+      for (var field in item) {
+        paramsStr.push(`'${field}':'${item[field]}'`);
+      }
+      let body = `{'__metadata':{'type':'${file.type}'},${paramsStr.join(
+        ',',
+      )}}`;
+      return http.post(file.uri, {
+        data: body,
+        headers: {
+          Authorization: `Bearer ${process.env.token}`,
+          'X-RequestDigest': formDigestValue,
+          'content-type': 'application/json;odata=verbose',
+          // 'content-length': body.length,
+          'IF-MATCH': '*',
+          'X-HTTP-Method': 'MERGE',
+        },
+      });
+    });
 };
 
 ///通过附件名称获取附件

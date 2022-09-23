@@ -64,6 +64,7 @@ const index = (props: any) => {
     formService.getTableDataAll('Tag', []).then((res) => {
       setTagData(res);
       setShowTags(res);
+      console.log(res);
     });
   };
 
@@ -230,7 +231,7 @@ const index = (props: any) => {
                       className="partProWrapItem"
                       key={index}
                       onClick={() => {
-                        window.location.href = `${process.env.pagePath}/newsDetail/index?news=${index}`;
+                        window.location.href = `${process.env.pagePath}/newsDetail/index?news=${item.key}`;
                       }}
                     >
                       <img src={item.BacImg} alt="" />
@@ -259,7 +260,7 @@ const index = (props: any) => {
                       className="partpro"
                       key={index}
                       onClick={() => {
-                        window.location.href = `${process.env.pagePath}/readIT/index?Tag=${index}`;
+                        window.location.href = `${process.env.pagePath}/readIT/index?Tag=${item.Title}`;
                       }}
                     >
                       {item.Title}
@@ -332,10 +333,10 @@ const index = (props: any) => {
             </div>
           </div>
           <div className="partRight">
-            <div className="partTitle">Chatbot</div>
+            <div className="partTitle">New Feature</div>
             <div className="partbox">
               <div className="part2">
-                <div className="qaInfoArticle">
+                {/* <div className="qaInfoArticle">
                   <img
                     className="robotName"
                     src={require('@/assets/images/robot1.png')}
@@ -360,6 +361,13 @@ const index = (props: any) => {
                       <img src={require('@/assets/images/send.png')} alt="" />
                     </div>
                   </div>
+                </div> */}
+                <div className="qaInfoArticle">
+                  <div className="titletwrap">
+                    <div className="title1">Under Development</div>
+                    <div className="title2">Stay Tuned...</div>
+                  </div>
+                  <img src={require('@/assets/images/NewFeature.png')} alt="" />
                 </div>
               </div>
             </div>

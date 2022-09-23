@@ -20,6 +20,10 @@
 //   background-color: #65ac1e;
 //   border-radius: 10px;
 // }
+// @font-face {
+//   font-family: "iconfont";
+//   src: url('./Alibaba-PuHuiTi-Bold.ttf');
+// }
 * {
   moz-user-select: -moz-none;
 
@@ -35,6 +39,7 @@
 
   user-select: none;
 }
+
 .Nodata {
   width: 500px;
   margin: 0 auto;
@@ -54,6 +59,7 @@ body {
   background-color: #efefef;
   padding-top: 70px;
   position: relative;
+  font-family: iconfont;
 }
 .spinGroup {
   position: absolute;
@@ -283,21 +289,19 @@ body {
                 font-family: Alibaba PuHuiTi;
                 font-weight: bold;
                 color: #ffffff;
-                line-height: 21px;
+
                 margin-bottom: 21px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
-                height: 42px;
               }
               .partProWrapItemTitleDate {
                 font-size: 16px;
                 font-family: Alibaba;
                 font-weight: normal;
                 color: #ffffff;
-                line-height: 21px;
               }
             }
           }
@@ -307,6 +311,7 @@ body {
         .partProWrap {
           display: flex;
           flex-wrap: wrap;
+          margin-bottom: 40px;
           .partProWrapItem {
             width: 49%;
             margin-right: 2%;
@@ -508,94 +513,122 @@ body {
           }
         }
         .part2 {
-          padding: 14px;
+          // padding: 14px;
           width: 100%;
-          height: 376px;
+          // height: 376px;
           // .qaInfo {
           //   background: #ffffff;
           //   box-shadow: 0px 4px 28px 0px rgba(0, 0, 0, 0.2);
+          // .qaInfoArticle {
+          //   position: relative;
+          //   .robotName {
+          //     position: absolute;
+          //     left: -60px;
+          //     top: 0;
+          //     width: 100px;
+          //   }
+          //   padding: 20px;
+          //   .qaInfoTime {
+          //     text-align: center;
+          //   }
+          //   .conversation {
+          //     display: flex;
+          //     align-items: center;
+          //     margin-bottom: 20px;
+          //     &.conversationMe {
+          //       flex-direction: row-reverse;
+          //       .conversationInfo {
+          //         &::before {
+          //           right: -20px;
+          //           border-right: 10px solid transparent;
+          //           border-left: 10px solid rgba(101, 172, 30, 0.08);
+          //           border-top: 10px solid transparent;
+          //           border-bottom: 10px solid transparent;
+          //         }
+          //         background: rgba(101, 172, 30, 0.08);
+          //         border-radius: 21px;
+          //         color: #65ac1e;
+          //       }
+          //     }
+          //     &.conversationYou {
+          //       .conversationInfo {
+          //         &::before {
+          //           left: -20px;
+          //           border-right: 10px solid #efefef;
+          //           border-left: 10px solid transparent;
+          //           border-top: 10px solid transparent;
+          //           border-bottom: 10px solid transparent;
+          //         }
+          //       }
+          //     }
+          //     .conversationInfo {
+          //       flex: 1;
+          //       padding: 12px;
+          //       font-size: 16px;
+          //       font-family: Alibaba;
+          //       font-weight: normal;
+          //       color: #000000;
+          //       background-color: #efefef;
+          //       position: relative;
+          //       margin-left: 30px;
+          //       &::before {
+          //         content: '';
+          //         position: absolute;
+          //         top: 30px;
+          //         width: 0;
+          //         height: 0;
+          //       }
+          //     }
+          //   }
+          //   .conversationEnter {
+          //     textarea {
+          //       width: 100%;
+          //       resize: none;
+          //       border: none;
+          //       outline: none;
+          //       height: 70px;
+          //       border-top: 1px solid #efefef;
+          //       &::placeholder {
+          //         font-size: 16px;
+          //         font-family: Alibaba;
+          //         font-weight: normal;
+          //         color: #dbdada;
+          //       }
+          //     }
+          //     div {
+          //       text-align: right;
+          //     }
+          //   }
+          // }
+          // }
           .qaInfoArticle {
             position: relative;
-            .robotName {
+            .titletwrap {
               position: absolute;
-              left: -60px;
+              left: 0;
               top: 0;
-              width: 100px;
-            }
-            padding: 20px;
-            .qaInfoTime {
-              text-align: center;
-            }
-            .conversation {
-              display: flex;
-              align-items: center;
-              margin-bottom: 20px;
-              &.conversationMe {
-                flex-direction: row-reverse;
-                .conversationInfo {
-                  &::before {
-                    right: -20px;
-                    border-right: 10px solid transparent;
-                    border-left: 10px solid rgba(101, 172, 30, 0.08);
-                    border-top: 10px solid transparent;
-                    border-bottom: 10px solid transparent;
-                  }
-                  background: rgba(101, 172, 30, 0.08);
-                  border-radius: 21px;
-                  color: #65ac1e;
-                }
+              width: 100%;
+              height: 100%;
+              padding: 33px;
+              .title1 {
+                font-size: 26px;
+                font-family: Alibaba PuHuiTi;
+                font-weight: bold;
+                font-style: italic;
+                color: #df9e38;
               }
-              &.conversationYou {
-                .conversationInfo {
-                  &::before {
-                    left: -20px;
-                    border-right: 10px solid #efefef;
-                    border-left: 10px solid transparent;
-                    border-top: 10px solid transparent;
-                    border-bottom: 10px solid transparent;
-                  }
-                }
-              }
-              .conversationInfo {
-                flex: 1;
-                padding: 12px;
+              .title2 {
                 font-size: 16px;
-                font-family: Alibaba;
-                font-weight: normal;
-                color: #000000;
-                background-color: #efefef;
-                position: relative;
-                margin-left: 30px;
-                &::before {
-                  content: '';
-                  position: absolute;
-                  top: 30px;
-                  width: 0;
-                  height: 0;
-                }
+                font-family: Alibaba PuHuiTi;
+                font-weight: 400;
+                color: #999999;
+                line-height: 50px;
               }
             }
-            .conversationEnter {
-              textarea {
-                width: 100%;
-                resize: none;
-                border: none;
-                outline: none;
-                height: 70px;
-                border-top: 1px solid #efefef;
-                &::placeholder {
-                  font-size: 16px;
-                  font-family: Alibaba;
-                  font-weight: normal;
-                  color: #dbdada;
-                }
-              }
-              div {
-                text-align: right;
-              }
+            img {
+              width: 100%;
             }
           }
-          // }
         }
       }
     }
@@ -760,9 +793,9 @@ body {
                 font-family: Alibaba;
                 font-weight: normal;
                 color: #ffffff;
-                line-height: 21px;
+
                 margin-bottom: 20px;
-                height: 40px;
+
                 overflow: hidden;
                 text-overflow: ellipsis;
                 display: -webkit-box;
@@ -771,7 +804,7 @@ body {
               }
               .partProWrapItemTitleDate {
                 font-size: 16px;
-                line-height: 16px;
+
                 font-family: Alibaba;
                 font-weight: normal;
                 color: #ffffff;
@@ -779,7 +812,7 @@ body {
                 opacity: 0.6;
               }
               .ProTag {
-                display: inline-block;
+                word-break: break-all;
                 border-radius: 3px;
                 font-style: italic;
                 font-size: 14px;
@@ -787,7 +820,7 @@ body {
                 font-weight: normal;
                 color: #ffffff;
                 opacity: 0.8;
-                line-height: 16px;
+                // line-height: 16px;
                 padding: 5px;
               }
             }
@@ -1320,7 +1353,7 @@ body {
                   opacity: 0.6;
                 }
                 .ProTag {
-                  display: inline-block;
+                  word-break: break-all;
                   border-radius: 3px;
                   font-style: italic;
                   font-size: 14px;
@@ -1657,6 +1690,9 @@ body {
   }
   .newsDetailbody {
     margin-top: 100px;
+    // .bgimg{
+    //   width: 100%;
+    // }
     .content {
       background-color: #ffffff;
       max-width: 1500px;
@@ -1695,6 +1731,33 @@ body {
             width: 16px;
             height: 16px;
             margin-right: 6px;
+          }
+        }
+      }
+      .tags {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        div {
+          height: 30px;
+          background-color: rgba(68, 68, 68, 0.06);
+          border-radius: 2px;
+          font-size: 14px;
+          font-family: Alibaba PuHuiTi;
+          font-weight: 400;
+          margin: 10px 10px 10px 0;
+          text-align: center;
+          line-height: 30px;
+          padding: 0 10px;
+          cursor: pointer;
+          &:nth-child(n + 1) {
+            color: #65ac1e;
+          }
+          &:nth-child(2n + 2) {
+            color: #21a0d2;
+          }
+          &:nth-child(3n + 3) {
+            color: #f39500;
           }
         }
       }

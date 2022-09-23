@@ -62,6 +62,16 @@ export default class FormService {
     return this._spService.updateItem(listName, id, item, token);
   }
 
+  // TODO上传图片
+  upImage(listName: string, id: number, file: any, arrayBuffer: any) {
+    let token = this._getToken();
+    return this._spService.upImage(listName, id, file, arrayBuffer, token);
+  }
+  upImageValidateUpdateListItem(res: any, id: any) {
+    let token = this._getToken();
+    return this._spService.upImageValidateUpdateListItem(res, token, id);
+  }
+
   submitBizForm(
     listName: string,
     item: any,

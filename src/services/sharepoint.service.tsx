@@ -750,6 +750,58 @@ export default class SharepointService {
       });
   }
 
+  // TODO上传图片
+
+  upImage(
+    listName: string,
+    id: number,
+    file: any,
+    arrayBuffer: any,
+    token: any,
+  ) {
+    let url = `${process.env.host}${process.env.relativePath}/_api/web/UploadImage(listTitle=@a1,imageName=@a2,listId=@a3,itemId=@a4,fieldId=@a5)?@a1='${listName}'&@a2='${file.file.name}'&@a3='${process.env.listId}'&@a4=${id}&@a5='${process.env.fieldId}'`;
+    return this._http
+      .post(url, {
+        headers: {
+          accept: 'application/json;odata=verbose',
+          Authorization: `Bearer ${token}`,
+          'content-type': 'application/json;odata=verbose',
+          'X-RequestDigest': this.formDigestValue,
+        },
+        data: arrayBuffer,
+      })
+      .then((response: any) => {
+        return response;
+      });
+  }
+
+  upImageValidateUpdateListItem(res: any, token: any, id: any) {
+    let url = `${process.env.host}${process.env.relativePath}/_api/web/GetList(@a1)/items(@a2)/ValidateUpdateListItem()?@a1=%27%2Fsites%2FGate2Digital%2FLists%2FNews%27&@a2=%27${id}%27`;
+    return this._http
+      .post(url, {
+        headers: {
+          accept: 'application/json;odata=verbose',
+          Authorization: `Bearer ${token}`,
+          'content-type': 'application/json;odata=verbose',
+          'X-RequestDigest': this.formDigestValue,
+        },
+        data: {
+          bNewDocumentUpdate: false,
+          checkInComment: null,
+          formValues: [
+            {
+              FieldName: 'DisplayImage',
+              FieldValue: `{\"type\":\"thumbnail\",\"fileName\":\"${res.data.d.UploadImage.Name}\",\"nativeFile\":{},\"fieldName\":\"DisplayImage\",\"serverUrl\":\"${process.env.host}\",\"fieldId\":\"${process.env.fieldId}\",\"serverRelativeUrl\":\"${res.data.d.UploadImage.ServerRelativeUrl}\",\"id\":\"${res.data.d.UploadImage.UniqueId}\"}`,
+              HasException: false,
+            },
+          ],
+        },
+      })
+      .then((response: any) => {
+        return response;
+      });
+  }
+
   // TODO
   updateLibItem(
     listName: string,

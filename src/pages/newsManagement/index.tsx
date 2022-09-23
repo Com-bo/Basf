@@ -22,12 +22,12 @@ const { Search } = Input;
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import ImgCrop from 'antd-img-crop';
 import 'antd/es/modal/style';
+import HttpService from '@/common/http.service';
 
 import BraftEditor from 'braft-editor';
 import 'braft-editor/dist/index.css';
 
 import type { MenuProps, MenuTheme, PaginationProps } from 'antd';
-type MenuItem = Required<MenuProps>['items'][number];
 import SpService from '@/services/sharepoint.service';
 import moment from 'moment';
 import BasfHeader from '@/components/Header';
@@ -55,9 +55,8 @@ import {
   TagOutlined,
 } from '@ant-design/icons';
 
-const index = (props: any) => {
+const index = () => {
   const formService = new FormService();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [rawData, setRawData] = useState<any>([]);
   const [newData, setNewData] = useState<any>([]);
   const listName = 'News';
@@ -76,22 +75,13 @@ const index = (props: any) => {
   const [totals, setTotals] = useState(0);
   const [showIsmainTainNews, setShowIsmainTainNews] = useState<any>([]);
   const [form] = Form.useForm();
-  const imgprops = {
-    width: 500, //裁剪宽度
-    height: 300, //裁剪高度
-    resize: false, //裁剪是否可以调整大小
-    resizeAndDrag: true, //裁剪是否可以调整大小、可拖动
-    modalTitle: '上传图片', //弹窗标题
-    modalWidth: 600, //弹窗宽度
-  };
 
+  // 上传附件
   const [file, setFile] = useState<any>();
   const [isCanUpload, setCanUpload] = useState(true);
-  // 设定【上传控件 - 属性】
   const uploadProps = {
     onChange() {
       let _listFile = form.getFieldValue('UploadFile');
-      // 只能上传一个文件
       if (!_listFile || _listFile.fileList <= 0) {
         setCanUpload(true);
       } else {
@@ -99,12 +89,36 @@ const index = (props: any) => {
       }
     },
   };
+  // 上传图片
+  // const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<any>();
+  const uploadFile = async (id: any) => {
+    console.log(fileList, id);
+    let reader = new FileReader();
+    let arrayBuffer = await new Promise(
+      (resolve: (e: any) => void, reject: (e: any) => void) => {
+        reader.onloadend = function (e: any) {
+          resolve(e.target.result);
+        };
+        reader.onerror = function (e: any) {
+          reject(e.target.error);
+        };
+        reader.readAsArrayBuffer(fileList.file.originFileObj);
+      },
+    );
+
+    return formService
+      .upImage(listName, id, fileList, arrayBuffer)
+      .then((res) => {
+        formService.upImageValidateUpdateListItem(res, id);
+      });
+  };
 
   //获取新闻信息
   const queryNewData = () => {
     setLoading(true);
     formService.getTableDataAll('News', []).then((res) => {
-      console.log(res);
+      // console.log(res);
       res.sort(function (a: any, b: any) {
         return a.PublishDate < b.PublishDate ? 1 : -1;
       });
@@ -119,7 +133,7 @@ const index = (props: any) => {
       setRawData(res);
       setTotals(res.length);
       queryMainTain(res);
-      console.log(res);
+      // console.log(res);
       setLoading(false);
     });
   };
@@ -177,7 +191,7 @@ const index = (props: any) => {
       dataIndex: 'action',
       key: 'action',
       width: '20%',
-      render: (text: any, record: any, index: any) => {
+      render: (text: any, record: any) => {
         return (
           <>
             <Space className="actions">
@@ -228,38 +242,13 @@ const index = (props: any) => {
 
   const onShowSizeChange: PaginationProps['onShowSizeChange'] = (
     current: any,
-    pageSize: any,
   ) => {
     setCurrent(current);
-  };
-
-  const onChangeDisplayImage: UploadProps['onChange'] = ({
-    fileList: newFileList,
-  }) => {
-    console.log(newFileList);
-    setFileList(newFileList);
-  };
-
-  const onPreviewDisplayImage = async (file: UploadFile) => {
-    let src = file.url as string;
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj as RcFile);
-        reader.onload = () => resolve(reader.result as string);
-      });
-    }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
   };
 
   const saveData = () => {
     form.validateFields().then(async () => {
       var key = form.getFieldValue('key');
-      var fileName = '';
-      var expandItems = ['FileLeafRef'];
       if (key) {
         formService
           .updateItem(listName, key, {
@@ -270,22 +259,26 @@ const index = (props: any) => {
             Content: form.getFieldValue('Content').toHTML(),
             Tag: form.getFieldValue('Tag').join(','),
           })
-          .then((res) => {
+          .then(() => {
             let NewsId = key;
-            uploadFileFun(
-              file.name,
-              listFilesName,
-              file,
-              process.env.taskRelativePath,
-            ).then((res) => {
-              getonFileByUrl(res.d.ListItemAllFields.__deferred.uri).then(
-                (res) => {
-                  updateFileItem(res, {
-                    NewsId: NewsId,
-                  }).then((res) => {});
-                },
-              );
-            });
+            uploadFile(NewsId);
+
+            if (file != undefined) {
+              uploadFileFun(
+                file.name,
+                listFilesName,
+                file,
+                process.env.taskRelativePath,
+              ).then((res) => {
+                getonFileByUrl(res.d.ListItemAllFields.__deferred.uri).then(
+                  (res) => {
+                    updateFileItem(res, {
+                      NewsId: NewsId,
+                    }).then(() => {});
+                  },
+                );
+              });
+            }
             Successfuloperation();
           });
       } else {
@@ -300,26 +293,32 @@ const index = (props: any) => {
           })
           .then((res) => {
             let NewsId = res.ID;
-            uploadFileFun(
-              file.name,
-              listFilesName,
-              file,
-              process.env.taskRelativePath,
-            ).then((res) => {
-              getonFileByUrl(res.d.ListItemAllFields.__deferred.uri).then(
-                (res) => {
-                  updateFileItem(res, {
-                    NewsId: NewsId,
-                  }).then((res) => {});
-                },
-              );
-            });
+            uploadFile(NewsId);
+
+            console.log(file);
+
+            if (file != undefined) {
+              uploadFileFun(
+                file.name,
+                listFilesName,
+                file,
+                process.env.taskRelativePath,
+              ).then((res) => {
+                getonFileByUrl(res.d.ListItemAllFields.__deferred.uri).then(
+                  (res) => {
+                    updateFileItem(res, {
+                      NewsId: NewsId,
+                    }).then(() => {});
+                  },
+                );
+              });
+            }
             Successfuloperation();
           });
       }
     });
   };
-  const handleChangeBraftEditor = (val: any) => {};
+  const handleChangeBraftEditor = () => {};
 
   useEffect(() => {
     queryNewData();
@@ -411,8 +410,8 @@ const index = (props: any) => {
               >
                 <DatePicker
                   disabled={componentDisabled}
-                  picker="month"
-                  format="YYYY-MM-DD"
+                  showTime
+                  format="YYYY-MM-DD HH:mm"
                   style={{ width: '100%' }}
                 />
               </Form.Item>
@@ -441,7 +440,7 @@ const index = (props: any) => {
             </Col>
             <Col span={24}>
               <Form.Item name="BacImg" label="Display Image">
-                <div style={{ minHeight: '122px' }}>
+                {/* <div style={{ minHeight: '122px' }}>
                   <ImgCrop {...imgprops}>
                     <Upload
                       listType="picture-card"
@@ -452,7 +451,14 @@ const index = (props: any) => {
                       {fileList.length < 1 && '+ Upload'}
                     </Upload>
                   </ImgCrop>
-                </div>
+                </div> */}
+                <Upload
+                  onChange={(file) => {
+                    setFileList(file);
+                  }}
+                >
+                  <Button>上传图片</Button>
+                </Upload>
               </Form.Item>
             </Col>
             <Col span={24}>

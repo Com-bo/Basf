@@ -257,7 +257,7 @@ const index = (props: any) => {
                       </div>
                     </div>
 
-                    <div className="modal">
+                    {/* <div className="modal">
                       <div className="modalitem">
                         <div>Title:</div>
                         <div>{item.Title}</div>
@@ -282,7 +282,7 @@ const index = (props: any) => {
                         <div>Description:</div>
                         <div>{item.Description}</div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 );
               })

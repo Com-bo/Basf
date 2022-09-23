@@ -48,13 +48,13 @@ export default defineConfig({
       path: `${pagePath}/EventManagement/index`,
       component: '@/pages/EventManagement/index',
     },
-    // {
-    //   path: `${pagePath}/DigitalAcademy/index`,
-    //   component: '@/pages/DigitalAcademy/index',
-    // },
-    // {
-    //   path: `${pagePath}/SolutionGallery/index`,
-    //   component: '@/pages/SolutionGallery/index',
-    // },
+    {
+      path: `${pagePath}/DigitalAcademy/index`,
+      component: '@/pages/DigitalAcademy/index',
+    },
+    {
+      path: `${pagePath}/SolutionGallery/index`,
+      component: '@/pages/SolutionGallery/index',
+    },
   ],
 });

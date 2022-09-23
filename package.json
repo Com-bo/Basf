@@ -3,6 +3,7 @@
   "scripts": {
     "start": "cross-env PORT=8001 UMI_ENV=dev umi dev",
     "dev": "cross-env UMI_ENV=dev umi build",
+    "uat": "cross-env UMI_ENV=uat umi build",
     "test": "cross-env UMI_ENV=test umi build",
     "build": "umi build",
     "postinstall": "umi generate tmp",
