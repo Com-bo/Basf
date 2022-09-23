@@ -84,7 +84,7 @@ const index = (props: any) => {
     setCheckedTagValues(checkedValues);
   };
   const isRepeat = (arr: any) => {
-    var hash = {};
+    var hash = [];
     for (var i in arr) {
       if (hash[arr[i]]) {
         return true;
@@ -103,7 +103,11 @@ const index = (props: any) => {
         setShowNews(
           newData
             // .filter((x: any) => checkedTagValues.indexOf(x.Tag) >= 0)
-            .filter((x: any) => checkedTagValues.indexOf(x.Tag) >= 0)
+            .filter((x: any) => {
+              var a = checkedTagValues.concat(x.Tag.split(','));
+              //  checkedTagValues.indexOf(x.Tag) >= 0
+              isRepeat(a);
+            })
             .filter((y: any) => y.Title.indexOf(seachTitleStr) >= 0),
         );
       } else {
